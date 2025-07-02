@@ -1,0 +1,53 @@
+<div class="admin-albums">
+
+  <h2>🎞️ Gestion des albums</h2>
+
+  <form [formGroup]="albumForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data" class="form">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom de l'album</mat-label>
+      <input matInput formControlName="nom" required />
+    </mat-form-field>
+
+    <input type="file" multiple (change)="onFilesSelected($event)" accept="image/*" />
+
+    <button mat-raised-button color="primary" type="submit">
+      {{ isEditing ? 'Modifier' : 'Ajouter' }}
+    </button>
+  </form>
+
+  <mat-form-field appearance="fill" class="search-bar">
+    <mat-label>Rechercher</mat-label>
+    <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom de l'album" />
+  </mat-form-field>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 album-table">
+    <ng-container matColumnDef="nom">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+      <td mat-cell *matCellDef="let a">{{ a.nom }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="media">
+      <th mat-header-cell *matHeaderCellDef>Images</th>
+      <td mat-cell *matCellDef="let a">
+        <div class="album-images">
+          <img *ngFor="let img of a.media" [src]="toBase64(img)" />
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let a">
+        <button mat-icon-button color="accent" (click)="editAlbum(a)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteAlbum(a.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

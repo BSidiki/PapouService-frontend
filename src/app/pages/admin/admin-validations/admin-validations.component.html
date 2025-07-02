@@ -1,0 +1,36 @@
+<div class="validations-container">
+  <h2>🔎 Validations de transactions</h2>
+
+  <mat-form-field appearance="fill" class="filter-select">
+    <mat-label>Type de transaction</mat-label>
+    <mat-select [(ngModel)]="filter" (selectionChange)="onFilterChange()">
+      <mat-option value="DEPOT">Dépôts</mat-option>
+      <mat-option value="RETRAIT">Retraits</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div *ngIf="loading">Chargement...</div>
+
+  <div *ngIf="transactions.length === 0 && !loading">
+    Aucune transaction à valider.
+  </div>
+
+  <mat-card *ngFor="let t of transactions" class="transaction-card">
+    <div><strong>Nom :</strong> {{ t.utilisateur?.prenomUtilisateur }} {{ t.utilisateur?.nomUtilisateur }}</div>
+    <div><strong>Montant :</strong> {{ t.montant | number:'1.0-0' }} FCFA</div>
+    <div><strong>Numéro :</strong> {{ t.numeroEnvoyant }}</div>
+    <div><strong>Date :</strong> {{ t.dateDepot || t.dateRetrait | date:'medium' }}</div>
+    <div><strong>Option :</strong> {{ t.optionDeTransaction }}</div>
+
+    <img *ngIf="t.file" [src]="toBase64(t.file)" alt="Capture" width="180" style="margin: 10px 0;" />
+
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="validerTransaction(t.idDepot || t.idRetrait)">
+        ✅ Valider
+      </button>
+      <button mat-stroked-button color="accent" (click)="voirDetails(t)">
+        🔎 Voir détails
+      </button>
+    </div>
+  </mat-card>
+</div>

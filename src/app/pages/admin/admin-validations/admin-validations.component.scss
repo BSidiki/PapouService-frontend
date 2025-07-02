@@ -1,0 +1,32 @@
+.validations-container {
+  padding: 1.5rem;
+
+  h2 {
+    color: #1976d2;
+    margin-bottom: 1rem;
+  }
+
+  .filter-select {
+    max-width: 300px;
+    margin-bottom: 1rem;
+  }
+
+  .transaction-card {
+    background: #f9f9f9;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #1976d2;
+
+    img {
+      border-radius: 4px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .actions {
+      margin-top: 1rem;
+      display: flex;
+      gap: 1rem;
+    }
+  }
+}

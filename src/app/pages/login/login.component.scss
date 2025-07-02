@@ -1,0 +1,82 @@
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  min-height: 80vh;
+  background: #f1f5f9;
+
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    background: white;
+
+    h2 {
+      margin-bottom: 1.5rem;
+      text-align: center;
+      color: #1976d2;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+
+      .logo-img {
+        width: 150px;
+        height: auto;
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #1976d2;
+    }
+
+    .error-message {
+      color: #e53935;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 1rem;
+
+      a {
+        color: #1976d2;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 1rem;
+
+    .login-card {
+      padding: 1.5rem;
+    }
+  }
+  ::ng-deep .mat-progress-spinner circle {
+    stroke-width: 4px;
+  }
+  ::ng-deep .mat-progress-spinner {
+    width: 40px;
+    height: 40px;
+  }
+}

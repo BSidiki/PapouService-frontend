@@ -1,0 +1,31 @@
+<div class="historique-container">
+  <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
+    ⬅️ Retour à la liste
+  </button>
+
+  <h2 class="img-text">📜 Historique des transactions du client
+    <span class="logo" routerLink="/accueil">
+      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="50"/>
+    </span>
+  </h2>
+
+  <mat-form-field appearance="fill" class="filter-select">
+    <mat-label>Filtrer par type</mat-label>
+    <mat-select [(ngModel)]="filterType" (selectionChange)="applyFilter()">
+      <mat-option value="ALL">Tous</mat-option>
+      <mat-option value="DEPOT">Dépôts</mat-option>
+      <mat-option value="RETRAIT">Retraits</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div *ngIf="filtered.length === 0">Aucun résultat pour ce filtre.</div>
+
+  <mat-card *ngFor="let item of filtered" class="historique-card" (click)="voirDetails(item)">
+    <div><strong>Type :</strong> {{ item.transaction }}</div>
+    <div><strong>ID :</strong> {{ item.id_transaction }}</div>
+    <div *ngIf="item.utilisateur">
+      <strong>Utilisateur :</strong> {{ item.utilisateur.prenomUtilisateur }} {{ item.utilisateur.nomUtilisateur }}
+    </div>
+    <div class="link-text">🔎 Voir les détails</div>
+  </mat-card>
+</div>

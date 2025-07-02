@@ -1,0 +1,31 @@
+.transactions-container {
+  padding: 2rem;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: #1976d2;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .search-bar {
+      flex: 1;
+      min-width: 250px;
+    }
+  }
+
+  table {
+    width: 100%;
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  ::ng-deep .mat-form-field {
+    min-width: 200px;
+  }
+}

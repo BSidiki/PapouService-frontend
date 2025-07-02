@@ -1,0 +1,34 @@
+<mat-card *ngIf="retrait" class="retrait-detail-card">
+  <div class="retrait-header">
+    <h2>Détail du retrait</h2>
+    <p class="montant">{{ retrait.montant | number }} FCFA</p>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="retrait-infos">
+    <p><strong>📞 Numéro envoyant :</strong> {{ retrait.numeroEnvoyant }}</p>
+    <p><strong>🌍 Pays :</strong> {{ retrait.pays }}</p>
+    <p><strong>💳 Option :</strong> {{ retrait.optionRetrait }}</p>
+    <p><strong>🔑 Code Retrait :</strong> {{ retrait.codeRetrait }}</p>
+    <p><strong>🏦 Transaction :</strong> {{ retrait.optionDeTransaction }}</p>
+    <p><strong>📅 Date :</strong> {{ retrait.dateRetrait | date:'dd/MM/yyyy - HH:mm' }}</p>
+  </div>
+
+  <div *ngIf="retrait.file" class="retrait-capture">
+    <p><strong>🖼️ Preuve de retrait :</strong></p>
+    <a [href]="toBase64(retrait.file)" target="_blank">
+      <img [src]="toBase64(retrait.file)" alt="Preuve de retrait" />
+    </a>
+  </div>
+
+  <div class="btn-retour">
+    <button mat-stroked-button color="primary" (click)="goBack()">
+      ⬅️ Retour à l’historique
+    </button>
+  </div>
+</mat-card>
+
+<div class="retrait-detail-card empty" *ngIf="!retrait">
+  <p>Aucun retrait trouvé.</p>
+</div>

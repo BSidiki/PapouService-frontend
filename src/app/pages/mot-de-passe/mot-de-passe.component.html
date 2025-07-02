@@ -1,0 +1,28 @@
+<mat-card class="password-card">
+  <span class="logo" routerLink="/accueil">
+    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
+  </span>
+  <h2>🔒 Changer mon mot de passe</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Ancien mot de passe</mat-label>
+      <input matInput type="password" [(ngModel)]="form.ancienMotDePasse" name="ancienMotDePasse" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Nouveau mot de passe</mat-label>
+      <input matInput type="password" [(ngModel)]="form.nouveauMotDePasse" name="nouveauMotDePasse" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Confirmer le mot de passe</mat-label>
+      <input matInput type="password" [(ngModel)]="form.confirmation" name="confirmation" required>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Mettre à jour</button>
+  </form>
+
+  <p class="success" *ngIf="message">{{ message }}</p>
+  <p class="error" *ngIf="error">{{ error }}</p>
+</mat-card>

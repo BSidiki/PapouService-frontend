@@ -1,0 +1,46 @@
+<app-header-public></app-header-public>
+
+<mat-card class="contact-card">
+  <span class="logo" routerLink="/accueil">
+    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
+  </span>
+  <h2>📨 Contactez-nous</h2>
+
+  <div class="contact-options">
+    <a href="tel:+22662054327">
+      <mat-icon>call</mat-icon> Appeler
+    </a>
+    <a href="mailto:contact@papouservice.com">
+      <mat-icon>email</mat-icon> Email
+    </a>
+    <a href="https://wa.me/22662054327" target="_blank" rel="noopener">
+      <mat-icon>chat</mat-icon> WhatsApp
+    </a>
+    <a href="https://m.me/papouservice" target="_blank" rel="noopener">
+      <mat-icon>message</mat-icon> Messenger
+    </a>
+  </div>
+
+  <form (ngSubmit)="envoyer()">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Votre nom</mat-label>
+      <input matInput [(ngModel)]="contact.nom" name="nom" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" [(ngModel)]="contact.email" name="email" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Message</mat-label>
+      <textarea matInput rows="5" [(ngModel)]="contact.message" name="message" required></textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Envoyer</button>
+  </form>
+
+  <p *ngIf="messageEnvoye" class="success-message">
+    ✅ Message envoyé. Merci pour votre contact !
+  </p>
+</mat-card>

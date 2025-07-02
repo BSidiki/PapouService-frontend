@@ -1,0 +1,43 @@
+.admin-albums {
+  padding: 2rem;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: #1976d2;
+  }
+
+  .form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: flex-end;
+
+    mat-form-field {
+      flex: 1 1 250px;
+    }
+  }
+
+  .search-bar {
+    margin: 1rem 0;
+    width: 300px;
+  }
+
+  .album-table {
+    width: 100%;
+  }
+
+  .album-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+  }
+}

@@ -1,0 +1,145 @@
+    <mat-sidenav-container class="sidenav-container">
+      <mat-sidenav
+        #drawer
+        [mode]="isMobile ? 'over' : 'side'"
+        [opened]="!isMobile"
+        class="sidenav"
+        fixedInViewport
+      >
+        <mat-toolbar color="primary">
+          {{ user?.prenomUtilisateur }} {{ user?.nomUtilisateur }}
+        </mat-toolbar>
+
+        <mat-nav-list>
+          <span class="logo" routerLink="/accueil">
+            <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="100" height="100"/>
+          </span>
+          <ng-container [ngSwitch]="role">
+            <ng-container *ngSwitchCase="'ADMIN'">
+              <a
+                mat-list-item
+                routerLink="/admin/dashboard"
+                [class.active]="isActive('/admin/dashboard')"
+                (click)="navigate(drawer, '/admin/dashboard')"
+              >
+                🏠 Dashboard
+              </a>
+              <a
+                mat-list-item
+                routerLink="/admin/clients"
+                [class.active]="isActive('/admin/clients')"
+                (click)="navigate(drawer, '/admin/clients')"
+              >
+                👥 Clients
+              </a>
+              <a
+                mat-list-item
+                routerLink="/admin/transactions"
+                [class.active]="isActive('/admin/transactions')"
+                (click)="navigate(drawer, '/admin/transactions')"
+              >
+                💼 Transactions
+              </a>
+              <a
+                mat-list-item
+                routerLink="/admin/administrateurs"
+                [class.active]="isActive('/admin/administrateurs')"
+                (click)="navigate(drawer, '/admin/administrateurs')"
+              >
+                ➕ Administrateurs
+              </a>
+              <a
+                mat-list-item
+                routerLink="/admin/annonces"
+                [class.active]="isActive('/admin/annonces')"
+                (click)="navigate(drawer, '/admin/annonces')"
+              >
+                ➕ Annonces
+              </a>
+              <!-- <a
+                mat-list-item
+                routerLink="/admin/albums"
+                [class.active]="isActive('/admin/albums')"
+                (click)="navigate(drawer, '/admin/albums')"
+              >
+                ➕ Albums
+              </a> -->
+              <a
+                mat-list-item
+                routerLink="/admin/pubs"
+                [class.active]="isActive('/admin/pubs')"
+                (click)="navigate(drawer, '/admin/pubs')"
+              >
+                ➕ Pubs
+              </a>
+              <a
+                mat-list-item
+                routerLink="/admin/mot-de-passe"
+                [class.active]="isActive('/admin/mot-de-passe')"
+                (click)="navigate(drawer, '/admin/mot-de-passe')"
+              >
+                🔒 Changer mot de passe
+              </a>
+            </ng-container>
+
+            <ng-container *ngSwitchCase="'USER'">
+              <a
+                mat-list-item
+                routerLink="/user/profil"
+                [class.active]="isActive('/user/profil')"
+                (click)="navigate(drawer, '/user/profil')"
+              >
+                👤 Mon profil
+              </a>
+              <a
+                mat-list-item
+                routerLink="/user/depot"
+                [class.active]="isActive('/user/depot')"
+                (click)="navigate(drawer, '/user/depot')"
+              >
+                💵 Faire un Dépôt
+              </a>
+              <a
+                mat-list-item
+                routerLink="/user/retrait"
+                [class.active]="isActive('/user/retrait')"
+                (click)="navigate(drawer, '/user/retrait')"
+              >
+                💵 Faire un Retrait
+              </a>
+              <a
+                mat-list-item
+                routerLink="/user/historique"
+                [class.active]="isActive('/user/historique')"
+                (click)="navigate(drawer, '/user/historique')"
+              >
+                📜 Historique
+              </a>
+              <a
+                mat-list-item
+                routerLink="/user/mot-de-passe"
+                [class.active]="isActive('/user/mot-de-passe')"
+                (click)="navigate(drawer, '/user/mot-de-passe')"
+              >
+                Changer mot de passe
+              </a>
+            </ng-container>
+          </ng-container>
+
+          <a mat-list-item (click)="logout()">Déconnexion</a>
+        </mat-nav-list>
+      </mat-sidenav>
+
+      <mat-sidenav-content>
+        <mat-toolbar color="primary">
+          <button mat-icon-button (click)="drawer.toggle()" *ngIf="isMobile">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <span class="toolbar-title">PapouService</span>
+        </mat-toolbar>
+
+        <div class="sidenav-content-body">
+          <router-outlet></router-outlet>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>

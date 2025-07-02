@@ -1,0 +1,49 @@
+.profil-container {
+  max-width: 650px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+  }
+
+  .profil-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  button {
+    align-self: center;
+    margin-top: 1rem;
+    width: fit-content;
+  }
+}
+.profil-avatar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+  }
+
+  .upload-button {
+    margin-top: 0.5rem;
+    width: fit-content;
+  }
+}

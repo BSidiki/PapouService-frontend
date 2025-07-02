@@ -1,0 +1,45 @@
+<mat-form-field appearance="fill" class="filter">
+  <mat-label>Filtrer par type</mat-label>
+  <mat-select [(ngModel)]="filter" (selectionChange)="applyFilter()">
+    <mat-option value="ALL">Tous</mat-option>
+    <mat-option value="DEPOT">Dépôts</mat-option>
+    <mat-option value="RETRAIT">Retraits</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<div *ngIf="filteredHistoriques.length === 0">Aucune transaction trouvée.</div>
+<mat-card
+  *ngFor="let item of filteredHistoriques"
+  class="transaction-card"
+  (click)="goToDetails(item)"
+  [ngClass]="{
+    'depot-card': item.transaction === 'DEPOT',
+    'retrait-card': item.transaction === 'RETRAIT'
+  }"
+>
+  <div class="transaction-header">
+    <span class="icon">
+      {{ item.transaction === 'DEPOT' ? '💸' : '💼' }}
+    </span>
+    <strong>{{ item.transaction }}</strong>
+  </div>
+
+  <div><strong>ID-TRANSACTION :</strong> N{{ item.id_transaction }}PS</div>
+
+  <div>
+    <strong>Montant :</strong>
+    {{ item.details?.montant || '---' }} FCFA
+  </div>
+
+  <div>
+    <strong>Numéro :</strong>
+    {{ item.details?.numeroEnvoyant || '---' }}
+  </div>
+
+  <div *ngIf="item.date">
+    <strong>Date :</strong>
+    {{ item.date | date: 'mediumDate' }}
+  </div>
+
+  <div class="link-text">📂 Voir les détails</div>
+</mat-card>

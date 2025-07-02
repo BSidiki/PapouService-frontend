@@ -1,0 +1,61 @@
+import { AuthService } from './../../../services/auth.service';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+
+@Component({
+  selector: 'app-profil',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule
+  ],
+  templateUrl: './profil.component.html',
+  styleUrls: ['./profil.component.scss']
+})
+export class ProfilComponent implements OnInit {
+  user: any = {};
+  afficherProfil = false;
+
+  constructor(private auth: AuthService, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.user = { ...this.auth.getUser() };
+  }
+
+  toggleAffichage() {
+    this.afficherProfil = !this.afficherProfil;
+  }
+
+  modifierProfil() {
+    const id = this.user.idUtilisateur;
+    let params = new HttpParams()
+      .set('nomUtilisateur', this.user.nomUtilisateur)
+      .set('prenomUtilisateur', this.user.prenomUtilisateur)
+      .set('numeroUtilisateur', this.user.numeroUtilisateur);
+
+    // Champs facultatifs si présents
+    if (this.user.id_1XBET) params = params.set('id_1XBET', this.user.id_1XBET);
+    if (this.user.id_BETWINNER) params = params.set('id_BETWINNER', this.user.id_BETWINNER);
+    if (this.user.id_MELBET) params = params.set('id_MELBET', this.user.id_MELBET);
+    if (this.user.id_1WIN) params = params.set('id_1WIN', this.user.id_1WIN);
+
+    this.http.put(`http://192.168.244.230:8080/utilisateurs/update/${id}`, null, { params }).subscribe({
+      next: (res: any) => {
+        alert('Profil mis à jour avec succès !');
+        this.auth.saveUser(res);
+      },
+      error: err => {
+        console.error(err);
+        alert('Erreur lors de la mise à jour du profil.');
+      }
+    });
+  }
+}

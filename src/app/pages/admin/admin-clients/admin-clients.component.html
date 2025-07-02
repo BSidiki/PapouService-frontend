@@ -1,0 +1,40 @@
+<div class="admin-clients">
+  <span class="logo" routerLink="/accueil">
+    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
+  </span>
+  <h2>👥 Liste des clients</h2>
+
+  <mat-form-field appearance="outline" class="search-bar">
+    <mat-label>Rechercher</mat-label>
+    <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom, Prénom ou Numéro">
+  </mat-form-field>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <ng-container matColumnDef="prenom">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Prénom</th>
+      <td mat-cell *matCellDef="let client">{{ client.prenomUtilisateur }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="nom">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+      <td mat-cell *matCellDef="let client">{{ client.nomUtilisateur }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Numéro</th>
+      <td mat-cell *matCellDef="let client">{{ client.numeroUtilisateur }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let client">
+        <button mat-button color="primary" (click)="voirProfil(client.idUtilisateur)">Profil</button>
+        <button mat-button color="accent" (click)="voirHistorique(client.idUtilisateur)">Historique</button>
+        <button mat-button color="warn" (click)="supprimer(client.idUtilisateur)">Supprimer</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

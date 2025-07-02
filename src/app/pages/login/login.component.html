@@ -1,0 +1,61 @@
+<app-header-public></app-header-public>
+
+<div class="login-page">
+  <mat-card class="login-card">
+    <span class="logo" routerLink="/accueil">
+      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
+    </span>
+    <h2>🔐 Connexion à votre compte</h2>
+
+    <form (ngSubmit)="onSubmit()">
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>📱 Numéro utilisateur</mat-label>
+        <input
+          matInput
+          [(ngModel)]="credentials.numeroUtilisateur"
+          name="numeroUtilisateur"
+          required
+          placeholder="Ex: +22670123456"
+        />
+      </mat-form-field>
+
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>🔑 Mot de passe</mat-label>
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          [(ngModel)]="credentials.password"
+          name="password"
+          required
+          placeholder="Votre mot de passe"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="togglePasswordVisibility()"
+        >
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="submit-btn" [disabled]="loading" type="submit">
+        <mat-progress-spinner
+          *ngIf="loading"
+          diameter="20"
+          mode="indeterminate"
+          color="accent"
+        ></mat-progress-spinner>
+        <span *ngIf="!loading">Se connecter</span>
+      </button>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+    </form>
+
+    <div class="login-footer">
+      <p>Pas encore de compte ? <a routerLink="/register">Créer un compte</a></p>
+    </div>
+  </mat-card>
+</div>

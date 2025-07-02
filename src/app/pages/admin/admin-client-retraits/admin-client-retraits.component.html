@@ -1,0 +1,23 @@
+
+<div class="retrait-container">
+  <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
+    ⬅️ Retour à la liste
+  </button>
+
+  <h2 class="img-text">💸 Retraits du client
+    <span class="logo" routerLink="/accueil">
+      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="50"/>
+    </span>
+  </h2>
+
+  <div *ngIf="retraits.length === 0">Aucun retrait trouvé.</div>
+
+  <mat-card *ngFor="let retrait of retraits" class="retrait-card" (click)="voirDetails(retrait.idRetrait)">
+    <div><strong>Montant :</strong> {{ retrait.montant | number:'1.0-0' }} FCFA</div>
+    <div><strong>Numéro :</strong> {{ retrait.numeroEnvoyant }}</div>
+    <div><strong>Pays :</strong> {{ retrait.pays }}</div>
+    <div><strong>Type :</strong> {{ retrait.optionDeTransaction }}</div>
+    <div><strong>Date :</strong> {{ retrait.dateRetrait | date:'medium' }}</div>
+    <div class="link-text">🔎 Voir le détail</div>
+  </mat-card>
+</div>

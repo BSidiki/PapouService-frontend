@@ -1,0 +1,34 @@
+<div class="admin-pubs">
+  <h2>📢 Gestion des publicités</h2>
+
+  <form (ngSubmit)="onSubmit()" [formGroup]="pubForm" enctype="multipart/form-data" class="form">
+    <input type="file" (change)="onFileSelected($event)" accept="image/*" required />
+    <button mat-raised-button color="primary" type="submit">
+      {{ isEditing ? 'Modifier' : 'Ajouter' }} la publicité
+    </button>
+  </form>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 pub-table">
+    <ng-container matColumnDef="fichier">
+      <th mat-header-cell *matHeaderCellDef>Image</th>
+      <td mat-cell *matCellDef="let pub">
+        <img *ngIf="pub.fichier" [src]="toBase64(pub.fichier)" class="pub-img" />
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let pub">
+        <button mat-icon-button color="accent" (click)="editPub(pub)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deletePub(pub.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>

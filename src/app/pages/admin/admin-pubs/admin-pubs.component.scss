@@ -1,0 +1,30 @@
+.admin-pubs {
+  padding: 2rem;
+
+  h2 {
+    margin-bottom: 1.5rem;
+    color: #1976d2;
+  }
+
+  .form {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .pub-table {
+    width: 100%;
+
+    .pub-img {
+      max-width: 150px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    th.mat-header-cell {
+      background-color: #1976d2;
+      color: white;
+    }
+  }
+}

@@ -1,0 +1,64 @@
+<div class="admin-dashboard">
+  <h2>📊 Dashboard Administrateur</h2>
+
+  <!-- Section Statistiques -->
+  <div class="stat-cards">
+    <mat-card class="stat-card primary">
+      <div>👥 Clients inscrits</div>
+      <div>{{ nombreClients }}</div>
+    </mat-card>
+
+    <mat-card class="stat-card accent">
+      <div>💰 Dépôts validés</div>
+      <div>{{ totalDepotsValides }}</div>
+    </mat-card>
+
+    <mat-card class="stat-card warn">
+      <div>💸 Retraits validés</div>
+      <div>{{ totalRetraitsValides }}</div>
+    </mat-card>
+  </div>
+
+  <!-- Section Graphique -->
+  <div class="chart-section">
+    <h3>📊 Montants Dépôts vs Retraits</h3>
+    <canvas baseChart
+            [data]="donutChartData"
+            [type]="'doughnut'">
+    </canvas>
+  </div>
+
+  <!-- Section Transactions récentes -->
+  <div class="table-section">
+    <h3>📄 Transactions récentes</h3>
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 clickable-table">
+
+      <!-- Type -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+        <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+      </ng-container>
+
+      <!-- Montant -->
+      <ng-container matColumnDef="montant">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant </th>
+        <td mat-cell *matCellDef="let element"> {{element.montant | number}} FCFA </td>
+      </ng-container>
+
+      <!-- Numéro -->
+      <ng-container matColumnDef="numero">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Numéro </th>
+        <td mat-cell *matCellDef="let element"> {{element.numero}} </td>
+      </ng-container>
+
+      <!-- Date -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
+        <td mat-cell *matCellDef="let element"> {{element.date | date:'short'}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="goToDetails(row)"></tr>
+    </table>
+  </div>
+</div>

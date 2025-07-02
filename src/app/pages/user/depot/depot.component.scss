@@ -1,0 +1,123 @@
+.depot-container {
+  max-width: 650px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .numero-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .indicatif {
+      width: 80px;
+    }
+
+    .numero {
+      flex: 1;
+    }
+  }
+
+  .file-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  @media screen and (max-width: 600px) {
+    padding: 1rem;
+
+    .numero-container {
+      flex-direction: column;
+
+      .indicatif,
+      .numero {
+        width: 100%;
+      }
+    }
+  }
+  .tel-button {
+    display: inline-block;
+    margin: 1rem 0;
+    padding: 0.7rem 1.5rem;
+    background-color: #1976d2;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  .instruction {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .depot-success {
+    text-align: center;
+    margin-top: 1rem;
+    color: green;
+  }
+
+  .ussd-block {
+    text-align: center;
+    margin-top: 2rem;
+
+    p {
+      margin-bottom: 1rem;
+    }
+  }
+
+  .tel-button {
+    display: inline-block;
+    background-color: #4caf50;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #45a049;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+    }
+  }
+
+  .instruction {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.4;
+
+    strong {
+      color: #1976d2;
+    }
+  }
+
+}
+

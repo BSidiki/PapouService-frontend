@@ -1,0 +1,50 @@
+.admin-clients {
+  padding: 2rem;
+
+  h2 {
+    margin-bottom: 1.5rem;
+    color: #1976d2;
+  }
+
+  .logo {
+    display: inline-block;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+    cursor: pointer;
+  }
+
+  .search-bar {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th.mat-header-cell {
+    background-color: #1976d2;
+    color: white;
+    font-weight: bold;
+  }
+
+  td.mat-cell {
+    background-color: #fff;
+  }
+
+  button {
+    margin-right: 0.25rem;
+  }
+
+  @media (max-width: 768px) {
+    .search-bar {
+      width: 100%;
+    }
+    table {
+      font-size: 14px;
+    }
+  }
+}

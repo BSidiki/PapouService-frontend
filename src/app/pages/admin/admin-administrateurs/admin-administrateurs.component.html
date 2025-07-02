@@ -1,0 +1,62 @@
+<mat-card>
+  <span class="logo" routerLink="/accueil">
+    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
+  </span>
+  <h2>👤 Administrateurs</h2>
+
+  <form [formGroup]="form" (ngSubmit)="ajouterAdmin()" class="admin-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Nom</mat-label>
+      <input matInput formControlName="nomUtilisateur" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Prénom</mat-label>
+      <input matInput formControlName="prenomUtilisateur" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Numéro</mat-label>
+      <input matInput formControlName="numeroUtilisateur" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Mot de passe</mat-label>
+      <input matInput type="password" formControlName="password" />
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Ajouter</button>
+  </form>
+</mat-card>
+
+<mat-card>
+  <h3>Liste des administrateurs</h3>
+  <table mat-table [dataSource]="admins" class="mat-elevation-z2">
+    <ng-container matColumnDef="nom">
+      <th mat-header-cell *matHeaderCellDef>Nom</th>
+      <td mat-cell *matCellDef="let admin">{{ admin.nomUtilisateur }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="prenom">
+      <th mat-header-cell *matHeaderCellDef>Prénom</th>
+      <td mat-cell *matCellDef="let admin">{{ admin.prenomUtilisateur }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef>Numéro</th>
+      <td mat-cell *matCellDef="let admin">{{ admin.numeroUtilisateur }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let admin">
+        <button mat-icon-button color="warn" (click)="supprimer(admin.idUtilisateur)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['nom', 'prenom', 'numero', 'actions']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['nom', 'prenom', 'numero', 'actions'];"></tr>
+  </table>
+</mat-card>

@@ -1,0 +1,33 @@
+<mat-card *ngIf="depot" class="depot-detail-card">
+  <div class="depot-header">
+    <h2>Détail du dépôt</h2>
+    <p class="montant">{{ depot.montant | number }} FCFA</p>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="depot-infos">
+    <p><strong>📞 Numéro envoyant :</strong> {{ depot.numeroEnvoyant }}</p>
+    <p><strong>🌍 Pays :</strong> {{ depot.pays }}</p>
+    <p><strong>💳 Option :</strong> {{ depot.optionDepot }}</p>
+    <p><strong>🏦 Transaction :</strong> {{ depot.optionDeTransaction }}</p>
+    <p><strong>📅 Date :</strong> {{ depot.dateDepot | date:'dd/MM/yyyy - HH:mm' }}</p>
+  </div>
+
+  <div *ngIf="depot.capture" class="depot-capture">
+    <p><strong>🖼️ Preuve de dépôt :</strong></p>
+    <a [href]="toBase64(depot.capture)" target="_blank">
+      <img [src]="toBase64(depot.capture)" alt="Preuve de dépôt" />
+    </a>
+  </div>
+
+  <div class="btn-retour">
+    <button mat-stroked-button color="primary" (click)="goBack()">
+      ⬅️ Retour à l’historique
+    </button>
+  </div>
+</mat-card>
+
+<div class="depot-detail-card empty" *ngIf="!depot">
+  <p>Aucun dépôt trouvé.</p>
+</div>

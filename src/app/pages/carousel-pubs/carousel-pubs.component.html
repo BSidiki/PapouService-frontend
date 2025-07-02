@@ -1,0 +1,20 @@
+<div class="pubs-section">
+  <div class="carousel-container" #carousel>
+    <div class="carousel-slide" *ngFor="let pub of pubs">
+      <a *ngIf="pub.lien" [href]="pub.lien" target="_blank">
+        <img [src]="toBase64(pub.fichier)" [alt]="pub.titre" />
+      </a>
+      <img *ngIf="!pub.lien" [src]="toBase64(pub.fichier)" [alt]="pub.titre" />
+      <div class="caption">{{ pub.titre }}</div>
+    </div>
+  </div>
+
+  <div class="dots-container" *ngIf="pubs.length > 1">
+    <span
+      class="dot"
+      *ngFor="let pub of pubs; let i = index"
+      [class.active]="i === currentIndex"
+      (click)="scrollTo(i)">
+    </span>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+.public-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  .logo {
+    font-weight: bold;
+    font-size: 1.3rem;
+    cursor: pointer;
+  }
+
+  .mobile-toggle {
+    display: none;
+    color: white;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    a {
+      font-size: 0.95rem;
+      color: white;
+      text-decoration: none;
+
+      &.active {
+        font-weight: bold;
+        border-bottom: 2px solid white;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .mobile-toggle {
+      display: block;
+    }
+
+    .nav-links {
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      background: #1976d2;
+      padding: 1rem;
+      display: none;
+
+      &.open {
+        display: flex;
+      }
+
+      a {
+        width: 100%;
+        padding: 0.5rem 0;
+      }
+    }
+  }
+}

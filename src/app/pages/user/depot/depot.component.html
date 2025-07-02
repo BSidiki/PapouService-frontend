@@ -1,0 +1,67 @@
+<div class="depot-container">
+  <h2>💸 Faire un dépôt</h2>
+
+  <form (ngSubmit)="submitDepot()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Pays</mat-label>
+      <mat-select [(ngModel)]="form.pays" name="pays" (selectionChange)="onPaysChange()" required>
+        <mat-option *ngFor="let pays of paysOptions" [value]="pays.nom">{{ pays.nom }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="numero-container">
+      <mat-form-field appearance="fill" class="indicatif">
+        <mat-label>Indicatif</mat-label>
+        <input matInput [value]="form.indicatif" disabled />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="numero">
+        <mat-label>Numéro</mat-label>
+        <input matInput [(ngModel)]="form.numero" name="numero" required />
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Montant</mat-label>
+      <input matInput type="number" [(ngModel)]="form.montant" name="montant" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Option de transaction</mat-label>
+      <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
+        <mat-option value="1XBET">1XBET</mat-option>
+        <mat-option value="BETWINNER">BETWINNER</mat-option>
+        <mat-option value="MELBET">MELBET</mat-option>
+        <mat-option value="1WIN">1WIN</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Option de dépôt</mat-label>
+      <mat-select [(ngModel)]="form.optionDepot" name="optionDepot" required>
+        <mat-option value="O">Orange Money</mat-option>
+        <mat-option value="M">Moov Money</mat-option>
+        <mat-option value="C">Carte Bancaire</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div *ngIf="form.optionDepot === 'O' || form.optionDepot === 'M'" class="ussd-block">
+      <p>💡 Cliquez sur le bouton ci-dessous pour lancer la transaction depuis votre téléphone :</p>
+
+      <button mat-raised-button class="tel-button" color="accent" type="button" (click)="ouvrirTelephone()">
+        📲 Lancer le code USSD
+      </button>
+
+      <p class="instruction">
+        ➕ validez puis Complétez avec votre <strong>code PIN</strong> et validez !
+      </p>
+    </div>
+
+    <div class="full-width file-zone">
+      <label for="file">Capture de dépôt :</label>
+      <input type="file" id="file" (change)="onFileSelected($event)" required />
+    </div>
+
+    <button mat-raised-button color="primary" type="submit">Soumettre</button>
+  </form>
+</div>

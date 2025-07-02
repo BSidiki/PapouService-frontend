@@ -1,0 +1,46 @@
+<div class="profil-container">
+  <h2>👤 Mon profil</h2>
+
+  <button mat-stroked-button color="accent" (click)="toggleAffichage()">
+    {{ afficherProfil ? 'Masquer' : 'Voir' }} le detail
+  </button>
+
+  <form *ngIf="afficherProfil" (ngSubmit)="modifierProfil()" class="profil-form">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Nom</mat-label>
+      <input matInput [(ngModel)]="user.nomUtilisateur" name="nomUtilisateur" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Prénom</mat-label>
+      <input matInput [(ngModel)]="user.prenomUtilisateur" name="prenomUtilisateur" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Numéro</mat-label>
+      <input matInput [(ngModel)]="user.numeroUtilisateur" name="numeroUtilisateur" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>ID 1XBET</mat-label>
+      <input matInput [(ngModel)]="user.id_1XBET" name="id_1XBET" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>ID BETWINNER</mat-label>
+      <input matInput [(ngModel)]="user.id_BETWINNER" name="id_BETWINNER" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>ID MELBET</mat-label>
+      <input matInput [(ngModel)]="user.id_MELBET" name="id_MELBET" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>ID 1WIN</mat-label>
+      <input matInput [(ngModel)]="user.id_1WIN" name="id_1WIN" />
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Modifier</button>
+  </form>
+</div>

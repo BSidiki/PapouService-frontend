@@ -1,0 +1,22 @@
+<div class="depot-container">
+  <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
+    ⬅️ Retour à la liste
+  </button>
+
+  <h2 class="img-text">💰 Dépôts du client
+    <span class="logo" routerLink="/accueil">
+      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="50"/>
+    </span>
+  </h2>
+
+  <div *ngIf="depots.length === 0">Aucun dépôt trouvé.</div>
+
+  <mat-card *ngFor="let depot of depots" class="depot-card" (click)="voirDetails(depot.idDepot)">
+    <div><strong>Montant :</strong> {{ depot.montant | number:'1.0-0' }} FCFA</div>
+    <div><strong>Numéro :</strong> {{ depot.numeroEnvoyant }}</div>
+    <div><strong>Pays :</strong> {{ depot.pays }}</div>
+    <div><strong>Type :</strong> {{ depot.optionDeTransaction }}</div>
+    <div><strong>Date :</strong> {{ depot.dateDepot | date:'medium' }}</div>
+    <div class="link-text">🔎 Voir le détail</div>
+  </mat-card>
+</div>

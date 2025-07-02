@@ -1,0 +1,74 @@
+<div class="transactions-container">
+  <h2>📊 Liste des transactions</h2>
+
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Type</mat-label>
+      <mat-select [(ngModel)]="type" (selectionChange)="applyFilter()">
+        <mat-option value="ALL">Tous</mat-option>
+        <mat-option value="DEPOT">Dépôts</mat-option>
+        <mat-option value="RETRAIT">Retraits</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Plateforme</mat-label>
+      <mat-select [(ngModel)]="plateforme" (selectionChange)="applyFilter()">
+        <mat-option value="">Toutes</mat-option>
+        <mat-option value="IXBET">1XBET</mat-option>
+        <mat-option value="BETWINNER">BETWINNER</mat-option>
+        <mat-option value="MELBET">MELBET</mat-option>
+        <mat-option value="IWIN">1WIN</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="search-bar">
+      <mat-label>Rechercher un client</mat-label>
+      <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom, prénom ou numéro" />
+    </mat-form-field>
+  </div>
+
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+    <ng-container matColumnDef="type">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+      <td mat-cell *matCellDef="let t">{{ t.type }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="nom">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+      <td mat-cell *matCellDef="let t">{{ t.utilisateur?.prenomUtilisateur }} {{ t.utilisateur?.nomUtilisateur }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Numéro</th>
+      <td mat-cell *matCellDef="let t">{{ t.numeroEnvoyant }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="montant">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+      <td mat-cell *matCellDef="let t">{{ t.montant | number:'1.0-0' }} FCFA</td>
+    </ng-container>
+
+    <ng-container matColumnDef="plateforme">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Plateforme</th>
+      <td mat-cell *matCellDef="let t">{{ t.optionDeTransaction }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+      <td mat-cell *matCellDef="let t">{{ t.dateDepot || t.dateRetrait | date:'short' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let t">
+        <button mat-button color="primary" (click)="voirDetails(t)">Détails</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+</div>

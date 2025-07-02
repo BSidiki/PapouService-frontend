@@ -1,0 +1,31 @@
+<div class="annonces-slider">
+  <div class="slider-wrapper">
+    <div class="slider-transition" [@fadeSlide]="currentIndex">
+      <mat-card class="slider-card" *ngIf="annonces.length > 0">
+        <img
+          *ngIf="annonces[currentIndex]?.media"
+          [src]="toBase64(annonces[currentIndex].media)"
+          alt="Annonce image"
+        />
+        <div class="slider-text">
+          <h2>{{ annonces[currentIndex]?.titre }}</h2>
+          <p>{{ annonces[currentIndex]?.texte }}</p>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="slider-controls">
+    <button mat-icon-button (click)="previous()"><mat-icon>chevron_left</mat-icon></button>
+    <button mat-icon-button (click)="next()"><mat-icon>chevron_right</mat-icon></button>
+  </div>
+  <div class="slider-indicators">
+    <span
+      *ngFor="let _, index as i of annonces"
+      class="dot"
+      [class.active]="i === currentIndex"
+      (click)="goToSlide(i)">
+    </span>
+  </div>
+
+</div>

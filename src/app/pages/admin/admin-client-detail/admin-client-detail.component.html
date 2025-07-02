@@ -1,0 +1,38 @@
+
+<div class="client-detail-container" *ngIf="!isLoading">
+  <mat-card *ngIf="client">
+    <mat-card-title>👤 Profil du client</mat-card-title>
+    <mat-card-content>
+      <p><strong>Nom :</strong> {{ client.nomUtilisateur }}</p>
+      <p><strong>Prénom :</strong> {{ client.prenomUtilisateur }}</p>
+      <p><strong>Numéro :</strong> {{ client.numeroUtilisateur }}</p>
+      <p><strong>ID 1XBET :</strong> {{ client.id_1XBET || 'N/A' }}</p>
+      <p><strong>ID BETWINNER :</strong> {{ client.id_BETWINNER || 'N/A' }}</p>
+      <p><strong>ID MELBET :</strong> {{ client.id_MELBET || 'N/A' }}</p>
+      <p><strong>ID 1WIN :</strong> {{ client.id_1WIN || 'N/A' }}</p>
+    </mat-card-content>
+
+    <mat-card-actions class="action-buttons">
+      <button mat-stroked-button color="accent" (click)="voirHistorique()">
+        📜 Historique
+      </button>
+      <button mat-stroked-button color="primary" (click)="voirDepots()">
+        💵 Dépôts
+      </button>
+      <button mat-stroked-button color="primary" (click)="voirRetraits()">
+        💸 Retraits
+      </button>
+      <!-- <button mat-stroked-button color="warn" (click)="supprimerClient()">
+        ❌ Supprimer
+      </button> -->
+    </mat-card-actions>
+    <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
+      ⬅️ Retour à la liste
+    </button>
+  </mat-card>
+</div>
+
+<div *ngIf="isLoading" class="loading">Chargement...</div>
+<div *ngIf="!client" class="no-client">
+  <p>Aucun client trouvé.</p>
+</div>

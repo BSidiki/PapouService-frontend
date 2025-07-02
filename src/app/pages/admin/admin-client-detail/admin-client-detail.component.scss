@@ -1,0 +1,35 @@
+.client-detail-container {
+  padding: 1.5rem;
+
+  mat-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fdfdfd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #1976d2;
+  }
+
+  mat-card-content p {
+    margin: 0.5rem 0;
+  }
+
+  .action-buttons {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+}
+
+.loading {
+  text-align: center;
+  margin-top: 2rem;
+  color: #666;
+}

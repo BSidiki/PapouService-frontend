@@ -1,0 +1,31 @@
+.transaction-card {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  cursor: pointer;
+  border-left: 5px solid transparent;
+  transition: border-color 0.3s;
+
+  .transaction-header {
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    .icon {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+  }
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  &.depot-card {
+    border-color: #4caf50;
+  }
+
+  &.retrait-card {
+    border-color: #f44336;
+  }
+}
