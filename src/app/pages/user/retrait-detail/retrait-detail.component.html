@@ -1,34 +1,46 @@
 <mat-card *ngIf="retrait" class="retrait-detail-card">
-  <div class="retrait-header">
-    <h2>Détail du retrait</h2>
-    <p class="montant">{{ retrait.montant | number }} FCFA</p>
+  <div class="header">
+    <h2><span class="emoji">💼</span> Détail du retrait</h2>
+    <span class="badge"
+      [ngClass]="{
+        'pending': retrait.transactionState === 'PENDING',
+        'validated': retrait.transactionState === 'VALIDATED',
+        'rejected': retrait.transactionState === 'REJECTED'
+      }">
+      {{
+        retrait.transactionState === 'PENDING' ? '⏳ En attente' :
+        retrait.transactionState === 'VALIDATED' ? '✅ Validé' :
+        retrait.transactionState === 'REJECTED' ? '❌ Rejeté' : 'Inconnu'
+      }}
+    </span>
   </div>
 
-  <mat-divider></mat-divider>
+  <h3 class="montant">{{ retrait.montant | number }} FCFA</h3>
 
-  <div class="retrait-infos">
-    <p><strong>📞 Numéro envoyant :</strong> {{ retrait.numeroEnvoyant }}</p>
+  <div class="infos-grid">
+    <p><strong>📞 Numéro :</strong> {{ retrait.numeroEnvoyant }}</p>
     <p><strong>🌍 Pays :</strong> {{ retrait.pays }}</p>
     <p><strong>💳 Option :</strong> {{ retrait.optionRetrait }}</p>
-    <p><strong>🔑 Code Retrait :</strong> {{ retrait.codeRetrait }}</p>
-    <p><strong>🏦 Transaction :</strong> {{ retrait.optionDeTransaction }}</p>
-    <p><strong>📅 Date :</strong> {{ retrait.dateRetrait | date:'dd/MM/yyyy - HH:mm' }}</p>
+    <p><strong>🏦 Plateforme :</strong> {{ retrait.optionDeTransaction }}</p>
+    <p><strong>🆔 ID Plateforme :</strong> {{ getIdPlateforme(retrait) }}</p>
+    <p><strong>📅 Date :</strong> {{ retrait.dateRetrait | date:'dd/MM/yyyy - HH:mm:ss' }}</p>
   </div>
 
-  <div *ngIf="retrait.file" class="retrait-capture">
-    <p><strong>🖼️ Preuve de retrait :</strong></p>
-    <a [href]="toBase64(retrait.file)" target="_blank">
-      <img [src]="toBase64(retrait.file)" alt="Preuve de retrait" />
-    </a>
+  <div *ngIf="retrait.file" class="image-section">
+    <p><strong>🖼️ Justificatif :</strong></p>
+    <img
+      [src]="toBase64(retrait.file)"
+      alt="Justificatif retrait"
+      (click)="toggleZoom()"
+      [class.zoomed]="zoomed"
+    />
   </div>
 
   <div class="btn-retour">
-    <button mat-stroked-button color="primary" (click)="goBack()">
-      ⬅️ Retour à l’historique
-    </button>
+    <button mat-stroked-button color="primary" (click)="goBack()">⬅️ Retour</button>
   </div>
 </mat-card>
 
-<div class="retrait-detail-card empty" *ngIf="!retrait">
+<div class="empty" *ngIf="!retrait">
   <p>Aucun retrait trouvé.</p>
 </div>

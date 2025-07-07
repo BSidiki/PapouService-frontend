@@ -15,6 +15,7 @@ import { MatDividerModule } from '@angular/material/divider';
 })
 export class DepotDetailComponent implements OnInit {
   depot: any;
+  zoomed = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -24,7 +25,7 @@ export class DepotDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.http.get(`http://192.168.244.230:8080/depots/${id}`).subscribe({
+    this.http.get(`http://192.168.11.100:8080/depots/${id}`).subscribe({
       next: (data) => this.depot = data,
       error: (err) => {
         console.error(err);
@@ -40,4 +41,39 @@ export class DepotDetailComponent implements OnInit {
   goBack() {
     this.location.back();
   }
+
+  changerStatut(nouveauStatut: 'VALIDATED' | 'REJECTED') {
+    this.http.put(`http://192.168.11.100:8080/depots/0/${this.depot.idDepot}/${nouveauStatut}`, {})
+      .subscribe({
+        next: () => {
+          this.depot.transactionState = nouveauStatut;
+          alert(`Dépôt ${nouveauStatut === 'VALIDATED' ? 'validé' : 'rejeté'} avec succès`);
+        },
+        error: () => {
+          alert("Erreur lors du changement de statut");
+        }
+      });
+  }
+
+toggleZoom() {
+  this.zoomed = !this.zoomed;
+}
+  get zoomClass() {
+    return this.zoomed ? 'zoomed' : '';
+  }
+
+  getIdPlateforme(depot: any): string {
+    const utilisateur = depot.utilisateur;
+    const plateforme = depot.optionDeTransaction;
+
+    switch (plateforme) {
+      case 'IXBET': return utilisateur?.id_1XBET;
+      case 'BETWINNER': return utilisateur?.id_BETWINNER;
+      case 'MELBET': return utilisateur?.id_MELBET;
+      case 'IWIN': return utilisateur?.id_1WIN;
+      default: return 'Inconnu';
+    }
+  }
+
+
 }

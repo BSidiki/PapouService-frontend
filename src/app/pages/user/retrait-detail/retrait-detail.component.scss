@@ -1,75 +1,94 @@
 .retrait-detail-card {
-  max-width: 700px;
+  max-width: 600px;
   margin: 2rem auto;
-  padding: 2rem;
-  background: #fdfdfd;
+  padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 
-  h2 {
-    margin: 0;
-    color: #333;
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .emoji {
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+
+    .badge {
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+    }
+
+    .pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+
+    .validated {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .rejected {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
   }
 
   .montant {
     font-size: 1.8rem;
-    color: #1976d2;
     font-weight: bold;
+    margin: 1rem 0;
+    color: #2e7d32;
   }
 
-  .retrait-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .infos-grid {
+    display: inline;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f3fdf4;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+    line-height: 1.5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
-  .retrait-infos {
-    font-size: 1rem;
-    color: #444;
-
-    p {
-      margin: 0.3rem 0;
-    }
-  }
-
-  .retrait-capture {
-    margin-top: 1.5rem;
+  .image-section {
+    margin-bottom:0;
 
     img {
       width: 100%;
-      max-height: 350px;
-      object-fit: cover;
-      border-radius: 10px;
-      transition: transform 0.3s ease;
+      border-radius: 8px;
       cursor: zoom-in;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-      &:hover {
-        transform: scale(1.03);
+      &.zoomed {
+        cursor: zoom-out;
+        transform: scale(2.5);
+        z-index: 1000;
+        position: relative;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
       }
     }
   }
 
   .btn-retour {
-    display: flex;
-    justify-content: flex-start;
-    margin-top: 1.5rem;
-  }
-
-  &.empty {
-    text-align: center;
-    color: gray;
+    text-align: left;
   }
 }
-.retrait-detail-card .btn-retour a {
-  text-decoration: none;
-  color: #1976d2;
-  font-weight: bold;
-  transition: color 0.3s;
 
-  &:hover {
-    color: #115293;
-  }
+.empty {
+  text-align: center;
+  margin-top: 2rem;
+  font-style: italic;
+  color: #999;
 }

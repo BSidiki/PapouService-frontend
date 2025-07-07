@@ -16,7 +16,7 @@
       <textarea matInput formControlName="texte" rows="3"></textarea>
     </mat-form-field>
 
-    <input type="file" (change)="onFileSelected($event)" />
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
 
     <button mat-raised-button color="primary" type="submit">
       {{ isEditing ? 'Modifier' : 'Ajouter' }}
@@ -49,10 +49,11 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let a">
-        <button mat-icon-button color="accent" (click)="editAnnonce(a)">
+        <!-- <button mat-icon-button color="accent" (click)="editAnnonce(a)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="deleteAnnonce(a.id)">
+        <button *ngIf="isEditing" mat-button type="button" (click)="cancelEdit()">Annuler</button> -->
+        <button mat-icon-button color="warn" (click)="deleteAnnonce(a.idAnnonce )">
           <mat-icon>delete</mat-icon>
         </button>
       </td>

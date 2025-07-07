@@ -22,6 +22,16 @@
       </mat-select>
     </mat-form-field>
 
+    <mat-form-field appearance="outline">
+      <mat-label>Statut</mat-label>
+      <mat-select [(ngModel)]="statut" (selectionChange)="applyFilter()">
+        <mat-option value="">Tous</mat-option>
+        <mat-option value="PENDING">En attente</mat-option>
+        <mat-option value="VALIDATED">Validé</mat-option>
+        <mat-option value="REJECTED">Rejeté</mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <mat-form-field appearance="outline" class="search-bar">
       <mat-label>Rechercher un client</mat-label>
       <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom, prénom ou numéro" />
@@ -63,6 +73,23 @@
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let t">
         <button mat-button color="primary" (click)="voirDetails(t)">Détails</button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="statut">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+      <td mat-cell *matCellDef="let t">
+        <span [ngClass]="{
+          'pending': t.statut === 'PENDING',
+          'validated': t.statut === 'VALIDATED',
+          'rejected': t.statut === 'REJECTED'
+        }">
+          {{
+            t.statut === 'PENDING' ? 'En attente' :
+            t.statut === 'VALIDATED' ? 'Validé' :
+            t.statut === 'REJECTED' ? 'Rejeté' : 'Inconnu'
+          }}
+        </span>
       </td>
     </ng-container>
 

@@ -14,6 +14,11 @@
     flex-wrap: wrap;
     gap: 1rem;
     margin-bottom: 2rem;
+    justify-content: space-between;
+    align-items: stretch;
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
 
     .stat-card {
       flex: 1 1 200px;
@@ -25,6 +30,44 @@
       background-color: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transition: transform 0.2s ease, box-shadow 0.3s;
+      border-left: 5px solid transparent;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      &:not(:last-child) {
+        margin-right: 1rem;
+      }
+      &:not(:last-child):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+      &:last-child:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
+      }
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
+      }
+      &:focus:not(:focus-visible) {
+        box-shadow: none;
+      }
+      &:focus:not(:focus-visible) {
+        outline: none;
+      }
 
       &:hover {
         transform: translateY(-4px);
@@ -128,5 +171,38 @@
         background-color: #333;
       }
     }
+  }
+  ::ng-deep .mat-snack-bar-container {
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: #323232;
+    color: white;
+  }
+
+  .thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: zoom-in;
+    transition: 0.2s;
+    border: 1px solid #ccc;
+  }
+
+  .thumb:hover {
+    transform: scale(1.1);
+  }
+
+  .image-dialog .mat-dialog-container {
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
   }
 }

@@ -23,6 +23,9 @@ export class AdminClientDetailComponent implements OnInit {
   client: any = null;
   isLoading = true;
   clientId: string | null = null;
+  fidelityStars = '';
+  isFidele = false;
+  depotCount = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,20 +34,33 @@ export class AdminClientDetailComponent implements OnInit {
     private location: Location
 ) {}
 
-  ngOnInit(): void {
-    this.clientId = this.route.snapshot.paramMap.get('id');
-    this.http.get(`http://192.168.244.230:8080/utilisateurs/getuser/${this.clientId}`).subscribe({
-      next: (data) => {
-        this.client = data;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-        alert('Erreur lors du chargement du profil client.');
-      }
-    });
-  }
+ngOnInit(): void {
+  this.clientId = this.route.snapshot.paramMap.get('id');
+  this.http.get(`http://192.168.11.100:8080/utilisateurs/getuser/${this.clientId}`).subscribe({
+    next: (data) => {
+      this.client = data;
+
+      // Appel pour les dépôts validés liés à ce client
+      this.http.get<any[]>(`http://192.168.11.100:8080/depots`).subscribe(depots => {
+        const validDepots = depots.filter(
+          d => d.transactionState === 'VALIDATED' &&
+               d.utilisateur?.numeroUtilisateur === this.client.numeroUtilisateur
+        );
+        this.depotCount = validDepots.length;
+        const stars = Math.min(5, Math.floor(this.depotCount / 1)); // Change /1 en /5 pour 1 étoile par 5 dépôts
+        this.fidelityStars = '★'.repeat(stars);
+        this.isFidele = stars === 5;
+      });
+
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error(err);
+      this.isLoading = false;
+      alert('Erreur lors du chargement du profil client.');
+    }
+  });
+}
 
   voirHistorique() {
     this.router.navigate([`/admin/clients/${this.clientId}/historique`]);
@@ -60,7 +76,7 @@ export class AdminClientDetailComponent implements OnInit {
 
   supprimerClient() {
     if (!confirm("Voulez-vous vraiment supprimer ce client ?")) return;
-    this.http.delete(`http://192.168.244.230:8080/utilisateurs/${this.clientId}`).subscribe({
+    this.http.delete(`http://192.168.11.100:8080/utilisateurs/${this.clientId}`).subscribe({
       next: () => {
         alert("Client supprimé avec succès.");
         this.router.navigate(['/admin/clients']);

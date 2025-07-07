@@ -47,4 +47,54 @@
       font-size: 14px;
     }
   }
+
+  .stars {
+    color: gold;
+    font-size: 1.2em;
+  }
+
+  .badge {
+    background: #fbc02d;
+    color: #000;
+    border-radius: 5px;
+    padding: 2px 6px;
+    margin-left: 8px;
+    font-weight: bold;
+  }
+
+  .filter-section {
+    margin: 1em 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .filter-input {
+      width: 200px;
+      margin-right: 10px;
+    }
+    .filter-button {
+      margin-left: 10px;
+    }
+  }
+
+  .chart-container {
+    max-width: 500px;
+    margin-bottom: 20px;
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  }
+  .filters-reshearch{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    .filter-input {
+      width: 200px;
+      margin-right: 10px;
+    }
+    .filter-button {
+      margin-left: 10px;
+    }
+  }
 }

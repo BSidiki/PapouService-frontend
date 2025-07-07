@@ -53,7 +53,7 @@ export class AdminPubsComponent implements OnInit {
   }
 
   loadPubs() {
-    this.http.get<any[]>('http://192.168.244.230:8080/pubs').subscribe({
+    this.http.get<any[]>('http://192.168.11.100:8080/pubs').subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.dataSource.sort = this.sort;
@@ -75,8 +75,8 @@ export class AdminPubsComponent implements OnInit {
     if (this.selectedFile) formData.append('fichier', this.selectedFile);
 
     const request = this.isEditing
-      ? this.http.put(`http://192.168.244.230:8080/pubs/${this.editId}`, formData)
-      : this.http.post('http://192.168.244.230:8080/pubs', formData);
+      ? this.http.put(`http://192.168.11.100:8080/pubs/${this.editId}`, formData)
+      : this.http.post('http://192.168.11.100:8080/pubs', formData);
 
     request.subscribe({
       next: () => {
@@ -98,7 +98,7 @@ export class AdminPubsComponent implements OnInit {
 
   deletePub(id: number) {
     if (!confirm("Supprimer cette publicité ?")) return;
-    this.http.delete(`http://192.168.244.230:8080/pubs/${id}`).subscribe({
+    this.http.delete(`http://192.168.11.100:8080/pubs/${id}`).subscribe({
       next: () => this.loadPubs(),
       error: () => alert("Erreur lors de la suppression"),
     });

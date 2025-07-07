@@ -1,4 +1,5 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { CotesSportivesComponent } from './pages/cotes-sportives/cotes-sportives.component';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, Component } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -32,10 +33,11 @@ import { AdminValidationsComponent } from './pages/admin/admin-validations/admin
 import { AdminTransactionsComponent } from './pages/admin/admin-transactions/admin-transactions.component';
 import { AdminAdministrateursComponent } from './pages/admin/admin-administrateurs/admin-administrateurs.component';
 import { AdminAnnoncesComponent } from './pages/admin/admin-annonces/admin-annonces.component';
-import { AdminAlbumsComponent } from './pages/admin/admin-albums/admin-albums.component';
 import { AdminPubsComponent } from './pages/admin/admin-pubs/admin-pubs.component';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { MotDePasseComponent } from './pages/mot-de-passe/mot-de-passe.component';
+import { OddsComponent } from './pages/odds/odds.component';
+import { MatchsComponent } from './pages/matchs/matchs.component';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -52,6 +54,9 @@ export const appConfig: ApplicationConfig = {
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'mot-de-passe', component: MotDePasseComponent },
+      { path: 'cotes', component: OddsComponent },
+      { path: 'sportives', component: CotesSportivesComponent },
+      { path: 'matchs', component: MatchsComponent },
       {
         path: 'user',
         component: UserHomeComponent,

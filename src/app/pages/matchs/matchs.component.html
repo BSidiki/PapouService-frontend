@@ -1,0 +1,18 @@
+<div class="matchs-container">
+  <h2>📅 Matchs à venir</h2>
+
+  <div *ngFor="let match of matchs" class="match-card">
+    <mat-card>
+      <mat-card-title>
+        {{ match.equipe1 }} vs {{ match.equipe2 }}
+      </mat-card-title>
+      <mat-card-subtitle>{{ match.ligue }} - {{ match.date }}</mat-card-subtitle>
+
+      <div class="cotes">
+        <div class="cote">1 : <strong>{{ match.cotes.c1 }}</strong></div>
+        <div class="cote">N : <strong>{{ match.cotes.n }}</strong></div>
+        <div class="cote">2 : <strong>{{ match.cotes.c2 }}</strong></div>
+      </div>
+    </mat-card>
+  </div>
+</div>

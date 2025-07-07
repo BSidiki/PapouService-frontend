@@ -28,4 +28,21 @@
   ::ng-deep .mat-form-field {
     min-width: 200px;
   }
+
+  .pending {
+    color: orange;
+    font-weight: bold;
+  }
+  .validated {
+    color: green;
+    font-weight: bold;
+  }
+  .rejected {
+    color: red;
+    font-weight: bold;
+  }
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+  }
 }

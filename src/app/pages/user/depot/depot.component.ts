@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { AnnoncesPublicComponent } from "../../annonces/annonces-public.component";
 
 @Component({
   selector: 'app-depot',
@@ -17,8 +18,9 @@ import { MatButtonModule } from '@angular/material/button';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule
-  ],
+    MatButtonModule,
+    AnnoncesPublicComponent
+],
   templateUrl: './depot.component.html',
   styleUrls: ['./depot.component.scss']
 })
@@ -90,7 +92,7 @@ export class DepotComponent {
     formData.append('optionDeTransaction', this.form.optionDeTransaction);
     formData.append('capture', this.file);
 
-    this.http.post(`http://192.168.244.230:8080/depots/user/${this.userId}`, formData).subscribe({
+    this.http.post(`http://192.168.11.100:8080/depots/user/${this.userId}`, formData).subscribe({
       next: () => {
         alert('Dépôt soumis avec succès !');
         this.form = { pays: '', indicatif: '', numero: '', montant: null, optionDepot: '', optionDeTransaction: '' };

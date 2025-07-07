@@ -7,8 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { FooterComponent } from '../../layout/footer/footer.component';
 import { HeaderPublicComponent } from '../../layout/header-public/header-public.component';
-import { CarouselPubsComponent } from "../carousel-pubs/carousel-pubs.component";
 import { AnnoncesPublicComponent } from "../annonces/annonces-public.component";
+import { MatchsComponent } from "../matchs/matchs.component";
 
 @Component({
   selector: 'app-accueil-public',
@@ -21,8 +21,8 @@ import { AnnoncesPublicComponent } from "../annonces/annonces-public.component";
     MatIconModule,
     FooterComponent,
     HeaderPublicComponent,
-    CarouselPubsComponent,
     AnnoncesPublicComponent,
+    MatchsComponent
 ],
   templateUrl: './accueil-public.component.html',
   styleUrls: ['./accueil-public.component.scss']
@@ -42,12 +42,12 @@ throw new Error('Method not implemented.');
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://192.168.244.230:8080/annonces').subscribe(data => {
+    this.http.get<any[]>('http://192.168.11.100:8080/annonces').subscribe(data => {
       this.annonces = data;
       this.autoSlide();
     });
 
-    this.http.get<any[]>('http://192.168.244.230:8080/albums').subscribe(data => {
+    this.http.get<any[]>('http://192.168.11.100:8080/albums').subscribe(data => {
       this.albums = data;
     });
   }

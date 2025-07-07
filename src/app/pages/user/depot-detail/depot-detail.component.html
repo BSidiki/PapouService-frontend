@@ -1,30 +1,43 @@
 <mat-card *ngIf="depot" class="depot-detail-card">
-  <div class="depot-header">
-    <h2>Détail du dépôt</h2>
-    <p class="montant">{{ depot.montant | number }} FCFA</p>
+  <div class="header">
+    <h2><span class="emoji">💸</span> Détail du dépôt</h2>
+    <span class="badge"
+      [ngClass]="{
+        'pending': depot.transactionState === 'PENDING',
+        'validated': depot.transactionState === 'VALIDATED',
+        'rejected': depot.transactionState === 'REJECTED'
+      }">
+      {{
+        depot.transactionState === 'PENDING' ? '⏳ En attente' :
+        depot.transactionState === 'VALIDATED' ? '✅ Validé' :
+        depot.transactionState === 'REJECTED' ? '❌ Rejeté' : 'Inconnu'
+      }}
+    </span>
   </div>
 
-  <mat-divider></mat-divider>
+  <h3 class="montant">Montant de dépôt : {{ depot.montant | number }} FCFA</h3>
 
-  <div class="depot-infos">
-    <p><strong>📞 Numéro envoyant :</strong> {{ depot.numeroEnvoyant }}</p>
+  <div class="infos-grid">
+    <p><strong>📞 Numéro :</strong> {{ depot.numeroEnvoyant }}</p>
     <p><strong>🌍 Pays :</strong> {{ depot.pays }}</p>
     <p><strong>💳 Option :</strong> {{ depot.optionDepot }}</p>
-    <p><strong>🏦 Transaction :</strong> {{ depot.optionDeTransaction }}</p>
-    <p><strong>📅 Date :</strong> {{ depot.dateDepot | date:'dd/MM/yyyy - HH:mm' }}</p>
+    <p><strong>🏦 Plateforme :</strong> {{ depot.optionDeTransaction }}</p>
+    <p><strong>🆔 ID Plateforme :</strong> {{ getIdPlateforme(depot) }}</p>
+    <p><strong>📅 Date :</strong> {{ depot.dateDepot | date:'dd/MM/yyyy - HH:mm:ss' }}</p>
   </div>
 
-  <div *ngIf="depot.capture" class="depot-capture">
+  <div *ngIf="depot.capture" class="image-section">
     <p><strong>🖼️ Preuve de dépôt :</strong></p>
-    <a [href]="toBase64(depot.capture)" target="_blank">
-      <img [src]="toBase64(depot.capture)" alt="Preuve de dépôt" />
-    </a>
+    <img
+      [src]="toBase64(depot.capture)"
+      alt="Preuve dépôt"
+      (click)="toggleZoom()"
+      [class.zoomed]="zoomed"
+    />
   </div>
 
   <div class="btn-retour">
-    <button mat-stroked-button color="primary" (click)="goBack()">
-      ⬅️ Retour à l’historique
-    </button>
+    <button mat-stroked-button color="primary" (click)="goBack()">⬅️ Retour</button>
   </div>
 </mat-card>
 

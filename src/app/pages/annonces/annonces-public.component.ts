@@ -36,7 +36,7 @@ export class AnnoncesPublicComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://192.168.244.230:8080/annonces').subscribe({
+    this.http.get<any[]>('http://192.168.11.100:8080/annonces').subscribe({
       next: (data) => {
         this.annonces = data;
         this.startAutoScroll();

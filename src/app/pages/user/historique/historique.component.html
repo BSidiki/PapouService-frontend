@@ -1,3 +1,6 @@
+<section class="hero-carousel">
+  <app-annonces-public></app-annonces-public>
+</section>
 <mat-form-field appearance="fill" class="filter">
   <mat-label>Filtrer par type</mat-label>
   <mat-select [(ngModel)]="filter" (selectionChange)="applyFilter()">
@@ -7,39 +10,60 @@
   </mat-select>
 </mat-form-field>
 
+<mat-form-field appearance="fill" class="filter">
+  <mat-label>Filtrer par statut</mat-label>
+  <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilter()">
+    <mat-option value="ALL">Tous</mat-option>
+    <mat-option value="PENDING">En attente</mat-option>
+    <mat-option value="VALIDATED">Validé</mat-option>
+    <mat-option value="REJECTED">Rejeté</mat-option>
+  </mat-select>
+</mat-form-field>
+
 <div *ngIf="filteredHistoriques.length === 0">Aucune transaction trouvée.</div>
-<mat-card
-  *ngFor="let item of filteredHistoriques"
-  class="transaction-card"
-  (click)="goToDetails(item)"
-  [ngClass]="{
-    'depot-card': item.transaction === 'DEPOT',
-    'retrait-card': item.transaction === 'RETRAIT'
-  }"
->
-  <div class="transaction-header">
-    <span class="icon">
-      {{ item.transaction === 'DEPOT' ? '💸' : '💼' }}
-    </span>
-    <strong>{{ item.transaction }}</strong>
-  </div>
 
-  <div><strong>ID-TRANSACTION :</strong> N{{ item.id_transaction }}PS</div>
+<!-- ✅ Nouvelle grille responsive -->
+<div class="transaction-list">
+  <mat-card
+    *ngFor="let item of filteredHistoriques"
+    class="transaction-card"
+    (click)="goToDetails(item)"
+    [ngClass]="{
+      'depot-card': item.transaction === 'DEPOT',
+      'retrait-card': item.transaction === 'RETRAIT'
+    }"
+  >
+    <div class="contenu">
+      <div class="transaction-header">
+        <span class="icon">
+          {{ item.transaction === 'DEPOT' ? '💸' : '💼' }}
+        </span>
+        <strong>{{ item.transaction }}</strong>
+      </div>
 
-  <div>
-    <strong>Montant :</strong>
-    {{ item.details?.montant || '---' }} FCFA
-  </div>
+      <div><strong>ID-TRANSACTION :</strong> N{{ item.id_transaction }}PS</div>
+      <div><strong>Montant :</strong> {{ item.details?.montant || '---' }} FCFA</div>
+      <div><strong>Numéro :</strong> {{ item.details?.numeroEnvoyant || '---' }}</div>
+      <div *ngIf="item.date">
+        <strong>Date :</strong> {{ item.date | date: 'dd/MM/yyyy - HH:mm' }}
+      </div>
+      <div>
+        <strong>Statut :</strong>
+        <span [ngClass]="{
+          'badge': true,
+          'pending': item.statut === 'PENDING',
+          'validated': item.statut === 'VALIDATED',
+          'rejected': item.statut === 'REJECTED'
+        }">
+          {{
+            item.statut === 'PENDING' ? 'En attente' :
+            item.statut === 'VALIDATED' ? 'Validé' :
+            item.statut === 'REJECTED' ? 'Rejeté' : 'Inconnu'
+          }}
+        </span>
+      </div>
 
-  <div>
-    <strong>Numéro :</strong>
-    {{ item.details?.numeroEnvoyant || '---' }}
-  </div>
-
-  <div *ngIf="item.date">
-    <strong>Date :</strong>
-    {{ item.date | date: 'mediumDate' }}
-  </div>
-
-  <div class="link-text">📂 Voir les détails</div>
-</mat-card>
+      <div class="link-text">📂 Voir les détails</div>
+    </div>
+  </mat-card>
+</div>

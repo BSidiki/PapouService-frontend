@@ -43,7 +43,7 @@ export class AdminAdministrateursComponent implements OnInit {
   }
 
   loadAdmins() {
-    this.http.get<any[]>('http://192.168.244.230:8080/utilisateurs')
+    this.http.get<any[]>('http://192.168.11.100:8080/utilisateurs')
       .subscribe({
         next: data => this.admins = data.filter(u => u.roles?.some((r: any) => r.name === 'ADMIN')),
         error: err => console.error(err)
@@ -61,7 +61,7 @@ export class AdminAdministrateursComponent implements OnInit {
     formData.append('password', valeur.password);
     formData.append('role', 'ADMIN');
 
-    this.http.post('http://192.168.244.230:8080/utilisateurs', formData)
+    this.http.post('http://192.168.11.100:8080/utilisateurs', formData)
       .subscribe({
         next: () => {
           this.form.reset();
@@ -73,7 +73,7 @@ export class AdminAdministrateursComponent implements OnInit {
 
   supprimer(id: number) {
     if (confirm("Voulez-vous vraiment supprimer cet admin ?")) {
-      this.http.delete(`http://192.168.244.230:8080/utilisateurs/${id}`)
+      this.http.delete(`http://192.168.11.100:8080/utilisateurs/${id}`)
         .subscribe({
           next: () => this.loadAdmins(),
           error: err => alert("Erreur : " + err.error.message)

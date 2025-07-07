@@ -2,34 +2,39 @@
 
 <div class="public-accueil">
 
-  <!-- 🔹 SECTION ANNONCES (carrousel d'annonces) -->
-  <section class="carousel-section">
+  <!-- 🔹 HERO: Carrousel pleine largeur -->
+  <section class="hero-carousel">
     <app-annonces-public></app-annonces-public>
   </section>
 
-  <!-- 🔹 SECTION PUB + À PROPOS -->
-  <section class="about-pub-section">
-    <div class="about-text">
-      <h2>📢 À propos de Papou Service</h2>
-      <p>
-        Nous sommes une équipe dynamique dédiée à vous offrir des services de dépôt et retrait 100% fiables pour vos plateformes de jeux.
-      </p>
-      <ul>
-        <li>✔ Rapide et sécurisé</li>
-        <li>✔ Disponible 24h/24</li>
-        <li>✔ Assistance client réactive</li>
-      </ul>
-    </div>
-    <div class="pub-zone">
-      <app-carousel-pubs></app-carousel-pubs>
+  <!-- 🔹 À propos de nous -->
+  <section class="about-section">
+    <div class="about-content">
+      <div class="about-text">
+        <h2>✨ Bienvenue sur <strong>Papou Service</strong></h2>
+        <p>
+          Une solution rapide, simple et sécurisée pour vos dépôts et retraits sur vos plateformes de jeu préférées.
+        </p>
+        <ul>
+          <li>✅ Transactions vérifiées</li>
+          <li>📞 Assistance 24h/24</li>
+          <li>🔒 Sécurité garantie</li>
+        </ul>
+      </div>
+      <div class="about-image">
+        <img src="assets/images/secure-payment.svg" alt="Sécurité Paiement">
+      </div>
     </div>
   </section>
 
-  <!-- 🔹 SECTION ALBUMS -->
-  <!-- <section class="album-section">
-    <h2>📸 Nos albums</h2>
-    <app-albums-public></app-albums-public>
-  </section> -->
+  <!-- 🔹 Zone Matchs -->
+  <section class="pub-match-section">
+    <h2>📺 Matchs en direct / Publicité</h2>
+    <div class="matchs-container">
+      <app-matchs></app-matchs>
+    </div>
+  </section>
 
 </div>
+
 <app-footer></app-footer>

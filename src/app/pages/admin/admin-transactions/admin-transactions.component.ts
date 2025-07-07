@@ -27,13 +27,15 @@ import { FormsModule } from '@angular/forms';
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-]
+  ]
 })
 export class AdminTransactionsComponent implements OnInit {
   type: 'ALL' | 'DEPOT' | 'RETRAIT' = 'ALL';
+  statut = '';
   search = '';
   plateforme = '';
-  displayedColumns = ['type', 'nom', 'numero', 'montant', 'plateforme', 'date', 'actions'];
+
+  displayedColumns = ['type', 'nom', 'numero', 'montant', 'plateforme', 'statut', 'date', 'actions'];
   dataSource = new MatTableDataSource<any>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -47,33 +49,35 @@ export class AdminTransactionsComponent implements OnInit {
 
   loadTransactions() {
     const requests = [
-      this.http.get<any[]>('http://192.168.244.230:8080/depots'),
-      this.http.get<any[]>('http://192.168.244.230:8080/retraits')
+      this.http.get<any[]>('http://192.168.11.100:8080/depots'),
+      this.http.get<any[]>('http://192.168.11.100:8080/retraits')
     ];
 
     Promise.all(requests.map(req => req.toPromise())).then(([depots, retraits]) => {
       const transactions = [
-        ...(depots ?? []).map(d => ({ ...d, type: 'DEPOT' })),
-        ...(retraits ?? []).map(r => ({ ...r, type: 'RETRAIT' }))
+        ...(depots ?? []).map(d => ({ ...d, type: 'DEPOT', statut: d.transactionState })),
+        ...(retraits ?? []).map(r => ({ ...r, type: 'RETRAIT', statut: r.transactionState }))
       ];
       this.dataSource.data = transactions;
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+      this.applyFilter();
     });
   }
 
   applyFilter() {
     this.dataSource.filterPredicate = (data, filter) => {
       const matchesType = this.type === 'ALL' || data.type === this.type;
+      const matchesStatut = !this.statut || data.statut === this.statut;
       const matchesSearch =
         !this.search ||
         data.utilisateur?.nomUtilisateur?.toLowerCase().includes(this.search.toLowerCase()) ||
         data.utilisateur?.prenomUtilisateur?.toLowerCase().includes(this.search.toLowerCase()) ||
         data.numeroEnvoyant?.includes(this.search);
       const matchesPlateforme = !this.plateforme || data.optionDeTransaction === this.plateforme;
-      return matchesType && matchesSearch && matchesPlateforme;
+      return matchesType && matchesSearch && matchesPlateforme && matchesStatut;
     };
-    this.dataSource.filter = '' + Math.random(); // Force update
+    this.dataSource.filter = '' + Math.random(); // force update
   }
 
   voirDetails(t: any) {

@@ -102,7 +102,7 @@ export class RegisterComponent {
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    this.http.post('http://192.168.244.230:8080/utilisateurs', body, { headers }).subscribe({
+    this.http.post('http://192.168.11.100:8080/utilisateurs', body, { headers }).subscribe({
       next: () => {
         this.successMessage = '✅ Inscription réussie !';
         this.loading = false;

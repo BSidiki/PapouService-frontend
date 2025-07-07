@@ -10,18 +10,28 @@
 
     <mat-card class="stat-card accent">
       <div>💰 Dépôts validés</div>
-      <div>{{ totalDepotsValides }}</div>
+      <div>{{ totalDepotsValides | number }} FCFA</div>
     </mat-card>
 
     <mat-card class="stat-card warn">
       <div>💸 Retraits validés</div>
-      <div>{{ totalRetraitsValides }}</div>
+      <div>{{ totalRetraitsValides | number }} FCFA</div>
+    </mat-card>
+
+    <mat-card class="stat-card warning">
+      <div>⏳ Dépôts en attente</div>
+      <div>{{ depotsPendingCount }}</div>
+    </mat-card>
+
+    <mat-card class="stat-card warning">
+      <div>⏳ Retraits en attente</div>
+      <div>{{ retraitsPendingCount }}</div>
     </mat-card>
   </div>
 
   <!-- Section Graphique -->
   <div class="chart-section">
-    <h3>📊 Montants Dépôts vs Retraits</h3>
+    <h3>📊 Montants Dépôts en attente vs Retraits en attente</h3>
     <canvas baseChart
             [data]="donutChartData"
             [type]="'doughnut'">
@@ -31,6 +41,27 @@
   <!-- Section Transactions récentes -->
   <div class="table-section">
     <h3>📄 Transactions récentes</h3>
+    <div class="filter-bar">
+      <mat-form-field appearance="fill">
+        <mat-label>Filtrer par type</mat-label>
+        <mat-select [(value)]="filterType" (selectionChange)="updateDataSource(allTransactions)">
+          <mat-option value="ALL">Tous</mat-option>
+          <mat-option value="Dépôt">Dépôt</mat-option>
+          <mat-option value="Retrait">Retrait</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Plateforme</mat-label>
+        <mat-select [(value)]="filterPlateforme" (selectionChange)="updateDataSource(allTransactions)">
+          <mat-option value="ALL">Toutes</mat-option>
+          <mat-option value="IXBET">1XBET</mat-option>
+          <mat-option value="BETWINNER">BETWINNER</mat-option>
+          <mat-option value="MELBET">MELBET</mat-option>
+          <mat-option value="IWIN">1WIN</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
     <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 clickable-table">
 
       <!-- Type -->
@@ -39,10 +70,10 @@
         <td mat-cell *matCellDef="let element"> {{element.type}} </td>
       </ng-container>
 
-      <!-- Montant -->
-      <ng-container matColumnDef="montant">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant </th>
-        <td mat-cell *matCellDef="let element"> {{element.montant | number}} FCFA </td>
+      <!-- Nom -->
+      <ng-container matColumnDef="nom">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Client </th>
+        <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
       </ng-container>
 
       <!-- Numéro -->
@@ -51,14 +82,52 @@
         <td mat-cell *matCellDef="let element"> {{element.numero}} </td>
       </ng-container>
 
+      <!-- Plateforme -->
+      <ng-container matColumnDef="plateforme">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Plateforme </th>
+        <td mat-cell *matCellDef="let element"> {{element.plateforme}} </td>
+      </ng-container>
+
+      <!-- ID Plateforme -->
+      <ng-container matColumnDef="idPlateforme">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> 🆔 ID Plateforme </th>
+        <td mat-cell *matCellDef="let element"> {{element.idPlateforme}} </td>
+      </ng-container>
+
+      <!-- Montant -->
+      <ng-container matColumnDef="montant">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant </th>
+        <td mat-cell *matCellDef="let element"> {{element.montant | number}} FCFA </td>
+      </ng-container>
+
       <!-- Date -->
       <ng-container matColumnDef="date">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
         <td mat-cell *matCellDef="let element"> {{element.date | date:'short'}} </td>
       </ng-container>
 
+      <!-- Capture -->
+      <ng-container matColumnDef="capture">
+        <th mat-header-cell *matHeaderCellDef> Preuve </th>
+        <td mat-cell *matCellDef="let element">
+          <img *ngIf="element.capture"
+               [src]="'data:image/jpeg;base64,' + element.capture"
+               (click)="showImageZoom(element.capture); $event.stopPropagation()"
+               style="height: 30px; cursor: zoom-in; border-radius: 4px;"/>
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-button color="primary" (click)="traiter(element, 'VALIDATED'); $event.stopPropagation()" style="color: green;">Valider</button>
+          <button mat-button color="warn" (click)="traiter(element, 'REJECTED'); $event.stopPropagation()" style="color: red;">Rejeter</button>
+        </td>
+      </ng-container>
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="goToDetails(row)"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </div>
 </div>

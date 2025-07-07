@@ -1,0 +1,19 @@
+<!-- cotes-sportives.component.html -->
+<app-header-public></app-header-public>
+
+<div class="cotes-container">
+  <h2>📊 Matchs et Cotes 1N2</h2>
+  <div class="matches-grid">
+    <mat-card *ngFor="let match of matchs" class="match-card">
+      <h3>{{ match.home_team }} vs {{ match.away_team }}</h3>
+      <p>{{ match.date | date:'short' }}</p>
+      <div class="odds">
+        <span><strong>1</strong> : {{ match.odds["1"] }}</span>
+        <span><strong>N</strong> : {{ match.odds["N"] }}</span>
+        <span><strong>2</strong> : {{ match.odds["2"] }}</span>
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+<app-footer></app-footer>

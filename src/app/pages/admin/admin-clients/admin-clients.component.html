@@ -1,13 +1,32 @@
 <div class="admin-clients">
-  <span class="logo" routerLink="/accueil">
-    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
-  </span>
+  <!-- <span class="logo" routerLink="/accueil">
+    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" />
+  </span> -->
   <h2>👥 Liste des clients</h2>
+  <div class="filters-reshearch">
+    <mat-form-field appearance="outline" class="search-bar">
+      <mat-label>Rechercher</mat-label>
+      <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom, Prénom ou Numéro" />
+    </mat-form-field>
 
-  <mat-form-field appearance="outline" class="search-bar">
-    <mat-label>Rechercher</mat-label>
-    <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom, Prénom ou Numéro">
-  </mat-form-field>
+    <!-- 🎯 Filtres par nombre d’étoiles -->
+    <div class="filter-section">
+      <label>Filtrer par fidélité : </label>
+      <select [(ngModel)]="selectedStarFilter" (change)="filterByStars()">
+        <option value="">Toutes</option>
+        <option *ngFor="let star of [0,1,2,3,4,5]" [value]="star">{{ star }} ⭐</option>
+      </select>
+      <button mat-button color="primary" (click)="resetFilter()">Réinitialiser</button>
+    </div>
+
+    <!-- 📊 Graphique fidélité -->
+    <div class="chart-container">
+      <canvas baseChart
+        [data]="{ labels: chartLabels, datasets: [{ data: chartData, label: 'Clients par fidélité' }] }"
+        [type]="'bar'">
+      </canvas>
+    </div>
+  </div>
 
   <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
     <ng-container matColumnDef="prenom">
@@ -25,13 +44,26 @@
       <td mat-cell *matCellDef="let client">{{ client.numeroUtilisateur }}</td>
     </ng-container>
 
+    <ng-container matColumnDef="fidelity">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fidélité</th>
+      <td mat-cell *matCellDef="let client">
+        <span class="stars">{{ client.fidelityStars }}</span>
+        <span
+          *ngIf="client.isFidele"
+          class="badge"
+          matTooltip="Client fidèle : 25 dépôts validés ou plus 🎖"
+          >🎖 Fidèle</span
+        >
+      </td>
+    </ng-container>
+
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let client">
         <button mat-button color="primary" (click)="voirProfil(client.idUtilisateur)">Profil</button>
         <button mat-button color="accent" (click)="voirHistorique(client.idUtilisateur)">Historique</button>
-        <button mat-button color="warn" (click)="supprimer(client.idUtilisateur)">Supprimer</button>
-      </td>
+<!--         <button mat-button color="warn" (click)="supprimer(client.idUtilisateur)">Supprimer</button>
+ -->      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

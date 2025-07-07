@@ -1,0 +1,43 @@
+.matchs-container {
+  padding: 2rem 1rem;
+  max-width: 800px;
+  margin: auto;
+
+  h2 {
+    text-align: center;
+    color: #1976d2;
+    margin-bottom: 1.5rem;
+  }
+
+  .match-card {
+    margin-bottom: 1rem;
+
+    mat-card {
+      padding: 1rem;
+
+      mat-card-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      mat-card-subtitle {
+        font-size: 0.9rem;
+        color: gray;
+        margin-bottom: 1rem;
+      }
+
+      .cotes {
+        display: flex;
+        justify-content: space-around;
+        padding-top: 0.5rem;
+
+        .cote {
+          font-size: 1rem;
+          background: #f0f0f0;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+        }
+      }
+    }
+  }
+}

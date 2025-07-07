@@ -56,7 +56,7 @@ export class AdminAnnoncesComponent implements OnInit {
   }
 
   loadAnnonces() {
-    this.http.get<any[]>('http://192.168.244.230:8080/annonces').subscribe({
+    this.http.get<any[]>('http://192.168.11.100:8080/annonces').subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.dataSource.sort = this.sort;
@@ -78,14 +78,21 @@ export class AdminAnnoncesComponent implements OnInit {
   }
 
   onSubmit() {
+    if (this.isEditing && !this.editId) {
+      alert("ID manquant pour la modification !");
+      return;
+    }
+
     const formData = new FormData();
     formData.append('titre', this.annonceForm.value.titre);
     formData.append('texte', this.annonceForm.value.texte);
-    if (this.selectedImage) formData.append('media', this.selectedImage);
+    if (this.selectedImage) {
+      formData.append('media', this.selectedImage);
+    }
 
     const request = this.isEditing
-      ? this.http.put(`http://192.168.244.230:8080/annonces/${this.editId}`, formData)
-      : this.http.post('http://192.168.244.230:8080/annonces', formData);
+      ? this.http.put(`http://192.168.11.100:8080/annonces/${this.editId}`, formData)
+      : this.http.post('http://192.168.11.100:8080/annonces', formData);
 
     request.subscribe({
       next: () => {
@@ -95,22 +102,39 @@ export class AdminAnnoncesComponent implements OnInit {
         this.isEditing = false;
         this.editId = null;
       },
-      error: () => alert("Échec de l'enregistrement"),
+      error: (err) => {
+        console.error(err);
+        alert("Échec de l'enregistrement ou de la modification");
+      }
     });
+  }
+
+  cancelEdit() {
+    this.isEditing = false;
+    this.editId = null;
+    this.annonceForm.reset();
+    this.selectedImage = null;
   }
 
   editAnnonce(annonce: any) {
     this.isEditing = true;
-    this.editId = annonce.id;
+    this.editId = annonce.idAnnonce; // ✅ correct car l'API renvoie "idAnnonce"
     this.annonceForm.patchValue({
       titre: annonce.titre,
       texte: annonce.texte,
     });
   }
 
-  deleteAnnonce(id: number) {
+
+  deleteAnnonce(id: number | undefined) {
+    if (!id) {
+      alert("ID de l'annonce introuvable");
+      return;
+    }
+
     if (!confirm('Supprimer cette annonce ?')) return;
-    this.http.delete(`http://192.168.244.230:8080/annonces/${id}`).subscribe({
+
+    this.http.delete(`http://192.168.11.100:8080/annonces/${id}`).subscribe({
       next: () => this.loadAnnonces(),
       error: () => alert('Erreur suppression'),
     });

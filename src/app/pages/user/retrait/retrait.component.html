@@ -1,3 +1,6 @@
+<section class="hero-carousel">
+  <app-annonces-public></app-annonces-public>
+</section>
 <div class="retrait-container">
   <h2>💸 Faire un retrait</h2>
 
@@ -25,9 +28,15 @@
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Option de retrait</mat-label>
       <mat-select [(ngModel)]="form.optionRetrait" name="optionRetrait" required>
-        <mat-option value="O">Orange Money</mat-option>
-        <mat-option value="M">Moov Money</mat-option>
-        <mat-option value="C">Carte Bancaire</mat-option>
+        <mat-option value="O">Orange Money
+          <img src="assets/images/OrangeMoney.png" alt="Orange Money" class="logo-option" height="20"/>
+        </mat-option>
+        <mat-option value="M">Moov Money
+          <img src="assets/images/MoovMoney.png" alt="Moov Money" class="logo-option" height="22"/>
+        </mat-option>
+        <mat-option value="C">Carte Bancaire
+          <img src="assets/images/CarteBancaire.jpeg" alt="Carte Bancaire" class="logo-option" height="20"/>
+        </mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -44,10 +53,18 @@
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Option de transaction</mat-label>
       <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
-        <mat-option value="1XBET">1XBET</mat-option>
-        <mat-option value="BETWINNER">BETWINNER</mat-option>
-        <mat-option value="MELBET">MELBET</mat-option>
-        <mat-option value="1WIN">1WIN</mat-option>
+        <mat-option value="1XBET">1XBET
+          <img src="assets/images/1XBet.png" alt="1XBET" class="logo-option" height="16"/>
+        </mat-option>
+        <mat-option value="BETWINNER">BETWINNER
+          <img src="assets/images/BetWinner.png" alt="BETWINNER" class="logo-option" height="16"/>
+        </mat-option>
+        <mat-option value="MELBET">MELBET
+          <img src="assets/images/MelBet.png" alt="MELBET" class="logo-option" height="16"/>
+        </mat-option>
+        <mat-option value="1WIN">1WIN
+          <img src="assets/images/1Win1.png" alt="1WIN" class="logo-option" height="16"/>
+        </mat-option>
       </mat-select>
     </mat-form-field>
 
