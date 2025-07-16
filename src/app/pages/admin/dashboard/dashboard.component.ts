@@ -5,7 +5,7 @@ import { MatSort } from '@angular/material/sort';
 import { ChartConfiguration } from 'chart.js';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CommonModule, formatDate } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -17,6 +17,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,7 +33,8 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatButtonModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -81,7 +83,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.depotsPendingCount = 0;
     this.retraitsPendingCount = 0;
 
-    this.http.get<any[]>('http://192.168.11.100:8080/depots').subscribe(depots => {
+    this.http.get<any[]>('http://192.168.57.230:8080/depots').subscribe(depots => {
       depots = depots || [];
       this.totalDepotsValides = depots.filter(d => d.transactionState === 'VALIDATED').reduce((sum, d) => sum + (d.montant || 0), 0);
       const pendingDepots = depots.filter(d => d.transactionState === 'PENDING');
@@ -100,7 +102,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         capture: d.capture
       })));
 
-      this.http.get<any[]>('http://192.168.11.100:8080/retraits').subscribe(retraits => {
+      this.http.get<any[]>('http://192.168.57.230:8080/retraits').subscribe(retraits => {
         retraits = retraits || [];
         this.totalRetraitsValides = retraits.filter(r => r.transactionState === 'VALIDATED').reduce((sum, r) => sum + (r.montant || 0), 0);
         const pendingRetraits = retraits.filter(r => r.transactionState === 'PENDING');
@@ -127,7 +129,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       });
     });
 
-    this.http.get<any[]>('http://192.168.11.100:8080/utilisateurs').subscribe(clients => {
+    this.http.get<any[]>('http://192.168.57.230:8080/utilisateurs').subscribe(clients => {
       this.nombreClients = (clients || []).length;
     });
   }
@@ -155,19 +157,38 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   traiter(row: any, etat: 'VALIDATED' | 'REJECTED') {
-    const url = row.type === 'Dépôt'
-      ? `http://192.168.11.100:8080/depots/${row.userId}/${row.id}/${etat}`
-      : `http://192.168.11.100:8080/retraits/${row.userId}/${row.id}/${etat}`;
+    if (etat === 'REJECTED') {
+      const dialogRef = this.dialog.open(MotifRejetDialogComponent, {
+        width: '400px',
+        data: { type: row.type }
+      });
 
-    this.http.put(url, {}).subscribe({
-      next: () => {
-        this.snackBar.open(`Transaction ${etat === 'VALIDATED' ? 'validée' : 'rejetée'} ✅`, 'Fermer', { duration: 3000 });
-        this.loadDonnees();
-      },
-      error: () => {
-        this.snackBar.open(`Erreur lors du traitement ❌`, 'Fermer', { duration: 3000 });
-      }
-    });
+      dialogRef.afterClosed().subscribe(motif => {
+        if (motif) {
+          this.snackBar.open(`Transaction rejetée ❌ | Motif: ${motif}`, 'Fermer', { duration: 5000 });
+          // ici on pourrait envoyer le motif à un service externe ou l'enregistrer localement
+          const url = row.type === 'Dépôt'
+            ? `http://192.168.57.230:8080/depots/${row.userId}/${row.id}/REJECTED`
+            : `http://192.168.57.230:8080/retraits/${row.userId}/${row.id}/REJECTED`;
+
+          this.http.put(url, {}).subscribe(() => this.loadDonnees());
+        }
+      });
+    } else {
+      const url = row.type === 'Dépôt'
+        ? `http://192.168.57.230:8080/depots/${row.userId}/${row.id}/VALIDATED`
+        : `http://192.168.57.230:8080/retraits/${row.userId}/${row.id}/VALIDATED`;
+
+      this.http.put(url, {}).subscribe({
+        next: () => {
+          this.snackBar.open(`Transaction validée ✅`, 'Fermer', { duration: 3000 });
+          this.loadDonnees();
+        },
+        error: () => {
+          this.snackBar.open(`Erreur lors du traitement ❌`, 'Fermer', { duration: 3000 });
+        }
+      });
+    }
   }
 
   showImageZoom(capture: any) {
@@ -192,4 +213,32 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 })
 export class ImageDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: { image: string }) {}
+}
+
+@Component({
+  selector: 'motif-rejet-dialog',
+  standalone: true,
+  template: `
+    <h2 mat-dialog-title>Motif de rejet</h2>
+    <mat-dialog-content>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Motif</mat-label>
+        <textarea matInput [(ngModel)]="motif" rows="3"></textarea>
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Annuler</button>
+      <button mat-raised-button color="warn" [mat-dialog-close]="motif">Rejeter</button>
+    </mat-dialog-actions>
+  `,
+  imports: [
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule
+  ],
+})
+export class MotifRejetDialogComponent {
+  motif = '';
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { type: string }) {}
 }

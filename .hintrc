@@ -28,9 +28,11 @@
       {
         "ignore": [
           "hyphens",
-          "backdrop-filter"
+          "backdrop-filter",
+          "-webkit-overflow-scrolling"
         ]
       }
-    ]
+    ],
+    "disown-opener": "off"
   }
 }

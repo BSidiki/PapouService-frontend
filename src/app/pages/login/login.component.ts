@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeaderPublicComponent } from '../../layout/header-public/header-public.component';
+import { FooterComponent } from "../../layout/footer/footer.component";
 
 @Component({
   selector: 'app-login',
@@ -24,8 +25,9 @@ import { HeaderPublicComponent } from '../../layout/header-public/header-public.
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    HeaderPublicComponent
-  ],
+    HeaderPublicComponent,
+    FooterComponent
+],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })

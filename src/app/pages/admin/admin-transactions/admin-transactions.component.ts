@@ -49,8 +49,8 @@ export class AdminTransactionsComponent implements OnInit {
 
   loadTransactions() {
     const requests = [
-      this.http.get<any[]>('http://192.168.11.100:8080/depots'),
-      this.http.get<any[]>('http://192.168.11.100:8080/retraits')
+      this.http.get<any[]>('http://192.168.57.230:8080/depots'),
+      this.http.get<any[]>('http://192.168.57.230:8080/retraits')
     ];
 
     Promise.all(requests.map(req => req.toPromise())).then(([depots, retraits]) => {

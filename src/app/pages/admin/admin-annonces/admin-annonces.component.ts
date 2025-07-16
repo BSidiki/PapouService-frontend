@@ -56,7 +56,7 @@ export class AdminAnnoncesComponent implements OnInit {
   }
 
   loadAnnonces() {
-    this.http.get<any[]>('http://192.168.11.100:8080/annonces').subscribe({
+    this.http.get<any[]>('http://192.168.57.230:8080/annonces').subscribe({
       next: (data) => {
         this.dataSource.data = data;
         this.dataSource.sort = this.sort;
@@ -91,8 +91,8 @@ export class AdminAnnoncesComponent implements OnInit {
     }
 
     const request = this.isEditing
-      ? this.http.put(`http://192.168.11.100:8080/annonces/${this.editId}`, formData)
-      : this.http.post('http://192.168.11.100:8080/annonces', formData);
+      ? this.http.put(`http://192.168.57.230:8080/annonces/${this.editId}`, formData)
+      : this.http.post('http://192.168.57.230:8080/annonces', formData);
 
     request.subscribe({
       next: () => {
@@ -134,7 +134,7 @@ export class AdminAnnoncesComponent implements OnInit {
 
     if (!confirm('Supprimer cette annonce ?')) return;
 
-    this.http.delete(`http://192.168.11.100:8080/annonces/${id}`).subscribe({
+    this.http.delete(`http://192.168.57.230:8080/annonces/${id}`).subscribe({
       next: () => this.loadAnnonces(),
       error: () => alert('Erreur suppression'),
     });

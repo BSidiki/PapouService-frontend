@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { HeaderPublicComponent } from "../../layout/header-public/header-public.component";
+import { FooterComponent } from "../../layout/footer/footer.component";
 
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [CommonModule, MatExpansionModule, HeaderPublicComponent],
+  imports: [CommonModule, MatExpansionModule, HeaderPublicComponent, FooterComponent],
   templateUrl: './faq.component.html',
   styleUrls: ['./faq.component.scss']
 })

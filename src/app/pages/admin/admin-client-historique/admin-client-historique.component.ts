@@ -42,14 +42,14 @@ export class AdminClientHistoriqueComponent implements OnInit {
   ngOnInit(): void {
     this.clientId = this.route.snapshot.paramMap.get('id')!;
 
-    this.http.get<any[]>(`http://192.168.11.100:8080/utilisateurs/${this.clientId}/historiques`)
+    this.http.get<any[]>(`http://192.168.57.230:8080/utilisateurs/${this.clientId}/historiques`)
       .subscribe({
         next: (data) => {
           this.historiques = data.sort((a, b) => b.id_transaction - a.id_transaction);
           const requests = this.historiques.map((item) => {
             const url = item.transaction === 'DEPOT'
-              ? `http://192.168.11.100:8080/depots/${item.id_transaction}`
-              : `http://192.168.11.100:8080/retraits/${item.id_transaction}`;
+              ? `http://192.168.57.230:8080/depots/${item.id_transaction}`
+              : `http://192.168.57.230:8080/retraits/${item.id_transaction}`;
 
             return this.http.get<any>(url).toPromise().then(details => {
               item.date = details.dateDepot || details.dateRetrait || null;

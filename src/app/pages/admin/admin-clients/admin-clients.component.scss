@@ -1,9 +1,13 @@
 .admin-clients {
   padding: 2rem;
+  font-family: 'Roboto', sans-serif;
 
   h2 {
     margin-bottom: 1.5rem;
-    color: #1976d2;
+    color: #00adef;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 1.8rem;
   }
 
   .logo {
@@ -23,12 +27,15 @@
   table {
     width: 100%;
     border-collapse: collapse;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
   }
 
   th.mat-header-cell {
-    background-color: #1976d2;
+    background-color: #00adef;
     color: white;
     font-weight: bold;
+    font-family: 'Poppins', sans-serif;
   }
 
   td.mat-cell {
@@ -43,6 +50,7 @@
     .search-bar {
       width: 100%;
     }
+
     table {
       font-size: 14px;
     }
@@ -51,6 +59,8 @@
   .stars {
     color: gold;
     font-size: 1.2em;
+    letter-spacing: 0.05rem;
+    font-family: 'Arial', sans-serif;
   }
 
   .badge {
@@ -60,17 +70,22 @@
     padding: 2px 6px;
     margin-left: 8px;
     font-weight: bold;
+    font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
   }
 
-  .filter-section {
+  .filter-section,
+  .filters-reshearch {
     margin: 1em 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     .filter-input {
       width: 200px;
       margin-right: 10px;
     }
+
     .filter-button {
       margin-left: 10px;
     }
@@ -79,22 +94,10 @@
   .chart-container {
     max-width: 500px;
     margin-bottom: 20px;
+
     canvas {
       width: 100% !important;
       height: auto !important;
-    }
-  }
-  .filters-reshearch{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    .filter-input {
-      width: 200px;
-      margin-right: 10px;
-    }
-    .filter-button {
-      margin-left: 10px;
     }
   }
 }

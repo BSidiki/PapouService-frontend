@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://192.168.11.100:8080'; // Adapté à ton backend
+  private apiUrl = 'http://192.168.57.230:8080'; // Adapté à ton backend
 
   constructor(public http: HttpClient) {}
 

@@ -14,6 +14,17 @@
       }}
     </span>
   </div>
+  <!-- Affichage du motif si rejeté -->
+  <div *ngIf="depot.transactionState === 'REJECTED'" class="rejection-section">
+    <mat-divider></mat-divider>
+    <p class="motif-title">❗ Motif du rejet :</p>
+    <p class="motif-texte">{{ motif || 'Nous avons rejeté votre dépôt' }}</p>
+
+    <div class="call-admin">
+      <!-- <p>Pour plus d'information contacter nos assistances</p> -->
+      <a class="call-button" href="tel:+22660417255">📞 Appeler l’assistance</a>
+    </div>
+  </div>
 
   <h3 class="montant">Montant de dépôt : {{ depot.montant | number }} FCFA</h3>
 

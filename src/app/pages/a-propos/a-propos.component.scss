@@ -1,37 +1,52 @@
 .a-propos-container {
-  max-width: 900px;
+  max-width: 80%;
   margin: 2rem auto;
   padding: 2rem;
+  font-family: 'Roboto', 'Open Sans', sans-serif;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 
   h2 {
     text-align: center;
-    color: #1976d2;
+    color: #991f23;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 2rem;
     margin-bottom: 1.5rem;
   }
 
   h3 {
-    margin-top: 2rem;
-    color: #444;
+    margin-top: 1.5rem;
+    color: #00adef;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
   }
 
   p, ul {
     font-size: 1rem;
     line-height: 1.6;
-    color: #555;
+    color: #444;
   }
 
   a {
-    color: #1976d2;
+    color: #00adef;
+    font-weight: 500;
     text-decoration: none;
 
     &:hover {
       text-decoration: underline;
+      color: #008bc1;
     }
   }
 
   ul {
-    list-style-type: disc;
+    list-style: disc;
     padding-left: 1.5rem;
+    li {
+      margin-bottom: 0.5rem;
+    }
   }
 
   .banner img {
@@ -39,6 +54,7 @@
     height: auto;
     border-radius: 12px;
     margin-bottom: 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
 
   .team-photo {
@@ -48,13 +64,69 @@
     img {
       max-width: 100%;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
     .caption {
       font-style: italic;
       margin-top: 0.5rem;
       color: #777;
+      font-family: 'Poppins', sans-serif;
+    }
+  }
+
+  .info-emplacement {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #e3f7fb;
+
+    .partie {
+      flex: 1 1 180px;
+      padding: 1rem;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      text-align: center;
+
+      h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      img.logo-img {
+        width: 80px;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        margin: 0.2rem 0;
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .info-emplacement {
+      flex-direction: column;
+      align-items: center;
+
+      .partie {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+    h2 {
+      font-size: 1.6rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
     }
   }
 }

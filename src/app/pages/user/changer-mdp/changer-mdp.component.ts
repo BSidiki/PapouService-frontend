@@ -51,7 +51,7 @@ export class ChangerMdpComponent {
       nouveauMotDePasse: this.form.nouveauMotDePasse
     };
 
-    this.http.put(`http://192.168.11.100:8080/utilisateur/${this.userId}/mot-de-passe`, payload)
+    this.http.put(`http://192.168.11.103:8080/utilisateur/${this.userId}/mot-de-passe`, payload)
       .subscribe({
         next: () => {
           this.message = 'Mot de passe changé avec succès';

@@ -36,12 +36,12 @@ export class AdminClientDetailComponent implements OnInit {
 
 ngOnInit(): void {
   this.clientId = this.route.snapshot.paramMap.get('id');
-  this.http.get(`http://192.168.11.100:8080/utilisateurs/getuser/${this.clientId}`).subscribe({
+  this.http.get(`http://192.168.57.230:8080/utilisateurs/getuser/${this.clientId}`).subscribe({
     next: (data) => {
       this.client = data;
 
       // Appel pour les dépôts validés liés à ce client
-      this.http.get<any[]>(`http://192.168.11.100:8080/depots`).subscribe(depots => {
+      this.http.get<any[]>(`http://192.168.57.230:8080/depots`).subscribe(depots => {
         const validDepots = depots.filter(
           d => d.transactionState === 'VALIDATED' &&
                d.utilisateur?.numeroUtilisateur === this.client.numeroUtilisateur
@@ -76,7 +76,7 @@ ngOnInit(): void {
 
   supprimerClient() {
     if (!confirm("Voulez-vous vraiment supprimer ce client ?")) return;
-    this.http.delete(`http://192.168.11.100:8080/utilisateurs/${this.clientId}`).subscribe({
+    this.http.delete(`http://192.168.57.230:8080/utilisateurs/${this.clientId}`).subscribe({
       next: () => {
         alert("Client supprimé avec succès.");
         this.router.navigate(['/admin/clients']);

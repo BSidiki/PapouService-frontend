@@ -23,10 +23,24 @@ export class RetraitDetailComponent implements OnInit {
     private location: Location
   ) {}
 
+  // ngOnInit(): void {
+  //   const id = this.route.snapshot.paramMap.get('id');
+  //   this.http.get(`http://192.168.57.230:8080/retraits/${id}`).subscribe({
+  //     next: (data) => this.retrait = data,
+  //     error: (err) => {
+  //       console.error(err);
+  //       alert("Erreur lors du chargement du retrait");
+  //     }
+  //   });
+  // }
+  motif: string = '';
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.http.get(`http://192.168.11.100:8080/retraits/${id}`).subscribe({
-      next: (data) => this.retrait = data,
+    this.http.get(`http://192.168.57.230:8080/retraits/${id}`).subscribe({
+      next: (data: any) => {
+        this.retrait = data;
+        this.motif = data.motifRejet || ''; // 🔄 Assurez-vous que le backend renvoie ça, sinon on le simulera plus tard
+      },
       error: (err) => {
         console.error(err);
         alert("Erreur lors du chargement du retrait");
@@ -43,7 +57,7 @@ export class RetraitDetailComponent implements OnInit {
   }
 
   changerStatut(nouveauStatut: 'VALIDATED' | 'REJECTED') {
-    this.http.put(`http://192.168.11.100:8080/retraits/0/${this.retrait.idRetrait}/${nouveauStatut}`, {})
+    this.http.put(`http://192.168.57.230:8080/retraits/0/${this.retrait.idRetrait}/${nouveauStatut}`, {})
       .subscribe({
         next: () => {
           this.retrait.transactionState = nouveauStatut;
@@ -68,9 +82,9 @@ export class RetraitDetailComponent implements OnInit {
     }
   }
 
-toggleZoom() {
-  this.zoomed = !this.zoomed;
-}
+  toggleZoom() {
+    this.zoomed = !this.zoomed;
+  }
   get zoomClass() {
     return this.zoomed ? 'zoomed' : '';
   }

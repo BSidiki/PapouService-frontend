@@ -34,7 +34,7 @@ export class ProfilComponent implements OnInit {
   ngOnInit(): void {
     this.user = { ...this.auth.getUser() };
 
-    this.http.get<any[]>('http://192.168.11.100:8080/depots').subscribe(depots => {
+    this.http.get<any[]>('http://192.168.57.230:8080/depots').subscribe(depots => {
       const validDepots = depots.filter(
         d => d.transactionState === 'VALIDATED' &&
              d.utilisateur?.numeroUtilisateur === this.user.numeroUtilisateur
@@ -63,7 +63,7 @@ export class ProfilComponent implements OnInit {
     if (this.user.id_MELBET) params = params.set('id_MELBET', this.user.id_MELBET);
     if (this.user.id_1WIN) params = params.set('id_1WIN', this.user.id_1WIN);
 
-    this.http.put(`http://192.168.11.100:8080/utilisateurs/update/${id}`, null, { params }).subscribe({
+    this.http.put(`http://192.168.57.230:8080/utilisateurs/update/${id}`, null, { params }).subscribe({
       next: (res: any) => {
         alert('Profil mis à jour avec succès !');
         this.auth.saveUser(res);

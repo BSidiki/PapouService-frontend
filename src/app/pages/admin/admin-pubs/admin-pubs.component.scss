@@ -1,30 +1,49 @@
 .admin-pubs {
   padding: 2rem;
+  font-family: 'Roboto', sans-serif;
 
   h2 {
     margin-bottom: 1.5rem;
-    color: #1976d2;
+    color: #00adef;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 1.8rem;
   }
 
   .form {
     margin-bottom: 2rem;
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     align-items: center;
+    font-family: 'Poppins', sans-serif;
   }
 
   .pub-table {
     width: 100%;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+
+    th.mat-header-cell {
+      background-color: #00adef;
+      color: white;
+      font-weight: bold;
+    }
+
+    td.mat-cell {
+      background-color: #fff;
+    }
 
     .pub-img {
       max-width: 150px;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+      cursor: pointer;
 
-    th.mat-header-cell {
-      background-color: #1976d2;
-      color: white;
+      &:hover {
+        transform: scale(1.05);
+      }
     }
   }
 }

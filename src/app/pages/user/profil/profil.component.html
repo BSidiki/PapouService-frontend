@@ -1,17 +1,16 @@
+<!-- ✅ Encapsule le formulaire dans une grille responsive -->
 <section class="hero-carousel">
   <app-annonces-public></app-annonces-public>
 </section>
-<div class="header-profil">
-  <!-- <app-matchs></app-matchs> -->
 
+<div class="header-profil">
   <div class="profil-container">
-    <!-- <app-odds></app-odds> -->
     <h2>👤 Mon profil</h2>
 
     <div class="profil-fidelity">
       <div>
         <button mat-stroked-button color="accent" (click)="toggleAffichage()">
-          {{ afficherProfil ? 'Masquer' : 'Voir' }} le detail
+          {{ afficherProfil ? 'Masquer' : 'Voir' }} le détail
         </button>
       </div>
       <div class="fidelity-info" *ngIf="fidelityStars">

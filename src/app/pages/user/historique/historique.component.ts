@@ -31,15 +31,15 @@ export class HistoriqueComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.http.get<any[]>(`http://192.168.11.100:8080/utilisateurs/${this.userId}/historiques`)
+    this.http.get<any[]>(`http://192.168.57.230:8080/utilisateurs/${this.userId}/historiques`)
       .subscribe({
         next: data => {
           this.historiques = data.sort((a, b) => b.id_transaction - a.id_transaction);
 
           for (const item of this.historiques) {
             const url = item.transaction === 'DEPOT'
-              ? `http://192.168.11.100:8080/depots/${item.id_transaction}`
-              : `http://192.168.11.100:8080/retraits/${item.id_transaction}`;
+              ? `http://192.168.57.230:8080/depots/${item.id_transaction}`
+              : `http://192.168.57.230:8080/retraits/${item.id_transaction}`;
 
             this.http.get<any>(url).subscribe({
               next: (details) => {

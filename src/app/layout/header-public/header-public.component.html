@@ -1,18 +1,15 @@
 <mat-toolbar color="primary" class="public-toolbar">
-  <button mat-icon-button class="mobile-toggle" (click)="toggleMenu()">
+  <button mat-icon-button class="mobile-toggle" (click)="toggleMenu()" aria-label="Ouvrir/fermer menu">
     <mat-icon>{{ showMenu ? 'close' : 'menu' }}</mat-icon>
   </button>
 
-<!--   <span class="logo" routerLink="/accueil">PapouService</span> -->
-<span class="logo" routerLink="/accueil">
-  <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="100" height="65"/>
-</span>
+  <span class="logo" routerLink="/accueil">
+    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="100%" />
+  </span>
 
   <nav class="nav-links" [class.open]="showMenu">
     <a mat-button routerLink="/accueil" routerLinkActive="active">Accueil</a>
-<!--     <a mat-button routerLink="/accueil/annonces" routerLinkActive="active">Annonces</a>
- --><!--     <a mat-button routerLink="/accueil/albums" routerLinkActive="active">Albums</a>
- -->    <a mat-button routerLink="/faq" routerLinkActive="active">FAQ</a>
+    <a mat-button routerLink="/faq" routerLinkActive="active">FAQ</a>
     <a mat-button routerLink="/contact" routerLinkActive="active">Contact</a>
     <a mat-button routerLink="/a-propos" routerLinkActive="active">À propos</a>
     <a mat-button routerLink="/login" routerLinkActive="active">Connexion</a>

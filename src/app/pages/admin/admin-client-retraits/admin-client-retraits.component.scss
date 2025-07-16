@@ -1,5 +1,6 @@
 .retrait-container {
   padding: 1.5rem;
+  font-family: 'Roboto', sans-serif;
 
   .retour-btn {
     margin-bottom: 1rem;
@@ -10,24 +11,52 @@
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: #991f23;
   }
 
   h2 {
-    color: #d32f2f;
+    color: #991f23;
+    font-size: 1.8rem;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
     margin-bottom: 1rem;
   }
 
   .retrait-card {
     padding: 1rem;
     margin-bottom: 1rem;
-    border-left: 4px solid #d32f2f;
-    background: #fdf5f5;
+    border-left: 4px solid #991f23;
+    background: #fff4f4;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
+
+    &:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .contenu {
+      font-size: 1rem;
+      font-family: 'Roboto', sans-serif;
+      color: #333;
+    }
   }
 
   .link-text {
     margin-top: 0.5rem;
-    color: #d32f2f;
+    color: #991f23;
     font-weight: bold;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: text-decoration 0.2s;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }

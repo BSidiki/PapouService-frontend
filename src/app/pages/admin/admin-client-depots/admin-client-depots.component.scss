@@ -1,32 +1,49 @@
 .depot-container {
   padding: 1.5rem;
+  font-family: 'Roboto', sans-serif;
 
   .retour-btn {
     margin-bottom: 1rem;
   }
+
   .img-text {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1rem;
+    font-family: 'Poppins', sans-serif;
   }
 
   h2 {
-    color: #1976d2;
+    color: #00adef; // ✅ Bleu officiel
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
     margin-bottom: 1rem;
   }
 
   .depot-card {
     padding: 1rem;
     margin-bottom: 1rem;
-    border-left: 4px solid #1976d2;
+    border-left: 4px solid #00adef; // ✅ Adapté au thème
     background: #f9f9f9;
     cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #e3f7fd;
+    }
   }
 
   .link-text {
     margin-top: 0.5rem;
-    color: #1976d2;
+    color: #00adef;
     font-weight: bold;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }

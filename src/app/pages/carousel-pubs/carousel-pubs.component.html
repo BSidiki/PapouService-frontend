@@ -1,18 +1,19 @@
-<div class="pubs-section">
-  <div class="carousel-container" #carousel>
-    <div class="carousel-slide" *ngFor="let pub of pubs">
-      <a *ngIf="pub.lien" [href]="pub.lien" target="_blank">
+<div class="pubs-carousel">
+  <div class="carousel-wrapper" #carousel>
+    <div class="carousel-slide" *ngFor="let pub of pubs; index as i" [title]="pub.titre">
+      <a *ngIf="pub.lien" [href]="pub.lien" target="_blank" rel="noopener noreferrer">
         <img [src]="toBase64(pub.fichier)" [alt]="pub.titre" />
       </a>
-      <img *ngIf="!pub.lien" [src]="toBase64(pub.fichier)" [alt]="pub.titre" />
-      <div class="caption">{{ pub.titre }}</div>
+      <ng-container *ngIf="!pub.lien">
+        <img [src]="toBase64(pub.fichier)" [alt]="pub.titre" />
+      </ng-container>
     </div>
   </div>
 
-  <div class="dots-container" *ngIf="pubs.length > 1">
+  <div class="dots" *ngIf="pubs.length > 1">
     <span
       class="dot"
-      *ngFor="let pub of pubs; let i = index"
+      *ngFor="let pub of pubs; index as i"
       [class.active]="i === currentIndex"
       (click)="scrollTo(i)">
     </span>

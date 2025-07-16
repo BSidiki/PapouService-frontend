@@ -11,5 +11,5 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./footer.component.scss']
 })
 export class FooterComponent {
-  currentYear = new Date().getFullYear();
+  currentYear: number = new Date().getFullYear();
 }

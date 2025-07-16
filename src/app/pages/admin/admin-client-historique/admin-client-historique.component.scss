@@ -1,9 +1,9 @@
-/* admin-client-historique.component.scss */
-
 .historique-container {
   padding: 2rem;
   max-width: 1200px;
   margin: auto;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
 
   .top-bar {
     display: flex;
@@ -15,8 +15,9 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      font-size: 1.5rem;
-      font-weight: bold;
+      font-size: 1.6rem;
+      font-family: 'Montserrat', sans-serif;
+      color: #00adef;
 
       .logo-img {
         height: 40px;
@@ -34,12 +35,13 @@
     .filter-select {
       flex: 1;
       min-width: 200px;
+      font-family: 'Poppins', sans-serif;
     }
   }
 
   .no-result {
     text-align: center;
-    color: #888;
+    color: #999;
     font-style: italic;
     margin-top: 2rem;
   }
@@ -55,18 +57,21 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 
     &.depot-card {
-      border-color: #4caf50;
+      border-color: #00c853;
     }
 
     &.retrait-card {
-      border-color: #e53935;
+      border-color: #d32f2f;
     }
 
     &:hover {
       transform: scale(1.02);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     }
 
     .contenu {
@@ -79,9 +84,12 @@
         align-items: center;
         gap: 0.5rem;
         font-size: 1.2rem;
+        font-weight: 500;
+        color: #333;
 
         .icon {
           font-size: 1.5rem;
+          color: #00adef;
         }
       }
 
@@ -91,7 +99,7 @@
         padding: 0.3rem 0.6rem;
         border-radius: 4px;
         font-weight: bold;
-        color: white;
+        color: #fff;
         margin-top: 0.3rem;
 
         &.pending {
@@ -103,33 +111,26 @@
         }
 
         &.rejected {
-          background-color: #f44336;
+          background-color: #e53935;
         }
       }
 
       .link-text {
         margin-top: 0.5rem;
         font-weight: bold;
-        color: #3f51b5;
+        color: #00adef;
         display: flex;
         align-items: center;
         gap: 0.3rem;
         cursor: pointer;
         text-decoration: none;
+
         &:hover {
           text-decoration: underline;
         }
+
         .icon {
           font-size: 1.2rem;
-        }
-        .link-text {
-          color: inherit;
-        }
-        .link-text:hover {
-          text-decoration: underline;
-        }
-        .link-text:visited {
-          color: inherit;
         }
       }
     }

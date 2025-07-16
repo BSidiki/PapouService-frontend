@@ -24,13 +24,18 @@ import { MatListModule } from '@angular/material/list';
   styleUrls: ['./header.component.scss']
 })
 export class LayoutHeaderComponent {
-  isMobile = false;
+  isMobile: boolean = false;
 
   constructor(public authService: AuthService, private router: Router) {}
 
-  ngOnInit() {
-    this.checkScreenSize();
-  }
+ngOnInit(): void {
+  this.checkScreenSize();
+  this.isMobile = window.innerWidth <= 768;
+  window.addEventListener('resize', () => {
+    this.isMobile = window.innerWidth <= 768;
+  });
+}
+
 
   @HostListener('window:resize')
   onResize() {

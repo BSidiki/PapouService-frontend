@@ -4,75 +4,98 @@
 <div class="retrait-container">
   <h2>💸 Faire un retrait</h2>
 
-  <form (ngSubmit)="submitRetrait()">
+  <div class="page-depot">
+    <div class="page-depot1">
+      <form (ngSubmit)="submitRetrait()">
+        <div *ngIf="transactionOptionsDisponibles.length === 0" class="alert-message">
+          ⚠️ Attention! Vous n'avez aucun ID enregistrer.<br> Vous pouvez modifier votre profil en ajoutant vos ID
+        </div>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Pays</mat-label>
+          <mat-select [(ngModel)]="form.pays" name="pays" (selectionChange)="onPaysChange()" required>
+            <mat-option *ngFor="let pays of paysOptions" [value]="pays.nom">{{ pays.nom }}</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Pays</mat-label>
-      <mat-select [(ngModel)]="form.pays" name="pays" (selectionChange)="onPaysChange()" required>
-        <mat-option *ngFor="let pays of paysOptions" [value]="pays.nom">{{ pays.nom }}</mat-option>
-      </mat-select>
-    </mat-form-field>
+        <div class="numero-container">
+          <mat-form-field appearance="fill" class="indicatif">
+            <mat-label>Indicatif</mat-label>
+            <input matInput [value]="form.indicatif" disabled />
+          </mat-form-field>
 
-    <div class="numero-container">
-      <mat-form-field appearance="fill" class="indicatif">
-        <mat-label>Indicatif</mat-label>
-        <input matInput [value]="form.indicatif" disabled />
-      </mat-form-field>
+          <mat-form-field appearance="fill" class="numero">
+            <mat-label>Numéro</mat-label>
+            <input matInput [(ngModel)]="form.numero" name="numero" required />
+          </mat-form-field>
+        </div>
 
-      <mat-form-field appearance="fill" class="numero">
-        <mat-label>Numéro</mat-label>
-        <input matInput [(ngModel)]="form.numero" name="numero" required />
-      </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Option de transaction</mat-label>
+          <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
+            <mat-option *ngFor="let opt of transactionOptionsDisponibles" [value]="opt.value">
+              {{ opt.label }}
+              <img [src]="'assets/images/' + opt.label + '.png'" [alt]="opt.label" class="logo-option" height="16" />
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Option de retrait</mat-label>
+          <mat-select [(ngModel)]="form.optionRetrait" name="optionRetrait" required>
+            <mat-option value="O">Orange Money
+              <img src="assets/images/OrangeMoney.png" alt="Orange Money" class="logo-option" height="20"/>
+            </mat-option>
+            <mat-option value="M">Moov Money
+              <img src="assets/images/MoovMoney.png" alt="Moov Money" class="logo-option" height="22"/>
+            </mat-option>
+            <mat-option value="C">Carte Bancaire
+              <img src="assets/images/CarteBancaire.jpeg" alt="Carte Bancaire" class="logo-option" height="20"/>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Code de retrait</mat-label>
+          <input matInput [(ngModel)]="form.codeRetrait" name="codeRetrait" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Montant</mat-label>
+          <input matInput type="number" [(ngModel)]="form.montant" name="montant" required>
+        </mat-form-field>
+
+        <!-- <mat-form-field appearance="fill" class="full-width">
+          <mat-label>Option de transaction</mat-label>
+          <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
+            <mat-option value="1XBET">1XBET
+              <img src="assets/images/1XBet.png" alt="1XBET" class="logo-option" height="16"/>
+            </mat-option>
+            <mat-option value="BETWINNER">BETWINNER
+              <img src="assets/images/BetWinner.png" alt="BETWINNER" class="logo-option" height="16"/>
+            </mat-option>
+            <mat-option value="MELBET">MELBET
+              <img src="assets/images/MelBet.png" alt="MELBET" class="logo-option" height="16"/>
+            </mat-option>
+            <mat-option value="1WIN">1WIN
+              <img src="assets/images/1Win1.png" alt="1WIN" class="logo-option" height="16"/>
+            </mat-option>
+          </mat-select>
+        </mat-form-field> -->
+
+        <div class="full-width file-zone">
+          <label for="file">Capture de dépôt :</label>
+          <input type="file" id="file" (change)="onFileSelected($event)" required />
+        </div>
+
+        <button mat-raised-button color="primary" type="submit">Soumettre</button>
+      </form>
     </div>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Option de retrait</mat-label>
-      <mat-select [(ngModel)]="form.optionRetrait" name="optionRetrait" required>
-        <mat-option value="O">Orange Money
-          <img src="assets/images/OrangeMoney.png" alt="Orange Money" class="logo-option" height="20"/>
-        </mat-option>
-        <mat-option value="M">Moov Money
-          <img src="assets/images/MoovMoney.png" alt="Moov Money" class="logo-option" height="22"/>
-        </mat-option>
-        <mat-option value="C">Carte Bancaire
-          <img src="assets/images/CarteBancaire.jpeg" alt="Carte Bancaire" class="logo-option" height="20"/>
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Code de retrait</mat-label>
-      <input matInput [(ngModel)]="form.codeRetrait" name="codeRetrait" required>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Montant</mat-label>
-      <input matInput type="number" [(ngModel)]="form.montant" name="montant" required>
-    </mat-form-field>
-
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Option de transaction</mat-label>
-      <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
-        <mat-option value="1XBET">1XBET
-          <img src="assets/images/1XBet.png" alt="1XBET" class="logo-option" height="16"/>
-        </mat-option>
-        <mat-option value="BETWINNER">BETWINNER
-          <img src="assets/images/BetWinner.png" alt="BETWINNER" class="logo-option" height="16"/>
-        </mat-option>
-        <mat-option value="MELBET">MELBET
-          <img src="assets/images/MelBet.png" alt="MELBET" class="logo-option" height="16"/>
-        </mat-option>
-        <mat-option value="1WIN">1WIN
-          <img src="assets/images/1Win1.png" alt="1WIN" class="logo-option" height="16"/>
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <div class="full-width file-zone">
-      <label for="file">Capture de dépôt :</label>
-      <input type="file" id="file" (change)="onFileSelected($event)" required />
+    <!-- <div class="page-depot3">
+      <app-odds></app-odds>
+    </div> -->
+    <div class="page-depot2">
+      <app-matchs></app-matchs>
     </div>
-
-    <button mat-raised-button color="primary" type="submit">Soumettre</button>
-  </form>
+  </div>
 </div>
+<app-footer></app-footer>

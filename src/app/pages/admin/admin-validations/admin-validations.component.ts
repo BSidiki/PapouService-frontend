@@ -34,8 +34,8 @@ export class AdminValidationsComponent implements OnInit {
   chargerTransactions() {
     this.loading = true;
     const endpoint = this.filter === 'DEPOT'
-      ? 'http://192.168.11.100:8080/depots'
-      : 'http://192.168.11.100:8080/retraits';
+      ? 'http://192.168.57.230:8080/depots'
+      : 'http://192.168.57.230:8080/retraits';
 
     this.http.get<any[]>(endpoint).subscribe({
       next: data => {

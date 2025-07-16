@@ -1,50 +1,94 @@
 .public-toolbar {
+  width: 100%; // ← ✅ Ajouté
   position: sticky;
   top: 0;
   z-index: 100;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
+  background-color: #991f23;
+  padding: 0.8rem 1.2rem;
+  font-family: 'Roboto', 'Open Sans', sans-serif;
 
   .logo {
+    display: flex;
+    align-items: center;
+    font-family: 'Montserrat', sans-serif;
     font-weight: bold;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
+    color: white;
     cursor: pointer;
+
+    img {
+      height: 45px;
+      margin-right: 0.5rem;
+    }
   }
 
   .mobile-toggle {
     display: none;
     color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    background: transparent;
+    border: none;
   }
 
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1rem;
 
     a {
-      font-size: 0.95rem;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
       color: white;
       text-decoration: none;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #00adef;
+      }
 
       &.active {
         font-weight: bold;
-        border-bottom: 2px solid white;
+        border-bottom: 2px solid #00adef;
+      }
+    }
+
+    a[mat-stroked-button] {
+      border: 2px solid white;
+      color: white;
+      font-weight: bold;
+      padding: 0.4rem 1rem;
+
+      &:hover {
+        border-color: #00adef;
+        color: #00adef;
       }
     }
   }
 
+  // Responsive mobile
   @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+
     .mobile-toggle {
       display: block;
+      margin-left: auto;
     }
 
     .nav-links {
       width: 100%;
       flex-direction: column;
       align-items: flex-start;
-      background: #1976d2;
+      background: #991f23;
       padding: 1rem;
+      margin-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
       display: none;
 
       &.open {
@@ -54,6 +98,13 @@
       a {
         width: 100%;
         padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      a[mat-stroked-button] {
+        align-self: stretch;
+        text-align: center;
+        margin-top: 0.5rem;
       }
     }
   }

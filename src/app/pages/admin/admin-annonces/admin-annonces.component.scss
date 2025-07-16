@@ -1,10 +1,14 @@
+@use 'sass:color';
 .admin-annonces {
   padding: 2rem;
   background-color: #f9f9f9;
+  font-family: 'Roboto', sans-serif;
 
   h2 {
-    color: #1976d2;
+    color: #991f23; // ✅ Rouge officiel
     margin-bottom: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
   }
 
   .form {
@@ -15,6 +19,19 @@
 
     mat-form-field {
       width: 100%;
+    }
+
+    button {
+      background-color: #00adef;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        // background-color: darken(#00adef, 10%);
+        background-color: color.adjust(#00adef, $lightness: -10%);
+      }
     }
   }
 
@@ -29,13 +46,20 @@
     overflow: hidden;
 
     th.mat-header-cell {
-      background-color: #1976d2;
+      background-color: #991f23;
       color: white;
       font-weight: bold;
+      font-family: 'Poppins', sans-serif;
     }
 
     td.mat-cell {
       background-color: #fff;
+      font-size: 0.95rem;
+      color: #333;
+    }
+
+    tr:hover td {
+      background-color: #f2f2f2;
     }
   }
 
@@ -47,8 +71,18 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  button[mat-icon-button] {
-    margin-right: 0.5rem;
+  .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+
+    button[mat-icon-button] {
+      color: #991f23;
+
+      &:hover {
+        color: #c62828;
+      }
+    }
   }
 
   @media (max-width: 768px) {
@@ -58,19 +92,11 @@
 
     .annonce-img {
       width: 60px;
-      height: 45px;
+      height: auto;
     }
   }
 
-  .annonce-img {
-    width: 60px;
-    height: auto;
-    border-radius: 6px;
-  }
-
-  .button-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
+  .logo{
+    margin-left: auto;
   }
 }

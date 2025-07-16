@@ -25,14 +25,19 @@ export class DepotDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.http.get(`http://192.168.11.100:8080/depots/${id}`).subscribe({
-      next: (data) => this.depot = data,
+    this.http.get(`http://192.168.57.230:8080/depots/${id}`).subscribe({
+      next: (data: any) => {
+        this.depot = data;
+        this.motif = data.motifRejet || ''; // 🔄 Assurez-vous que le backend renvoie ça, sinon on le simulera plus tard
+      },
       error: (err) => {
         console.error(err);
         alert("Erreur lors du chargement du dépôt");
       }
     });
   }
+
+  motif: string = '';
 
   toBase64(media: any): string {
     return 'data:image/jpeg;base64,' + media;
@@ -43,7 +48,7 @@ export class DepotDetailComponent implements OnInit {
   }
 
   changerStatut(nouveauStatut: 'VALIDATED' | 'REJECTED') {
-    this.http.put(`http://192.168.11.100:8080/depots/0/${this.depot.idDepot}/${nouveauStatut}`, {})
+    this.http.put(`http://192.168.57.230:8080/depots/0/${this.depot.idDepot}/${nouveauStatut}`, {})
       .subscribe({
         next: () => {
           this.depot.transactionState = nouveauStatut;
@@ -55,9 +60,9 @@ export class DepotDetailComponent implements OnInit {
       });
   }
 
-toggleZoom() {
-  this.zoomed = !this.zoomed;
-}
+  toggleZoom() {
+    this.zoomed = !this.zoomed;
+  }
   get zoomClass() {
     return this.zoomed ? 'zoomed' : '';
   }

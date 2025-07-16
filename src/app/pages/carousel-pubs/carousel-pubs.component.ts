@@ -25,7 +25,7 @@ export class CarouselPubsComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://192.168.11.100:8080/pubs').subscribe({
+    this.http.get<any[]>('http://192.168.57.230:8080/pubs').subscribe({
       next: data => {
         this.pubs = data;
         this.startAutoScroll();

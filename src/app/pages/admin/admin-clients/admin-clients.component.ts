@@ -42,9 +42,9 @@ export class AdminClientsComponent implements OnInit {
   constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    this.http.get<any[]>('http://192.168.11.100:8080/utilisateurs').subscribe(users => {
+    this.http.get<any[]>('http://192.168.57.230:8080/utilisateurs').subscribe(users => {
       const clients = users.filter(u => u.roles?.some((r: any) => r.name === 'USER'));
-      this.http.get<any[]>('http://192.168.11.100:8080/depots').subscribe(depots => {
+      this.http.get<any[]>('http://192.168.57.230:8080/depots').subscribe(depots => {
         const validatedDepots = depots.filter(d => d.transactionState === 'VALIDATED');
 
         const clientsWithFidelity = clients.map(client => {
@@ -99,7 +99,7 @@ export class AdminClientsComponent implements OnInit {
 
   supprimer(id: number) {
     if (confirm("Voulez-vous vraiment supprimer ce client ?")) {
-      this.http.delete(`http://192.168.11.109:8080/utilisateurs/${id}`).subscribe(() => {
+      this.http.delete(`http://192.168.57.230:8080/utilisateurs/${id}`).subscribe(() => {
         this.dataSource.data = this.dataSource.data.filter(u => u.idUtilisateur !== id);
         this.updateChart(this.dataSource.data);
       });

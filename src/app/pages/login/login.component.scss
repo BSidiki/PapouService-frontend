@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 .login-page {
   display: flex;
   justify-content: center;
@@ -5,19 +7,23 @@
   padding: 2rem;
   min-height: 80vh;
   background: #f1f5f9;
+  font-family: 'Roboto', 'Open Sans', sans-serif;
 
   .login-card {
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     padding: 2rem;
     border-radius: 16px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    background: white;
+    background: #ffffff;
 
     h2 {
       margin-bottom: 1.5rem;
       text-align: center;
-      color: #1976d2;
+      color: #991f23;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: bold;
+      font-size: 1.6rem;
     }
 
     .logo {
@@ -26,7 +32,7 @@
       margin-bottom: 1rem;
 
       .logo-img {
-        width: 150px;
+        width: 130px;
         height: auto;
       }
     }
@@ -35,12 +41,30 @@
       display: flex;
       flex-direction: column;
       gap: 1.2rem;
+
+      mat-form-field {
+        font-family: 'Roboto', 'Open Sans', sans-serif;
+      }
     }
 
     .submit-btn {
       width: 100%;
-      padding: 0.7rem;
-      background-color: #1976d2;
+      padding: 0.75rem;
+      font-size: 1rem;
+      background-color: color.adjust(#00adef, $lightness: -10%);
+      color: white;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: color.adjust(#00adef, $lightness: -15%);
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
     }
 
     .error-message {
@@ -55,8 +79,9 @@
       margin-top: 1rem;
 
       a {
-        color: #1976d2;
+        color: #00adef;
         text-decoration: none;
+        font-family: 'Poppins', sans-serif;
 
         &:hover {
           text-decoration: underline;
@@ -72,9 +97,11 @@
       padding: 1.5rem;
     }
   }
+
   ::ng-deep .mat-progress-spinner circle {
     stroke-width: 4px;
   }
+
   ::ng-deep .mat-progress-spinner {
     width: 40px;
     height: 40px;

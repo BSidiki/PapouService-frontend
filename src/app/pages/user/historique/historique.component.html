@@ -1,28 +1,34 @@
 <section class="hero-carousel">
   <app-annonces-public></app-annonces-public>
 </section>
-<mat-form-field appearance="fill" class="filter">
-  <mat-label>Filtrer par type</mat-label>
-  <mat-select [(ngModel)]="filter" (selectionChange)="applyFilter()">
-    <mat-option value="ALL">Tous</mat-option>
-    <mat-option value="DEPOT">Dépôts</mat-option>
-    <mat-option value="RETRAIT">Retraits</mat-option>
-  </mat-select>
-</mat-form-field>
 
-<mat-form-field appearance="fill" class="filter">
-  <mat-label>Filtrer par statut</mat-label>
-  <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilter()">
-    <mat-option value="ALL">Tous</mat-option>
-    <mat-option value="PENDING">En attente</mat-option>
-    <mat-option value="VALIDATED">Validé</mat-option>
-    <mat-option value="REJECTED">Rejeté</mat-option>
-  </mat-select>
-</mat-form-field>
+<!-- ✅ Barres de filtres flexibles et responsives -->
+<div class="filter-bar">
+  <mat-form-field appearance="fill" class="filter">
+    <mat-label>Filtrer par type</mat-label>
+    <mat-select [(ngModel)]="filter" (selectionChange)="applyFilter()">
+      <mat-option value="ALL">Tous</mat-option>
+      <mat-option value="DEPOT">Dépôts</mat-option>
+      <mat-option value="RETRAIT">Retraits</mat-option>
+    </mat-select>
+  </mat-form-field>
 
-<div *ngIf="filteredHistoriques.length === 0">Aucune transaction trouvée.</div>
+  <mat-form-field appearance="fill" class="filter">
+    <mat-label>Filtrer par statut</mat-label>
+    <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilter()">
+      <mat-option value="ALL">Tous</mat-option>
+      <mat-option value="PENDING">En attente</mat-option>
+      <mat-option value="VALIDATED">Validé</mat-option>
+      <mat-option value="REJECTED">Rejeté</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
 
-<!-- ✅ Nouvelle grille responsive -->
+<div *ngIf="filteredHistoriques.length === 0" class="no-result">
+  Aucune transaction trouvée.
+</div>
+
+<!-- ✅ Grille responsive -->
 <div class="transaction-list">
   <mat-card
     *ngFor="let item of filteredHistoriques"
@@ -49,16 +55,22 @@
       </div>
       <div>
         <strong>Statut :</strong>
-        <span [ngClass]="{
-          'badge': true,
-          'pending': item.statut === 'PENDING',
-          'validated': item.statut === 'VALIDATED',
-          'rejected': item.statut === 'REJECTED'
-        }">
+        <span
+          [ngClass]="{
+            badge: true,
+            pending: item.statut === 'PENDING',
+            validated: item.statut === 'VALIDATED',
+            rejected: item.statut === 'REJECTED'
+          }"
+        >
           {{
-            item.statut === 'PENDING' ? 'En attente' :
-            item.statut === 'VALIDATED' ? 'Validé' :
-            item.statut === 'REJECTED' ? 'Rejeté' : 'Inconnu'
+            item.statut === 'PENDING'
+              ? 'En attente'
+              : item.statut === 'VALIDATED'
+              ? 'Validé'
+              : item.statut === 'REJECTED'
+              ? 'Rejeté'
+              : 'Inconnu'
           }}
         </span>
       </div>

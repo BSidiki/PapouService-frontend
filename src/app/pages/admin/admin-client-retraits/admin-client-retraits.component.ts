@@ -25,7 +25,7 @@ export class AdminClientRetraitsComponent implements OnInit {
 
   ngOnInit(): void {
     this.clientId = this.route.snapshot.paramMap.get('id')!;
-    this.http.get<any[]>(`http://192.168.11.100:8080/utilisateurs/${this.clientId}/listRetraits`)
+    this.http.get<any[]>(`http://192.168.57.230:8080/utilisateurs/${this.clientId}/listRetraits`)
       .subscribe({
         next: data => this.retraits = data.reverse(),
         error: err => {

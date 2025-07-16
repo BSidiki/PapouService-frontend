@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { HeaderPublicComponent } from "../../layout/header-public/header-public.component";
+import { FooterComponent } from "../../layout/footer/footer.component";
 
 @Component({
   selector: 'app-contact',
@@ -19,7 +20,8 @@ import { HeaderPublicComponent } from "../../layout/header-public/header-public.
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    HeaderPublicComponent
+    HeaderPublicComponent,
+    FooterComponent
 ],
   templateUrl: './contact.component.html',
   styleUrls: ['./contact.component.scss']
