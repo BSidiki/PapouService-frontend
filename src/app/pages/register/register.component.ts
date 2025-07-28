@@ -53,7 +53,8 @@ export class RegisterComponent {
     id_1XBET: '',
     id_BETWINNER: '',
     id_MELBET: '',
-    id_1WIN: ''
+    id_1WIN: '',
+    id_888STARZ:''
   };
 
   confirmPassword = '';
@@ -98,7 +99,8 @@ export class RegisterComponent {
       .set('id_1XBET', this.user.id_1XBET || '')
       .set('id_BETWINNER', this.user.id_BETWINNER || '')
       .set('id_MELBET', this.user.id_MELBET || '')
-      .set('id_1WIN', this.user.id_1WIN || '');
+      .set('id_1WIN', this.user.id_1WIN || '')
+      .set('id_888STARZ', this.user.id_888STARZ || '');
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 

@@ -59,7 +59,8 @@ export class RetraitComponent {
         { label: '1XBET', value: '1XBET', id: user.id_1XBET },
         { label: 'BETWINNER', value: 'BETWINNER', id: user.id_BETWINNER },
         { label: 'MELBET', value: 'MELBET', id: user.id_MELBET },
-        { label: '1WIN', value: '1WIN', id: user.id_1WIN }
+        { label: '1WIN', value: '1WIN', id: user.id_1WIN },
+        { label: '888STARZ', value: '888STARZ', id: user.id_888STARZ }
       ].filter(opt => !!opt.id); // ❗ garder que ceux renseignés
     }
   }

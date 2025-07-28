@@ -62,6 +62,11 @@
         <input matInput name="id_1WIN" [(ngModel)]="user.id_1WIN" />
       </mat-form-field>
 
+      <mat-form-field class="full-width" appearance="outline">
+        <mat-label>ID 888STARZ</mat-label>
+        <input matInput name="id_888STARZ" [(ngModel)]="user.id_888STARZ" />
+      </mat-form-field>
+
       <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="!formValid() || loading">
         <mat-progress-spinner *ngIf="loading" diameter="20" color="accent" mode="indeterminate"></mat-progress-spinner>
         <span *ngIf="!loading">Créer un compte</span>

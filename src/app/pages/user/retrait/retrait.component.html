@@ -25,7 +25,7 @@
 
           <mat-form-field appearance="fill" class="numero">
             <mat-label>Numéro</mat-label>
-            <input matInput [(ngModel)]="form.numero" name="numero" required />
+            <input matInput [(ngModel)]="form.numeroEnvoyant" name="numero" required />
           </mat-form-field>
         </div>
 
@@ -48,6 +48,12 @@
             <mat-option value="M">Moov Money
               <img src="assets/images/MoovMoney.png" alt="Moov Money" class="logo-option" height="22"/>
             </mat-option>
+            <mat-option value="W">Wave Money
+              <img src="assets/images/WaveMoney.png" alt="Wave Money" class="logo-option" height="22"/>
+            </mat-option>
+            <mat-option value="S">Sank Money
+              <img src="assets/images/SankMoney.jpeg" alt="Sank Money" class="logo-option" height="22"/>
+            </mat-option>
             <mat-option value="C">Carte Bancaire
               <img src="assets/images/CarteBancaire.jpeg" alt="Carte Bancaire" class="logo-option" height="20"/>
             </mat-option>
@@ -64,24 +70,6 @@
           <input matInput type="number" [(ngModel)]="form.montant" name="montant" required>
         </mat-form-field>
 
-        <!-- <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Option de transaction</mat-label>
-          <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
-            <mat-option value="1XBET">1XBET
-              <img src="assets/images/1XBet.png" alt="1XBET" class="logo-option" height="16"/>
-            </mat-option>
-            <mat-option value="BETWINNER">BETWINNER
-              <img src="assets/images/BetWinner.png" alt="BETWINNER" class="logo-option" height="16"/>
-            </mat-option>
-            <mat-option value="MELBET">MELBET
-              <img src="assets/images/MelBet.png" alt="MELBET" class="logo-option" height="16"/>
-            </mat-option>
-            <mat-option value="1WIN">1WIN
-              <img src="assets/images/1Win1.png" alt="1WIN" class="logo-option" height="16"/>
-            </mat-option>
-          </mat-select>
-        </mat-form-field> -->
-
         <div class="full-width file-zone">
           <label for="file">Capture de dépôt :</label>
           <input type="file" id="file" (change)="onFileSelected($event)" required />
@@ -90,9 +78,6 @@
         <button mat-raised-button color="primary" type="submit">Soumettre</button>
       </form>
     </div>
-    <!-- <div class="page-depot3">
-      <app-odds></app-odds>
-    </div> -->
     <div class="page-depot2">
       <app-matchs></app-matchs>
     </div>

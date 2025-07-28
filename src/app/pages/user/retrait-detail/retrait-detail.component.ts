@@ -23,16 +23,6 @@ export class RetraitDetailComponent implements OnInit {
     private location: Location
   ) {}
 
-  // ngOnInit(): void {
-  //   const id = this.route.snapshot.paramMap.get('id');
-  //   this.http.get(`http://192.168.57.230:8080/retraits/${id}`).subscribe({
-  //     next: (data) => this.retrait = data,
-  //     error: (err) => {
-  //       console.error(err);
-  //       alert("Erreur lors du chargement du retrait");
-  //     }
-  //   });
-  // }
   motif: string = '';
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -78,6 +68,7 @@ export class RetraitDetailComponent implements OnInit {
       case 'BETWINNER': return utilisateur?.id_BETWINNER;
       case 'MELBET': return utilisateur?.id_MELBET;
       case 'IWIN': return utilisateur?.id_1WIN;
+      case 'STARZ': return utilisateur?.id_888STARZ;
       default: return 'Inconnu';
     }
   }

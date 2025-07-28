@@ -57,7 +57,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<any>();
   displayedColumns: string[] = ['type', 'nom', 'numero', 'plateforme', 'idPlateforme', 'montant', 'date', 'capture', 'actions'];
   filterType: 'ALL' | 'Dépôt' | 'Retrait' = 'ALL';
-  filterPlateforme: 'ALL' | 'IXBET' | 'BETWINNER' | 'MELBET' | 'IWIN' = 'ALL';
+  filterPlateforme: 'ALL' | 'IXBET' | 'BETWINNER' | 'MELBET' | 'IWIN' | 'STARZ' = 'ALL';
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -143,6 +143,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       case 'BETWINNER': return u.id_BETWINNER;
       case 'MELBET': return u.id_MELBET;
       case 'IWIN': return u.id_1WIN;
+      case 'STARZ': return u.id_888STARZ;
       default: return '—';
     }
   }

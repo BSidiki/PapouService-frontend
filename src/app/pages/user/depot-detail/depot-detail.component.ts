@@ -76,6 +76,7 @@ export class DepotDetailComponent implements OnInit {
       case 'BETWINNER': return utilisateur?.id_BETWINNER;
       case 'MELBET': return utilisateur?.id_MELBET;
       case 'IWIN': return utilisateur?.id_1WIN;
+      case 'STARZ': return utilisateur?.id_888STARZ;
       default: return 'Inconnu';
     }
   }

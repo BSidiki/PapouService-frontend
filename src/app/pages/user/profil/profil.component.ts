@@ -62,6 +62,7 @@ export class ProfilComponent implements OnInit {
     if (this.user.id_BETWINNER) params = params.set('id_BETWINNER', this.user.id_BETWINNER);
     if (this.user.id_MELBET) params = params.set('id_MELBET', this.user.id_MELBET);
     if (this.user.id_1WIN) params = params.set('id_1WIN', this.user.id_1WIN);
+    if (this.user.id_888STARZ) params = params.set('id_888STARZ', this.user.id_888STARZ);
 
     this.http.put(`http://192.168.57.230:8080/utilisateurs/update/${id}`, null, { params }).subscribe({
       next: (res: any) => {

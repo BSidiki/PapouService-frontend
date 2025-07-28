@@ -1,15 +1,21 @@
 <section class="hero-carousel">
   <app-annonces-public></app-annonces-public>
 </section>
+
 <div class="depot-container">
   <h2>💸 Faire un dépôt</h2>
 
   <div class="page-depot">
     <div class="page-depot1">
       <form (ngSubmit)="submitDepot()">
+
+        <!-- Message d'avertissement si aucun ID -->
         <div *ngIf="transactionOptionsDisponibles.length === 0" class="alert-message">
-          ⚠️ Attention! Vous n'avez aucun ID enregistrer.<br> Vous pouvez modifier votre profil en ajoutant vos ID
+          ⚠️ Attention! Vous n'avez aucun ID enregistré.<br>
+          Vous pouvez modifier votre profil en ajoutant vos ID.
         </div>
+
+        <!-- Sélection du pays -->
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Pays</mat-label>
           <mat-select [(ngModel)]="form.pays" name="pays" (selectionChange)="onPaysChange()" required>
@@ -17,6 +23,7 @@
           </mat-select>
         </mat-form-field>
 
+        <!-- Numéro et indicatif -->
         <div class="numero-container">
           <mat-form-field appearance="fill" class="indicatif">
             <mat-label>Indicatif</mat-label>
@@ -29,11 +36,13 @@
           </mat-form-field>
         </div>
 
+        <!-- Montant -->
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Montant</mat-label>
           <input matInput type="number" [(ngModel)]="form.montant" name="montant" required>
         </mat-form-field>
 
+        <!-- Option de transaction -->
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Option de transaction</mat-label>
           <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
@@ -44,47 +53,74 @@
           </mat-select>
         </mat-form-field>
 
+        <!-- Option de dépôt -->
         <mat-form-field appearance="fill" class="full-width">
           <mat-label>Option de dépôt</mat-label>
           <mat-select [(ngModel)]="form.optionDepot" name="optionDepot" required>
-            <mat-option value="O">Orange Money
+            <mat-option value="O">
+              Orange Money
               <img src="assets/images/OrangeMoney.png" alt="Orange Money" class="logo-option" height="20"/>
             </mat-option>
-            <mat-option value="M">Moov Money
+            <mat-option value="M">
+              Moov Money
               <img src="assets/images/MoovMoney.png" alt="Moov Money" class="logo-option" height="22"/>
             </mat-option>
-            <mat-option value="C">Carte Bancaire
+            <mat-option value="W">
+              Wave Money
+              <img src="assets/images/WaveMoney.png" alt="Wave Money" class="logo-option" height="22"/>
+            </mat-option>
+            <mat-option value="S">
+              Sank Money
+              <img src="assets/images/SankMoney.jpeg" alt="Sank Money" class="logo-option" height="22"/>
+            </mat-option>
+            <mat-option value="C">
+              Carte Bancaire
               <img src="assets/images/CarteBancaire.jpeg" alt="Carte Bancaire" class="logo-option" height="20"/>
             </mat-option>
           </mat-select>
         </mat-form-field>
 
+        <!-- Bloc d'action en fonction de l'option -->
         <div *ngIf="form.optionDepot === 'O' || form.optionDepot === 'M'" class="ussd-block">
           <p>💡 Cliquez sur le bouton ci-dessous pour lancer la transaction depuis votre téléphone :</p>
-
           <button mat-raised-button class="tel-button" color="accent" type="button" (click)="ouvrirTelephone()">
             📲 Lancer le code USSD
           </button>
-
-          <p class="instruction">
-            ➕ validez puis Complétez avec votre <strong>code PIN</strong> et validez !
-          </p>
+          <p class="instruction">➕ Validez puis complétez avec votre <strong>code PIN</strong> et validez !</p>
         </div>
 
+        <!-- Bouton Wave -->
+        <div *ngIf="form.optionDepot === 'W'" class="ussd-block">
+          <p>🌊 Vous utilisez Wave. Cliquez ci-dessous pour ouvrir l'application :</p>
+          <button mat-raised-button class="tel-button" color="accent" type="button" (click)="ouvrirWave()">
+            🚀 Ouvrir Wave
+          </button>
+        </div>
+
+        <!-- Bouton Sank Money -->
+        <div *ngIf="form.optionDepot === 'S'" class="ussd-block">
+          <p>💳 Vous utilisez Sank Money. Cliquez ci-dessous pour ouvrir l'application :</p>
+          <button mat-raised-button class="tel-button" color="accent" type="button" (click)="ouvrirSankMoney()">
+            🚀 Ouvrir Sank Money
+          </button>
+        </div>
+
+        <!-- Upload capture -->
         <div class="full-width file-zone">
           <label for="file">Capture de dépôt :</label>
           <input type="file" id="file" (change)="onFileSelected($event)" required />
         </div>
 
+        <!-- Bouton soumettre -->
         <button mat-raised-button color="primary" type="submit">Soumettre</button>
       </form>
     </div>
-    <!-- <div class="page-depot3">
-      <app-odds></app-odds>
-    </div> -->
+
+    <!-- Zone Matchs -->
     <div class="page-depot2">
       <app-matchs></app-matchs>
     </div>
   </div>
 </div>
+
 <app-footer></app-footer>
