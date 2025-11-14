@@ -1,34 +1,298 @@
 <div class="admin-pubs">
-  <h2>📢 Gestion des publicités</h2>
-
-  <form (ngSubmit)="onSubmit()" [formGroup]="pubForm" enctype="multipart/form-data" class="form">
-    <input type="file" (change)="onFileSelected($event)" accept="image/*" required />
-    <button mat-raised-button color="primary" type="submit">
-      {{ isEditing ? 'Modifier' : 'Ajouter' }} la publicité
-    </button>
-  </form>
-
-  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 pub-table">
-    <ng-container matColumnDef="fichier">
-      <th mat-header-cell *matHeaderCellDef>Image</th>
-      <td mat-cell *matCellDef="let pub">
-        <img *ngIf="pub.fichier" [src]="toBase64(pub.fichier)" class="pub-img" />
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Actions</th>
-      <td mat-cell *matCellDef="let pub">
-        <button mat-icon-button color="accent" (click)="editPub(pub)">
-          <mat-icon>edit</mat-icon>
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h2>📢 Gestion des Publicités</h2>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="loadPubs()" [disabled]="loading" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          {{ loading ? 'Actualisation...' : 'Actualiser' }}
         </button>
-        <button mat-icon-button color="warn" (click)="deletePub(pub.id)">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
+      </div>
+    </div>
+    <p class="subtitle">Ajoutez et gérez les publicités affichées dans l'application</p>
+  </div>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+  <!-- Stats Cards -->
+  <div class="stats-cards" *ngIf="!loading">
+    <div class="stat-card primary">
+      <div class="stat-icon">🖼️</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ dataSource.data.length }}</div>
+        <div class="stat-label">Publicités</div>
+      </div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-icon">📱</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getActivePubs() }}</div>
+        <div class="stat-label">Actives</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Section -->
+  <div class="form-section">
+    <mat-card class="form-card">
+      <div class="card-header">
+        <h3>{{ isEditing ? '✏️ Modifier la Publicité' : '➕ Ajouter une Publicité' }}</h3>
+        <span class="form-subtitle">
+          {{ isEditing ? 'Remplacez l\'image de la publicité' : 'Téléchargez une nouvelle image publicitaire' }}
+        </span>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" [formGroup]="pubForm" enctype="multipart/form-data" class="pub-form">
+        <div class="upload-section">
+          <div class="upload-container">
+            <input type="file"
+                   id="pubUpload"
+                   accept="image/*"
+                   (change)="onFileSelected($event)"
+                   class="file-input" />
+
+            <div class="upload-area" [class.has-file]="previewUrl || selectedFile">
+              <label for="pubUpload" class="upload-label">
+                <div class="upload-icon">
+                  <mat-icon>cloud_upload</mat-icon>
+                </div>
+                <div class="upload-text">
+                  <span class="upload-title">{{ getUploadTitle() }}</span>
+                  <span class="upload-subtitle">Cliquez ou glissez-déposez une image</span>
+                </div>
+              </label>
+
+              <!-- File Preview -->
+              <div class="file-preview" *ngIf="previewUrl">
+                <img [src]="previewUrl"
+                     (click)="openImageZoom(previewUrl)"
+                     class="preview-image"
+                     alt="Aperçu de la publicité" />
+                <div class="preview-overlay">
+                  <button type="button"
+                          mat-icon-button
+                          color="warn"
+                          class="remove-image"
+                          (click)="removeImage()"
+                          matTooltip="Supprimer l'image">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                  <span class="zoom-hint">👆 Cliquer pour zoomer</span>
+                </div>
+              </div>
+
+              <!-- Editing Preview -->
+              <div class="file-preview" *ngIf="previewUrl" (click)="openImageZoom(previewUrl)" role="button" tabindex="0">
+                <img [src]="previewUrl" class="preview-image" alt="Aperçu de la publicité" />
+                <div class="preview-overlay">
+                  <button type="button" mat-icon-button color="warn" class="remove-image" (click)="removeImage(); $event.stopPropagation()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                  <span class="zoom-hint">👆 Cliquer pour zoomer</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="upload-info">
+              <mat-icon>info</mat-icon>
+              <span>Formats supportés: JPG, PNG, WebP, GIF • Taille max: 5MB • Ratio recommandé: 16:9</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button
+                  type="button"
+                  (click)="cancelEdit()"
+                  *ngIf="isEditing"
+                  class="cancel-btn">
+            <mat-icon>cancel</mat-icon>
+            Annuler
+          </button>
+          <button mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="(!selectedFile && !isEditing) || loading"
+                  class="submit-btn">
+            <div class="button-content">
+              <mat-progress-spinner
+                *ngIf="loading"
+                diameter="20"
+                mode="indeterminate"
+                color="accent">
+              </mat-progress-spinner>
+              <mat-icon *ngIf="!loading">{{ isEditing ? 'save' : 'add' }}</mat-icon>
+              <span>{{ loading ? 'Traitement...' : (isEditing ? 'Modifier la Publicité' : 'Ajouter la Publicité') }}</span>
+            </div>
+          </button>
+        </div>
+      </form>
+    </mat-card>
+  </div>
+
+  <!-- Pubs List -->
+  <div class="list-section">
+    <mat-card class="list-card">
+      <div class="list-header">
+        <div class="list-title">
+          <h3>📋 Liste des Publicités</h3>
+          <span class="list-subtitle">{{ dataSource.filteredData.length }} publicité(s)</span>
+        </div>
+
+        <div class="list-actions">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Rechercher une publicité</mat-label>
+            <input matInput
+                   [(ngModel)]="search"
+                   (ngModelChange)="applyFilter()"
+                   placeholder="Filtrer par ID..." />
+            <mat-icon matSuffix>search</mat-icon>
+            <button *ngIf="search"
+                    mat-icon-button
+                    matSuffix
+                    aria-label="Effacer"
+                    (click)="search=''; applyFilter()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="loading">
+        <div class="loading-content">
+          <mat-spinner diameter="40"></mat-spinner>
+          <span>Chargement des publicités...</span>
+        </div>
+      </div>
+
+      <!-- Desktop Grid -->
+      <div class="grid-section" *ngIf="!loading && dataSource.filteredData.length > 0">
+        <div class="desktop-view">
+          <div class="pubs-grid">
+            <div *ngFor="let pub of dataSource.filteredData" class="pub-card">
+              <div class="pub-image-container">
+                <ng-container *ngIf="toBase64(pub.fichier) as src">
+                  <div class="pub-image-container" (click)="openImageZoom(src)" role="button" tabindex="0">
+                    <img *ngIf="src" [src]="src" class="pub-image" alt="Publicité" />
+                    <div class="image-overlay"><span class="zoom-indicator">🔍</span></div>
+                  </div>
+                </ng-container>
+                <div class="image-overlay">
+                  <span class="zoom-indicator">🔍</span>
+                </div>
+              </div>
+
+              <div class="pub-info">
+                <div class="pub-id">ID: {{ getId(pub) }}</div>
+                <div class="pub-size" *ngIf="getImageSize(pub)">
+                  {{ getImageSize(pub) }}
+                </div>
+              </div>
+
+              <div class="pub-actions">
+                <button mat-raised-button
+                        color="primary"
+                        (click)="editPub(pub)"
+                        class="edit-btn"
+                        matTooltip="Modifier cette publicité">
+                  <mat-icon>edit</mat-icon>
+                  Modifier
+                </button>
+                <button mat-raised-button
+                        color="warn"
+                        (click)="deletePub(getId(pub))"
+                        class="delete-btn"
+                        matTooltip="Supprimer cette publicité">
+                  <mat-icon>delete</mat-icon>
+                  Supprimer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile View -->
+        <div class="mobile-view">
+          <div *ngFor="let pub of dataSource.filteredData" class="pub-card-mobile">
+            <div class="card-header">
+              <div class="pub-info-mobile">
+                <h4>Publicité #{{ getId(pub) }}</h4>
+                <span class="pub-size" *ngIf="getImageSize(pub)">
+                  {{ getImageSize(pub) }}
+                </span>
+              </div>
+              <div class="pub-actions-mobile">
+                <button mat-icon-button
+                        color="primary"
+                        (click)="editPub(pub)"
+                        matTooltip="Modifier">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button
+                        color="warn"
+                        (click)="deletePub(getId(pub))"
+                        matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-content">
+              <ng-container *ngIf="toBase64(pub.fichier) as src">
+                <div class="pub-image-mobile-wrapper" (click)="openImageZoom(src)" role="button" tabindex="0">
+                  <img *ngIf="src" [src]="src" class="pub-image-mobile" alt="Publicité" />
+                </div>
+              </ng-container>
+              <span class="zoom-hint-mobile">👆 Cliquer pour zoomer</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <mat-paginator [pageSize]="6"
+                       [pageSizeOptions]="[6, 12, 24, 48]"
+                       showFirstLastButtons
+                       [length]="dataSource.filteredData.length"
+                       class="custom-paginator">
+        </mat-paginator>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && dataSource.filteredData.length === 0">
+        <div class="empty-icon">📢</div>
+        <h4>Aucune publicité trouvée</h4>
+        <p *ngIf="search">Aucune publicité ne correspond à votre recherche</p>
+        <p *ngIf="!search">Aucune publicité n'a été ajoutée pour le moment</p>
+        <button *ngIf="search"
+                mat-raised-button
+                color="primary"
+                (click)="search=''; applyFilter()"
+                class="retry-btn">
+          <mat-icon>refresh</mat-icon>
+          Réinitialiser la recherche
+        </button>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Image Zoom Modal -->
+  <div class="image-zoom-overlay" *ngIf="zoomedImage" (click)="closeImageZoom()">
+    <div class="image-zoom-container" (click)="$event.stopPropagation()">
+      <button mat-icon-button class="close-zoom" (click)="closeImageZoom()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <img [src]="zoomedImage" class="zoomed-image" alt="Publicité zoomée" />
+      <div class="zoom-controls">
+        <button mat-icon-button (click)="zoomOut()" class="zoom-control-btn">
+          <mat-icon>zoom_out</mat-icon>
+        </button>
+        <button mat-icon-button (click)="zoomIn()" class="zoom-control-btn">
+          <mat-icon>zoom_in</mat-icon>
+        </button>
+        <button mat-icon-button (click)="resetZoom()" class="zoom-control-btn">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

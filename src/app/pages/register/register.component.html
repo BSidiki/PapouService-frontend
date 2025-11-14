@@ -1,83 +1,256 @@
 <app-header-public></app-header-public>
 
-<div class="register-page">
-  <mat-card class="register-card">
-    <div class="logo-section">
-      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" />
-      <h2>Créer un compte PapouService</h2>
-      <p class="welcome-message">Bienvenue ! Veuillez remplir le formulaire ci-dessous pour commencer.</p>
+<div class="register-container">
+  <div class="register-background">
+    <div class="register-card-wrapper">
+      <mat-card class="register-card">
+        <!-- En-tête -->
+        <div class="card-header">
+          <span class="logo" routerLink="/accueil">
+            <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" loading="lazy"/>
+          </span>
+          <h1 class="main-title">📝 Créer un compte</h1>
+          <p class="subtitle">Rejoignez la communauté PapouService</p>
+        </div>
+
+        <!-- Formulaire d'inscription -->
+        <form (ngSubmit)="onSubmit()" class="register-form">
+          <!-- Informations personnelles -->
+          <section class="form-section">
+            <h2 class="section-title">
+              <mat-icon>person</mat-icon>
+              Informations personnelles
+            </h2>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nom</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="user.nomUtilisateur"
+                  name="nomUtilisateur"
+                  required
+                  placeholder="Votre nom de famille"
+                  autocomplete="family-name"
+                />
+                <mat-icon matPrefix>badge</mat-icon>
+                <mat-error>Le nom est requis</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Prénom</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="user.prenomUtilisateur"
+                  name="prenomUtilisateur"
+                  required
+                  placeholder="Votre prénom"
+                  autocomplete="given-name"
+                />
+                <mat-icon matPrefix>person</mat-icon>
+                <mat-error>Le prénom est requis</mat-error>
+              </mat-form-field>
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>📱 Numéro de téléphone</mat-label>
+              <input
+                matInput
+                [(ngModel)]="user.numeroUtilisateur"
+                name="numeroUtilisateur"
+                required
+                placeholder="Ex: 75000000 ou +22675000000"
+                autocomplete="tel"
+                (blur)="onPhoneBlur()"
+              />
+              <mat-icon matPrefix>smartphone</mat-icon>
+              <mat-hint>Format: 75000000 ou +22675000000</mat-hint>
+              <!-- Message d'erreur plus informatif -->
+              <mat-error *ngIf="user.numeroUtilisateur && user.numeroUtilisateur.length < 8">
+                Le numéro doit contenir au moins 8 chiffres
+              </mat-error>
+            </mat-form-field>
+          </section>
+
+          <!-- Sécurité du compte -->
+          <section class="form-section">
+            <h2 class="section-title">
+              <mat-icon>lock</mat-icon>
+              Sécurité du compte
+            </h2>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>🔑 Mot de passe</mat-label>
+              <input
+                matInput
+                [type]="hidePassword ? 'password' : 'text'"
+                [(ngModel)]="user.password"
+                name="password"
+                required
+                placeholder="Créez un mot de passe sécurisé"
+                autocomplete="new-password"
+                minlength="6"
+                #passwordInput="ngModel"
+              />
+              <mat-icon matPrefix>password</mat-icon>
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [attr.aria-label]="hidePassword ? 'Afficher le mot de passe' : 'Masquer le mot de passe'"
+              >
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              <mat-hint>Minimum 6 caractères</mat-hint>
+              <mat-error *ngIf="passwordInput.errors?.['minlength']">
+                Le mot de passe doit contenir au moins 6 caractères
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>✅ Confirmer le mot de passe</mat-label>
+              <input
+                matInput
+                [type]="hidePassword ? 'password' : 'text'"
+                [(ngModel)]="confirmPassword"
+                name="confirmPassword"
+                required
+                placeholder="Répétez votre mot de passe"
+                autocomplete="new-password"
+                #confirmInput="ngModel"
+              />
+              <mat-icon matPrefix>check_circle</mat-icon>
+              <mat-error *ngIf="confirmInput.touched && !isPasswordMatch()">
+                Les mots de passe ne correspondent pas
+              </mat-error>
+              <mat-hint *ngIf="isPasswordMatch() && confirmPassword" class="match-hint">
+                ✅ Les mots de passe correspondent
+              </mat-hint>
+            </mat-form-field>
+
+            <!-- Indicateur de force du mot de passe -->
+            <div *ngIf="user.password" class="password-strength">
+              <div class="strength-bar">
+                <div class="strength-fill" [class]="getPasswordStrengthClass()"></div>
+              </div>
+              <span class="strength-text">{{ getPasswordStrengthText() }}</span>
+            </div>
+          </section>
+
+          <!-- Identifiants de plateforme -->
+          <section class="form-section optional-section">
+            <h2 class="section-title">
+              <mat-icon>casino</mat-icon>
+              Identifiants de plateforme <span class="optional-badge">(facultatif)</span>
+            </h2>
+            <p class="section-description">
+              Ajoutez vos identifiants pour synchroniser vos comptes de paris sportifs
+            </p>
+
+            <div class="platforms-grid">
+              <mat-form-field appearance="outline" class="platform-field">
+                <mat-label>
+                  <img src="assets/images/1XBET.png" alt="1XBET" class="platform-logo" />
+                  ID 1XBET
+                </mat-label>
+                <input matInput [(ngModel)]="user.id_1XBET" name="id_1XBET" />
+                <mat-icon matPrefix>sports_esports</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="platform-field">
+                <mat-label>
+                  <img src="assets/images/BETWINNER.png" alt="BETWINNER" class="platform-logo" />
+                  ID BETWINNER
+                </mat-label>
+                <input matInput [(ngModel)]="user.id_BETWINNER" name="id_BETWINNER" />
+                <mat-icon matPrefix>sports_esports</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="platform-field">
+                <mat-label>
+                  <img src="assets/images/MELBET.png" alt="MELBET" class="platform-logo" />
+                  ID MELBET
+                </mat-label>
+                <input matInput [(ngModel)]="user.id_MELBET" name="id_MELBET" />
+                <mat-icon matPrefix>sports_esports</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="platform-field">
+                <mat-label>
+                  <span class="platform-text">1WIN</span>
+                </mat-label>
+                <input matInput [(ngModel)]="user.id_1WIN" name="id_1WIN" />
+                <mat-icon matPrefix>sports_esports</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="platform-field">
+                <mat-label>
+                  <span class="platform-text">888STARZ</span>
+                </mat-label>
+                <input matInput [(ngModel)]="user.id_888STARZ" name="id_888STARZ" />
+                <mat-icon matPrefix>sports_esports</mat-icon>
+              </mat-form-field>
+            </div>
+          </section>
+
+          <!-- Bouton d'inscription -->
+          <button
+            mat-raised-button
+            color="primary"
+            class="submit-btn"
+            type="submit"
+            [disabled]="loading || !formValid()"
+            aria-label="Créer un compte"
+          >
+            <div class="button-content">
+              <mat-progress-spinner
+                *ngIf="loading"
+                diameter="20"
+                mode="indeterminate"
+                color="accent"
+                class="spinner"
+              ></mat-progress-spinner>
+              <mat-icon *ngIf="!loading" class="btn-icon">person_add</mat-icon>
+              <span class="btn-text">
+                {{ loading ? 'Création en cours...' : 'Créer mon compte' }}
+              </span>
+            </div>
+          </button>
+
+          <!-- Messages de statut -->
+          <div *ngIf="successMessage" class="success-message" role="alert">
+            <mat-icon class="success-icon">check_circle</mat-icon>
+            <div class="message-content">
+              <h3>Compte créé avec succès !</h3>
+              <p>Redirection vers la page de connexion...</p>
+            </div>
+          </div>
+
+          <div *ngIf="errorMessage" class="error-message" role="alert">
+            <mat-icon class="error-icon">error</mat-icon>
+            <div class="message-content">
+              <h3>Erreur lors de l'inscription</h3>
+              <p>{{ errorMessage }}</p>
+            </div>
+          </div>
+        </form>
+
+        <!-- Lien de connexion -->
+        <div class="login-redirect">
+          <p>Déjà un compte ?</p>
+          <button mat-stroked-button routerLink="/login" class="login-btn">
+            <mat-icon>login</mat-icon>
+            Se connecter
+          </button>
+        </div>
+
+        <!-- Informations de sécurité -->
+        <div class="security-notice">
+          <mat-icon class="security-icon">security</mat-icon>
+          <p>Vos données sont sécurisées et confidentielles</p>
+        </div>
+      </mat-card>
     </div>
-
-    <form #registerForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>Nom</mat-label>
-        <input matInput name="nomUtilisateur" [(ngModel)]="user.nomUtilisateur" required />
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>Prénom</mat-label>
-        <input matInput name="prenomUtilisateur" [(ngModel)]="user.prenomUtilisateur" required />
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>Numéro de téléphone</mat-label>
-        <input matInput name="numeroUtilisateur" [(ngModel)]="user.numeroUtilisateur" required pattern="^(\+226|00226|226)?[0-9]{8}$" />
-        <mat-error *ngIf="!isValidPhone()">Numéro invalide</mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>Mot de passe</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" name="password" [(ngModel)]="user.password" required minlength="6" />
-        <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
-          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-        </button>
-        <mat-error *ngIf="user?.password && user.password.length < 6">Mot de passe trop court</mat-error>
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>Confirmer le mot de passe</mat-label>
-        <input matInput [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="confirmPassword" name="confirmPassword" required />
-        <mat-error *ngIf="!isPasswordMatch()">Les mots de passe ne correspondent pas</mat-error>
-      </mat-form-field>
-
-      <h4 class="id-title">Identifiants de plateforme (facultatif)</h4>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>ID 1XBET</mat-label>
-        <input matInput name="id_1XBET" [(ngModel)]="user.id_1XBET" />
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>ID BETWINNER</mat-label>
-        <input matInput name="id_BETWINNER" [(ngModel)]="user.id_BETWINNER" />
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>ID MELBET</mat-label>
-        <input matInput name="id_MELBET" [(ngModel)]="user.id_MELBET" />
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>ID 1WIN</mat-label>
-        <input matInput name="id_1WIN" [(ngModel)]="user.id_1WIN" />
-      </mat-form-field>
-
-      <mat-form-field class="full-width" appearance="outline">
-        <mat-label>ID 888STARZ</mat-label>
-        <input matInput name="id_888STARZ" [(ngModel)]="user.id_888STARZ" />
-      </mat-form-field>
-
-      <button mat-raised-button color="primary" class="submit-btn" type="submit" [disabled]="!formValid() || loading">
-        <mat-progress-spinner *ngIf="loading" diameter="20" color="accent" mode="indeterminate"></mat-progress-spinner>
-        <span *ngIf="!loading">Créer un compte</span>
-      </button>
-    </form>
-
-    <div class="redirect-login">
-      Déjà un compte ? <a routerLink="/login">Se connecter</a>
-    </div>
-
-    <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
-  </mat-card>
+  </div>
 </div>

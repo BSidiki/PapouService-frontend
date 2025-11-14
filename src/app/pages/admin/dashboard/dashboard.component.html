@@ -1,134 +1,415 @@
 <div class="admin-dashboard">
-  <h2>📊 Dashboard Administrateur</h2>
-
-  <!-- Section Statistiques -->
-  <div class="stat-cards">
-    <mat-card class="stat-card primary">
-      <div>👥 Clients inscrits</div>
-      <div>{{ nombreClients }}</div>
-    </mat-card>
-
-    <mat-card class="stat-card accent">
-      <div>💰 Dépôts validés</div>
-      <div>{{ totalDepotsValides | number }} FCFA</div>
-    </mat-card>
-
-    <mat-card class="stat-card warn">
-      <div>💸 Retraits validés</div>
-      <div>{{ totalRetraitsValides | number }} FCFA</div>
-    </mat-card>
-
-    <mat-card class="stat-card warning">
-      <div>⏳ Dépôts en attente</div>
-      <div>{{ depotsPendingCount }}</div>
-    </mat-card>
-
-    <mat-card class="stat-card warning">
-      <div>⏳ Retraits en attente</div>
-      <div>{{ retraitsPendingCount }}</div>
-    </mat-card>
-  </div>
-
-  <!-- Section Graphique -->
-  <div class="chart-section">
-    <h3>📊 Montants Dépôts en attente vs Retraits en attente</h3>
-    <canvas baseChart
-            [data]="donutChartData"
-            [type]="'doughnut'">
-    </canvas>
-  </div>
-
-  <!-- Section Transactions récentes -->
-  <div class="table-section">
-    <h3>📄 Transactions récentes</h3>
-    <div class="filter-bar">
-      <mat-form-field appearance="fill">
-        <mat-label>Filtrer par type</mat-label>
-        <mat-select [(value)]="filterType" (selectionChange)="updateDataSource(allTransactions)">
-          <mat-option value="ALL">Tous</mat-option>
-          <mat-option value="Dépôt">Dépôt</mat-option>
-          <mat-option value="Retrait">Retrait</mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <mat-form-field appearance="fill">
-        <mat-label>Plateforme</mat-label>
-        <mat-select [(value)]="filterPlateforme" (selectionChange)="updateDataSource(allTransactions)">
-          <mat-option value="ALL">Toutes</mat-option>
-          <mat-option value="IXBET">1XBET</mat-option>
-          <mat-option value="BETWINNER">BETWINNER</mat-option>
-          <mat-option value="MELBET">MELBET</mat-option>
-          <mat-option value="IWIN">1WIN</mat-option>
-          <mat-option value="STARZ">888STARZ</mat-option>
-        </mat-select>
-      </mat-form-field>
+  <!-- Header -->
+  <div class="header-row">
+    <div class="header-content">
+      <h2>📊 Dashboard Administrateur</h2>
+      <div class="tools">
+        <button mat-stroked-button (click)="refresh()" [disabled]="loading" class="refresh-btn">
+          <span class="btn-content">
+            <mat-icon>refresh</mat-icon>
+            <span class="text">{{ loading ? 'Chargement...' : 'Rafraîchir' }}</span>
+          </span>
+        </button>
+        <span *ngIf="lastUpdated" class="last">MAJ: {{ lastUpdated }}</span>
+      </div>
     </div>
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 clickable-table">
-
-      <!-- Type -->
-      <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
-        <td mat-cell *matCellDef="let element"> {{element.type}} </td>
-      </ng-container>
-
-      <!-- Nom -->
-      <ng-container matColumnDef="nom">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Client </th>
-        <td mat-cell *matCellDef="let element"> {{element.nom}} </td>
-      </ng-container>
-
-      <!-- Numéro -->
-      <ng-container matColumnDef="numero">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Numéro </th>
-        <td mat-cell *matCellDef="let element"> {{element.numero}} </td>
-      </ng-container>
-
-      <!-- Plateforme -->
-      <ng-container matColumnDef="plateforme">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Plateforme </th>
-        <td mat-cell *matCellDef="let element"> {{element.plateforme}} </td>
-      </ng-container>
-
-      <!-- ID Plateforme -->
-      <ng-container matColumnDef="idPlateforme">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> 🆔 ID Plateforme </th>
-        <td mat-cell *matCellDef="let element"> {{element.idPlateforme}} </td>
-      </ng-container>
-
-      <!-- Montant -->
-      <ng-container matColumnDef="montant">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Montant </th>
-        <td mat-cell *matCellDef="let element"> {{element.montant | number}} FCFA </td>
-      </ng-container>
-
-      <!-- Date -->
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Date </th>
-        <td mat-cell *matCellDef="let element"> {{element.date | date:'short'}} </td>
-      </ng-container>
-
-      <!-- Capture -->
-      <ng-container matColumnDef="capture">
-        <th mat-header-cell *matHeaderCellDef> Preuve </th>
-        <td mat-cell *matCellDef="let element">
-          <img *ngIf="element.capture"
-               [src]="'data:image/jpeg;base64,' + element.capture"
-               (click)="showImageZoom(element.capture); $event.stopPropagation()"
-               style="height: 30px; cursor: zoom-in; border-radius: 4px;"/>
-        </td>
-      </ng-container>
-
-      <!-- Actions -->
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef> Actions </th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-button color="primary" (click)="traiter(element, 'VALIDATED'); $event.stopPropagation()" style="color: green;">Valider</button>
-          <button mat-button color="warn" (click)="traiter(element, 'REJECTED'); $event.stopPropagation()" style="color: red;">Rejeter</button>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
   </div>
+
+  <!-- States -->
+  <div class="state" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <span>Chargement des données...</span>
+    </div>
+  </div>
+  <div class="state error" *ngIf="!loading && error">
+    <span>⚠️ Une erreur est survenue lors du chargement des données</span>
+  </div>
+
+  <ng-container *ngIf="!loading && !error">
+    <!-- Stat cards -->
+    <div class="stat-cards">
+      <mat-card class="stat-card primary">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-label">Clients inscrits</div>
+          <div class="stat-value">{{ nombreClients }}</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card accent">
+        <div class="stat-icon">💰</div>
+        <div class="stat-content">
+          <div class="stat-label">Dépôts validés</div>
+          <div class="stat-value">{{ totalDepotsValides | number }} FCFA</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card warn">
+        <div class="stat-icon">💸</div>
+        <div class="stat-content">
+          <div class="stat-label">Retraits validés</div>
+          <div class="stat-value">{{ totalRetraitsValides | number }} FCFA</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card warning">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <div class="stat-label">Dépôts en attente</div>
+          <div class="stat-value">{{ depotsPendingCount }}</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card warning">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+          <div class="stat-label">Retraits en attente</div>
+          <div class="stat-value">{{ retraitsPendingCount }}</div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <h3>📈 Analytics</h3>
+      <div class="charts">
+        <div class="chart-card">
+          <h4>Montants validés</h4>
+          <div class="chart-container">
+            <canvas baseChart
+                    [type]="'doughnut'"
+                    [data]="donutChartData"
+                    [options]="{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          position: 'bottom',
+                          labels: {
+                            boxWidth: 12,
+                            font: { size: 11 }
+                          }
+                        }
+                      }
+                    }">
+            </canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <h4>Volumes par jour</h4>
+          <div class="chart-container">
+            <canvas baseChart
+                    [type]="'line'"
+                    [data]="lineChartData"
+                    [options]="{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      plugins: {
+                        legend: {
+                          position: 'bottom',
+                          labels: {
+                            boxWidth: 12,
+                            font: { size: 11 }
+                          }
+                        }
+                      },
+                      scales: {
+                        x: {
+                          ticks: { font: { size: 10 } },
+                          grid: { display: false }
+                        },
+                        y: {
+                          ticks: { font: { size: 10 } },
+                          grid: { color: 'rgba(0,0,0,0.1)' }
+                        }
+                      }
+                    }">
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions Section -->
+    <div class="transactions-section">
+      <div class="section-header">
+        <h3>📄 Transactions en attente ({{dataSource.data.length}})</h3>
+        <div class="header-actions">
+          <!-- Barre de recherche -->
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Rechercher...</mat-label>
+            <input matInput [(ngModel)]="filters.search" (input)="onFilterChange()"
+                   placeholder="Nom, téléphone, montant...">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+
+          <!-- Bouton filtres mobile -->
+          <button mat-stroked-button class="filter-toggle" (click)="toggleFilters()" *ngIf="!filtersExpanded">
+            <mat-icon>filter_list</mat-icon>
+            <span class="filter-text">Filtres</span>
+            <span class="filter-badge" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
+          </button>
+
+          <!-- Bouton effacer filtres -->
+          <button mat-stroked-button class="clear-filters" (click)="clearFilters()"
+                  *ngIf="activeFiltersCount > 0" matTooltip="Effacer tous les filtres">
+            <mat-icon>clear_all</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filtres améliorés -->
+      <div class="filter-bar" [class.expanded]="filtersExpanded">
+        <div class="filter-group">
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Type</mat-label>
+            <mat-select [(value)]="filters.type" (selectionChange)="onFilterChange()">
+              <mat-option value="ALL">Tous les types</mat-option>
+              <mat-option value="Dépôt">Dépôts seulement</mat-option>
+              <mat-option value="Retrait">Retraits seulement</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Plateforme</mat-label>
+            <mat-select [(value)]="filters.plateforme" (selectionChange)="onFilterChange()">
+              <mat-option value="ALL">Toutes les plateformes</mat-option>
+              <mat-option value="IXBET">1XBET</mat-option>
+              <mat-option value="BETWINNER">BETWINNER</mat-option>
+              <mat-option value="MELBET">MELBET</mat-option>
+              <mat-option value="IWIN">1WIN</mat-option>
+              <mat-option value="STARZ">888STARZ</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="filter-field">
+            <mat-label>Statut</mat-label>
+            <mat-select [(value)]="filters.statut" (selectionChange)="onFilterChange()">
+              <mat-option value="ALL">Tous les statuts</mat-option>
+              <mat-option value="PENDING">En attente</mat-option>
+              <mat-option value="VALIDATED">Validé</mat-option>
+              <mat-option value="REJECTED">Rejeté</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="filter-actions">
+          <button mat-stroked-button (click)="clearFilters()" class="clear-btn">
+            <mat-icon>clear</mat-icon>
+            Effacer
+          </button>
+          <button mat-stroked-button (click)="toggleFilters()" class="close-filters">
+            <mat-icon>close</mat-icon>
+            Fermer
+          </button>
+        </div>
+      </div>
+
+      <!-- Indicateur de filtres actifs -->
+      <div class="active-filters" *ngIf="activeFiltersCount > 0">
+        <div class="filters-summary">
+          <span class="filters-label">{{ activeFiltersCount }} filtre(s) actif(s)</span>
+          <button mat-button (click)="clearFilters()" class="clear-all-btn">
+            Tout effacer
+          </button>
+        </div>
+      </div>
+
+      <!-- Message vide -->
+      <div *ngIf="dataSource.data.length === 0" class="no-data">
+        <div class="no-data-icon">📭</div>
+        <h4>Aucune transaction trouvée</h4>
+        <p *ngIf="activeFiltersCount > 0">
+          Aucune transaction ne correspond à vos critères de recherche.
+          <button mat-button (click)="clearFilters()" class="reset-link">Réinitialiser les filtres</button>
+        </p>
+        <p *ngIf="activeFiltersCount === 0">Toutes les transactions ont été traitées</p>
+      </div>
+
+      <!-- Desktop Table -->
+      <div class="table-container desktop-view" *ngIf="dataSource.data.length > 0">
+        <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)" class="mat-elevation-z2">
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="badge" [class.badge-depot]="element.type === 'Dépôt'"
+                    [class.badge-retrait]="element.type === 'Retrait'">
+                {{ element.type }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Nom Column -->
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="client-cell">
+                <div class="client-name">{{ element.nom || '—' }}</div>
+                <div class="client-phone" *ngIf="element.numero && element.numero !== '—'">
+                  {{ element.numero }}
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Numéro Column -->
+          <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef>Numéro</th>
+            <td mat-cell *matCellDef="let element"> {{ element.numero || '—' }} </td>
+          </ng-container>
+
+          <!-- Plateforme Column -->
+          <ng-container matColumnDef="plateforme">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Plateforme</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="platform-info">
+                <span class="platform-name">{{ element.plateforme }}</span>
+                <span class="platform-id" *ngIf="element.idPlateforme && element.idPlateforme !== '—'">
+                  ID: {{ element.idPlateforme }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- ID Plateforme Column -->
+          <ng-container matColumnDef="idPlateforme">
+            <th mat-header-cell *matHeaderCellDef>ID Plateforme</th>
+            <td mat-cell *matCellDef="let element"> {{ element.idPlateforme }} </td>
+          </ng-container>
+
+          <!-- Montant Column -->
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+            <td mat-cell *matCellDef="let element">
+              <strong class="amount">{{ element.montant | number }} FCFA</strong>
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="date">{{ formatDate(element.date) }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Capture Column -->
+          <ng-container matColumnDef="capture">
+            <th mat-header-cell *matHeaderCellDef>Preuve</th>
+            <td mat-cell *matCellDef="let element">
+              <img *ngIf="element.capture"
+                   [src]="'data:image/jpeg;base64,' + element.capture"
+                   (click)="showImageZoom(element.capture); $event.stopPropagation()"
+                   class="thumb"
+                   alt="Preuve"/>
+              <span *ngIf="!element.capture" class="no-image">—</span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let element">
+              <div class="action-buttons">
+                <button mat-raised-button color="primary" class="action-btn validate"
+                        (click)="traiter(element, 'VALIDATED'); $event.stopPropagation()"
+                        matTooltip="Valider cette transaction">
+                  <span class="btn-content">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Valider</span>
+                  </span>
+                </button>
+                <button mat-raised-button color="warn" class="action-btn reject"
+                        (click)="traiter(element, 'REJECTED'); $event.stopPropagation()"
+                        matTooltip="Rejeter cette transaction">
+                  <span class="btn-content">
+                    <mat-icon>cancel</mat-icon>
+                    <span>Rejeter</span>
+                  </span>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <!-- Mobile Cards -->
+      <div class="mobile-view" *ngIf="dataSource.data.length > 0">
+        <!-- CORRECTION : Utiliser getMobileTransactions() pour avoir la pagination -->
+        <div *ngFor="let transaction of getMobileTransactions()" class="transaction-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="badge" [class.badge-depot]="transaction.type === 'Dépôt'"
+                    [class.badge-retrait]="transaction.type === 'Retrait'">
+                {{ transaction.type }}
+              </span>
+              <span class="amount">{{ transaction.montant | number }} FCFA</span>
+            </div>
+            <div class="date-mobile">{{ formatDate(transaction.date) }}</div>
+          </div>
+
+          <div class="card-content">
+            <div class="info-row">
+              <span class="label">Client:</span>
+              <span class="value">{{ transaction.nom || '—' }}</span>
+            </div>
+            <div class="info-row" *ngIf="transaction.numero && transaction.numero !== '—'">
+              <span class="label">Téléphone:</span>
+              <span class="value">{{ transaction.numero }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Plateforme:</span>
+              <span class="value">{{ transaction.plateforme }}</span>
+            </div>
+            <div class="info-row" *ngIf="transaction.idPlateforme && transaction.idPlateforme !== '—'">
+              <span class="label">ID Plateforme:</span>
+              <span class="value">{{ transaction.idPlateforme }}</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <div class="proof-section" *ngIf="transaction.capture">
+              <span class="proof-label">Preuve:</span>
+              <img [src]="'data:image/jpeg;base64,' + transaction.capture"
+                  (click)="showImageZoom(transaction.capture)"
+                  class="thumb-mobile"
+                  alt="Preuve"/>
+            </div>
+            <div class="action-buttons-mobile">
+              <button mat-raised-button color="primary" class="action-btn validate"
+                      (click)="traiter(transaction, 'VALIDATED')">
+                <span class="btn-content">
+                  <mat-icon>check_circle</mat-icon>
+                  <span class="btn-text">Valider</span>
+                </span>
+              </button>
+              <button mat-raised-button color="warn" class="action-btn reject"
+                      (click)="traiter(transaction, 'REJECTED')">
+                <span class="btn-content">
+                  <mat-icon>cancel</mat-icon>
+                  <span class="btn-text">Rejeter</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination - CORRECTION : S'assurer qu'elle est connectée -->
+      <mat-paginator *ngIf="dataSource.data.length > 0"
+                    [pageSizeOptions]="[5, 10, 20, 50]"
+                    [pageSize]="10"
+                    showFirstLastButtons
+                    class="custom-paginator"
+                    aria-label="Select page of transactions">
+      </mat-paginator>
+    </div>
+  </ng-container>
 </div>

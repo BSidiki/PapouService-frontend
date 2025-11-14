@@ -1,47 +1,141 @@
 <app-header-public></app-header-public>
+<div class="contact-container">
+  <!-- Carte principale de contact -->
+  <mat-card class="contact-card">
+    <div class="card-header">
+      <span class="logo" routerLink="/accueil">
+        <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" loading="lazy"/>
+      </span>
+      <h1 class="main-title">📨 Contactez-nous</h1>
+      <p class="subtitle">Nous sommes à votre écoute pour toute question ou demande</p>
+    </div>
 
-<mat-card class="contact-card">
-  <span class="logo" routerLink="/accueil">
-    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
-  </span>
-  <h2>📨 Contactez-nous</h2>
+    <!-- Options de contact rapide -->
+    <section class="quick-contact-section">
+      <h2 class="section-title">Contact Rapide</h2>
+      <div class="contact-options-grid">
+        <a href="tel:+22662054327" class="contact-option phone">
+          <div class="option-icon">
+            <mat-icon>call</mat-icon>
+          </div>
+          <div class="option-content">
+            <span class="option-title">Appeler</span>
+            <span class="option-detail">+226 62 05 43 27</span>
+          </div>
+        </a>
 
-  <div class="contact-options">
-    <a href="tel:+22662054327">
-      <mat-icon>call</mat-icon> Appeler
-    </a>
-    <a href="mailto:contact@papouservice.com">
-      <mat-icon>email</mat-icon> Email
-    </a>
-    <a href="https://wa.me/22660417255" target="_blank" rel="noopener">
-      <mat-icon>chat</mat-icon> WhatsApp
-    </a>
-    <a href="https://m.me/papouservice" target="_blank" rel="noopener">
-      <mat-icon>message</mat-icon> Messenger
-    </a>
-  </div>
+        <a href="mailto:contact&#64;papouservice.com" class="contact-option email">
+          <div class="option-icon">
+            <mat-icon>email</mat-icon>
+          </div>
+          <div class="option-content">
+            <span class="option-title">Email</span>
+            <span class="option-detail">contact&#64;papouservice.com</span>
+          </div>
+        </a>
 
-  <form (ngSubmit)="envoyer()">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Votre nom</mat-label>
-      <input matInput [(ngModel)]="contact.nom" name="nom" required />
-    </mat-form-field>
+        <a href="https://wa.me/22660417255" target="_blank" rel="noopener" class="contact-option whatsapp">
+          <div class="option-icon">
+            <mat-icon>chat</mat-icon>
+          </div>
+          <div class="option-content">
+            <span class="option-title">WhatsApp</span>
+            <span class="option-detail">+226 60 41 72 55</span>
+          </div>
+        </a>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" [(ngModel)]="contact.email" name="email" required />
-    </mat-form-field>
+        <a href="https://m.me/papouservice" target="_blank" rel="noopener" class="contact-option messenger">
+          <div class="option-icon">
+            <mat-icon>message</mat-icon>
+          </div>
+          <div class="option-content">
+            <span class="option-title">Messenger</span>
+            <span class="option-detail">&#64;papouservice</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Message</mat-label>
-      <textarea matInput rows="5" [(ngModel)]="contact.message" name="message" required></textarea>
-    </mat-form-field>
+    <!-- Formulaire de contact -->
+    <section class="form-section">
+      <h2 class="section-title">Envoyez-nous un message</h2>
 
-    <button mat-raised-button color="primary" type="submit">Envoyer</button>
-  </form>
+      <form (ngSubmit)="envoyer()" class="contact-form">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Votre nom complet</mat-label>
+            <input matInput [(ngModel)]="contact.nom" name="nom" required />
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error>Veuillez saisir votre nom</mat-error>
+          </mat-form-field>
+        </div>
 
-  <p *ngIf="messageEnvoye" class="success-message">
-    ✅ Message envoyé. Merci pour votre contact !
-  </p>
-</mat-card>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Adresse email</mat-label>
+            <input matInput type="email" [(ngModel)]="contact.email" name="email" required />
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error>Veuillez saisir un email valide</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Votre message</mat-label>
+            <textarea matInput rows="6" [(ngModel)]="contact.message" name="message"
+                     placeholder="Décrivez votre demande en détail..." required></textarea>
+            <mat-icon matSuffix>edit</mat-icon>
+            <mat-error>Veuillez saisir votre message</mat-error>
+          </mat-form-field>
+        </div>
+
+        <button mat-raised-button type="submit" class="submit-button"
+                [disabled]="!contact.nom || !contact.email || !contact.message">
+          <mat-icon>send</mat-icon>
+          Envoyer le message
+        </button>
+      </form>
+
+      <!-- Message de confirmation -->
+      <div *ngIf="messageEnvoye" class="success-message">
+        <div class="success-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="success-content">
+          <h3>Message envoyé avec succès !</h3>
+          <p>Merci pour votre message. Nous vous répondrons dans les plus brefs délais.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Informations supplémentaires -->
+    <section class="info-section">
+      <div class="info-grid">
+        <div class="info-item">
+          <mat-icon>schedule</mat-icon>
+          <div class="info-content">
+            <h4>Horaires d'ouverture</h4>
+            <p>Lun - Dim: 8h00 - 22h00</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <mat-icon>location_on</mat-icon>
+          <div class="info-content">
+            <h4>Réponse rapide</h4>
+            <p>Délai moyen: 2-4 heures</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <mat-icon>support_agent</mat-icon>
+          <div class="info-content">
+            <h4>Support dédié</h4>
+            <p>Équipe disponible 7j/7</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </mat-card>
+</div>
 <app-footer></app-footer>

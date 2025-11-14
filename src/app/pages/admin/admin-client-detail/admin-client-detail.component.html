@@ -1,47 +1,194 @@
+<div class="admin-client-detail">
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-content">
+      <mat-spinner diameter="50"></mat-spinner>
+      <h3>Chargement du profil client</h3>
+      <p>Récupération des informations en cours...</p>
+    </div>
+  </div>
 
-<div class="client-detail-container" *ngIf="!isLoading">
-  <mat-card *ngIf="client">
-    <mat-card-title>👤 Profil du client</mat-card-title>
-    <p class="fid"><strong>Dépôts validés :</strong> {{ depotCount }}</p>
-    <p class="fid">
-      <strong>Fidélité :</strong>
-      <span class="stars">{{ fidelityStars }}</span>
-      <span *ngIf="isFidele" class="badge" matTooltip="Ce client a atteint le niveau maximum de fidélité 🎖">
-        🎖 Fidèle
-      </span>
-    </p>
-    <mat-card-content>
-      <p><strong>Nom :</strong> {{ client.nomUtilisateur }}</p>
-      <p><strong>Prénom :</strong> {{ client.prenomUtilisateur }}</p>
-      <p><strong>Numéro :</strong> {{ client.numeroUtilisateur }}</p>
-      <p><strong>ID 1XBET :</strong> {{ client.id_1XBET || 'N/A' }}</p>
-      <p><strong>ID BETWINNER :</strong> {{ client.id_BETWINNER || 'N/A' }}</p>
-      <p><strong>ID MELBET :</strong> {{ client.id_MELBET || 'N/A' }}</p>
-      <p><strong>ID 1WIN :</strong> {{ client.id_1WIN || 'N/A' }}</p>
-      <p><strong>ID 888STARZ :</strong> {{ client.id_888STARZ || 'N/A' }}</p>
-    </mat-card-content>
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!isLoading && hasError">
+    <div class="error-content">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <h3>Client non trouvé</h3>
+      <p>Impossible de charger les informations de ce client. Vérifiez l'identifiant ou réessayez plus tard.</p>
+      <button mat-raised-button color="primary" (click)="goBack()" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+        Retour à la liste
+      </button>
+    </div>
+  </div>
 
-    <mat-card-actions class="action-buttons">
-      <button mat-stroked-button color="accent" (click)="voirHistorique()">
-        📜 Historique
-      </button>
-      <button mat-stroked-button color="primary" (click)="voirDepots()">
-        💵 Dépôts
-      </button>
-      <button mat-stroked-button color="primary" (click)="voirRetraits()">
-        💸 Retraits
-      </button>
-      <!-- <button mat-stroked-button color="warn" (click)="supprimerClient()">
-        ❌ Supprimer
-      </button> -->
-    </mat-card-actions>
-    <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
-      ⬅️ Retour à la liste
-    </button>
-  </mat-card>
-</div>
+  <!-- Client Profile -->
+  <div class="client-profile" *ngIf="!isLoading && client && !hasError">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="header-content">
+        <button mat-stroked-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </button>
+        <div class="header-title">
+          <h1>👤 Profil Client</h1>
+          <p class="subtitle">Informations détaillées du client N°: PS-KONGO.000{{ clientId }}</p>
+        </div>
+        <img src="assets/images/logo.png" alt="logo" class="platform-icon" style="width: 5%;"/>
+      </div>
+    </div>
 
-<div *ngIf="isLoading" class="loading">Chargement...</div>
-<div *ngIf="!client" class="no-client">
-  <p>Aucun client trouvé.</p>
+    <!-- Stats Cards -->
+    <div class="stats-section">
+      <div class="stats-cards">
+        <div class="stat-card primary">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ depotCount }}</div>
+            <div class="stat-label">Dépôts Validés</div>
+          </div>
+        </div>
+
+        <div class="stat-card accent">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ fidelityStars.length }}</div>
+            <div class="stat-label">Niveau Fidélité</div>
+          </div>
+        </div>
+
+        <div class="stat-card" [class.fidele]="isFidele">
+          <div class="stat-icon">{{ isFidele ? '🎖️' : '👤' }}</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ isFidele ? 'Fidèle' : 'Standard' }}</div>
+            <div class="stat-label">Statut</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fidelity Badge -->
+      <div class="fidelity-section" *ngIf="fidelityStars">
+        <div class="fidelity-card">
+          <div class="fidelity-header">
+            <mat-icon class="fidelity-icon">loyalty</mat-icon>
+            <h3>Niveau de Fidélité</h3>
+          </div>
+          <div class="fidelity-stars">
+            <span class="stars">{{ fidelityStars }}</span>
+            <span class="stars-placeholder">☆☆☆☆☆</span>
+          </div>
+          <div class="fidelity-info">
+            <p>{{ getFidelityMessage() }}</p>
+            <span *ngIf="isFidele" class="fidelity-badge" matTooltip="Client fidèle - Niveau maximum atteint">
+              🎖 Client Fidèle
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-grid">
+      <!-- Personal Information -->
+      <mat-card class="info-card">
+        <div class="card-header">
+          <mat-icon class="card-icon">person</mat-icon>
+          <h3>Informations Personnelles</h3>
+        </div>
+        <mat-card-content>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Nom complet</span>
+              <span class="value">{{ getFullName() }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Numéro de téléphone</span>
+              <span class="value phone">
+                <mat-icon>phone</mat-icon>
+                {{ client.numeroUtilisateur || 'Non renseigné' }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">ID Client</span>
+              <span class="value id">PS-KONGO.000{{ client.idUtilisateur }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Platform IDs -->
+      <mat-card class="platforms-card">
+        <div class="card-header">
+          <mat-icon class="card-icon">casino</mat-icon>
+          <h3>Identifiants Plateformes</h3>
+        </div>
+        <mat-card-content>
+          <div class="platforms-grid">
+            <div class="platform-item" *ngIf="client.id_1XBET">
+              <img src="assets/images/1xbet-icon.png" alt="1XBET" class="platform-icon" />
+              <div class="platform-info">
+                <span class="platform-name">1XBET</span>
+                <span class="platform-id">{{ client.id_1XBET }}</span>
+              </div>
+            </div>
+
+            <div class="platform-item" *ngIf="client.id_BETWINNER">
+              <img src="assets/images/betwinner-icon.png" alt="BETWINNER" class="platform-icon" />
+              <div class="platform-info">
+                <span class="platform-name">BETWINNER</span>
+                <span class="platform-id">{{ client.id_BETWINNER }}</span>
+              </div>
+            </div>
+
+            <div class="platform-item" *ngIf="client.id_MELBET">
+              <img src="assets/images/melbet-icon.png" alt="MELBET" class="platform-icon" />
+              <div class="platform-info">
+                <span class="platform-name">MELBET</span>
+                <span class="platform-id">{{ client.id_MELBET }}</span>
+              </div>
+            </div>
+
+            <div class="platform-item" *ngIf="client.id_1WIN">
+              <img src="assets/images/1win-icon.png" alt="1WIN" class="platform-icon" />
+              <div class="platform-info">
+                <span class="platform-name">1WIN</span>
+                <span class="platform-id">{{ client.id_1WIN }}</span>
+              </div>
+            </div>
+
+            <div class="platform-item" *ngIf="client.id_888STARZ">
+              <img src="assets/images/888starz-icon.png" alt="888STARZ" class="platform-icon" />
+              <div class="platform-info">
+                <span class="platform-name">888STARZ</span>
+                <span class="platform-id">{{ client.id_888STARZ }}</span>
+              </div>
+            </div>
+
+            <div class="no-platforms" *ngIf="!hasPlatformIds()">
+              <mat-icon>info</mat-icon>
+              <span>Aucun identifiant de plateforme enregistré</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions-section">
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" (click)="voirHistorique()" class="action-btn">
+          <mat-icon>history</mat-icon>
+          Historique Complet
+        </button>
+        <button mat-raised-button color="accent" (click)="voirDepots()" class="action-btn">
+          <mat-icon>payments</mat-icon>
+          Dépôts
+        </button>
+        <button mat-raised-button color="accent" (click)="voirRetraits()" class="action-btn">
+          <mat-icon>savings</mat-icon>
+          Retraits
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

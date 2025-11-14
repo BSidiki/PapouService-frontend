@@ -1,174 +1,502 @@
-.retrait-detail-card {
-  max-width: 85%;
-  margin: 2rem auto;
-  padding: 1.5rem;
-  border-radius: 12px;
-  background-color: #ffffff;
-  font-family: 'Roboto', sans-serif;
-  color: #333;
-  font-size: 1rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
+// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500;600&family=Roboto:wght@400;500&display=swap');
 
-  &:hover {
-    box-shadow: 0 6px 24px rgba(0, 173, 239, 0.25);
+.retrait-detail-page {
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8fdff 0%, #e3f7fb 100%);
+  min-height: 100vh;
+}
+
+// États de chargement et d'erreur
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+
+  p {
+    margin-top: 1rem;
+    color: #666;
+    font-family: 'Roboto', sans-serif;
   }
+}
 
-  .header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
+.error-card {
+  padding: 2rem;
+  text-align: center;
+  max-width: 400px;
+
+  .error-content {
+    .error-icon {
+      font-size: 4rem;
+      color: #f44336;
+      margin-bottom: 1rem;
+    }
 
     h2 {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 1.5rem;
-      font-weight: bold;
       color: #991f23;
-      margin: 0;
-    }
-
-    .badge {
-      padding: 0.3rem 0.75rem;
-      border-radius: 16px;
-      font-size: 0.8rem;
-      text-transform: uppercase;
+      font-family: 'Montserrat', sans-serif;
       font-weight: bold;
-      color: white;
-
-      &.pending { background-color: #f39c12; }
-      &.validated { background-color: #27ae60; }
-      &.rejected { background-color: #e74c3c; }
-      &.default { background-color: #2c3e50; }
+      margin-bottom: 1rem;
     }
-  }
-
-  .montant {
-    font-size: 2rem;
-    font-weight: bold;
-    text-align: center;
-    color: #00adef;
-    margin: 1.5rem 0;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  .infos-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    font-size: 0.95rem;
-    font-weight: 500;
 
     p {
-      margin: 0;
+      color: #666;
+      font-family: 'Roboto', sans-serif;
+      margin-bottom: 2rem;
+    }
+  }
+}
 
-      strong {
-        color: #2c3e50;
+// Carte principale
+.retrait-detail-card {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1f5fe;
+  overflow: hidden;
+
+  .card-header {
+    padding: 2rem 2rem 1.5rem;
+    background: linear-gradient(135deg, #00adef, #008bc1);
+    color: white;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+
+      .main-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+        font-size: clamp(1.5rem, 3vw, 1.8rem);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .title-icon {
+          font-size: 2rem;
+        }
+      }
+
+      .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
         font-family: 'Poppins', sans-serif;
-      }
-    }
-
-    @media (max-width: 600px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .image-section {
-    margin-bottom: 1.5rem;
-
-    img {
-      width: 100%;
-      border-radius: 8px;
-      cursor: zoom-in;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-      &.zoomed {
-        cursor: zoom-out;
-        transform: scale(1.8);
-        z-index: 1000;
-        position: relative;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-      }
-
-      &:hover {
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-    }
-  }
-
-  .btn-retour {
-    margin-top: 1.5rem;
-    text-align: left;
-
-    button {
-      font-weight: 500;
-      border-radius: 6px;
-      text-transform: none;
-    }
-  }
-
-  .rejection-section {
-    margin-top: 2rem;
-    padding: 1rem;
-    background-color: #fff3f3;
-    border-left: 4px solid #e53935;
-    border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
-
-    .motif-title {
-      font-weight: bold;
-      color: #e53935;
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
-    }
-
-    .motif-texte {
-      font-style: italic;
-      color: #555;
-    }
-
-    .call-admin {
-      margin-top: 1rem;
-      text-align: center;
-
-      .call-button {
-        display: inline-block;
-        background-color: #00adef;
-        color: white;
-        padding: 0.6rem 1rem;
-        border-radius: 8px;
-        text-decoration: none;
         font-weight: 600;
-        transition: background-color 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
 
-        &:hover {
-          background-color: #0094cb;
+        &.pending {
+          background: rgba(243, 156, 18, 0.9);
+        }
+
+        &.validated {
+          background: rgba(39, 174, 96, 0.9);
+        }
+
+        &.rejected {
+          background: rgba(231, 76, 60, 0.9);
+        }
+
+        .status-icon {
+          font-size: 1.2rem;
+        }
+
+        .status-text {
+          font-size: 0.9rem;
+          text-transform: uppercase;
         }
       }
     }
   }
 }
 
-.empty {
-  text-align: center;
-  color: #888;
-  font-style: italic;
-  margin-top: 2rem;
-  font-size: 1.1rem;
+// Section rejet
+.rejection-section {
+  padding: 1.5rem 2rem;
 
-  .emoji {
-    font-size: 2rem;
-    margin-right: 0.3rem;
+  .rejection-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .rejection-icon {
+      color: #f44336;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .rejection-text {
+      h3 {
+        color: #991f23;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+      }
+
+      p {
+        color: #666;
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        font-style: italic;
+      }
+    }
   }
 
-  .pending { color: #f39c12; }
-  .validated { color: #27ae60; }
-  .rejected { color: #e74c3c; }
-  .default { color: #2c3e50; }
+  .assistance-section {
+    background: rgba(153, 31, 35, 0.05);
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(153, 31, 35, 0.2);
+
+    p {
+      color: #666;
+      font-family: 'Roboto', sans-serif;
+      margin: 0 0 1rem 0;
+      text-align: center;
+    }
+
+    .assistance-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+
+      .assistance-btn {
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+// Section montant
+.amount-section {
+  text-align: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fdff, #e3f7fb);
+
+  .amount-display {
+    margin-bottom: 0.5rem;
+
+    .amount-value {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: bold;
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: #991f23;
+    }
+
+    .amount-currency {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: #00adef;
+      margin-left: 0.5rem;
+    }
+  }
+
+  .amount-label {
+    color: #666;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.1rem;
+  }
+}
+
+// Grille des détails
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 2rem;
+
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 173, 239, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 173, 239, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(0, 173, 239, 0.1);
+      transform: translateY(-2px);
+    }
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .detail-icon {
+      color: #00adef;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .detail-content {
+      .detail-label {
+        display: block;
+        color: #666;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .detail-value {
+        display: block;
+        color: #333;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 500;
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// Section image
+.image-section {
+  padding: 0 2rem 2rem;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #991f23;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+
+    mat-icon {
+      color: #00adef;
+    }
+  }
+
+  .image-container {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: zoom-in;
+    transition: all 0.3s ease;
+    background: #f5f5f5;
+
+    &.zoomed {
+      cursor: zoom-out;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.8);
+      z-index: 1000;
+      max-width: 90vw;
+      max-height: 90vh;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+
+      .proof-image {
+        cursor: zoom-out;
+      }
+    }
+
+    .image-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+      color: #666;
+      font-family: 'Roboto', sans-serif;
+
+      span {
+        margin-top: 1rem;
+      }
+    }
+
+    .proof-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s ease;
+
+      &.hidden {
+        display: none;
+      }
+    }
+
+    .image-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+
+      &:hover {
+        opacity: 1;
+      }
+
+      mat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  .image-hint {
+    text-align: center;
+    color: #666;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+}
+
+// Section actions
+.actions-section {
+  padding: 1.5rem 2rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+
+  .actions-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .back-btn {
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+
+      mat-icon {
+        margin-right: 0.5rem;
+      }
+    }
+
+    .status-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      .validate-btn,
+      .reject-btn {
+        border-radius: 10px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+
+        .action-spinner {
+          margin-right: 0.5rem;
+        }
+
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+
+      .validate-btn {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+      }
+
+      .reject-btn {
+        border-color: #e74c3c;
+        color: #e74c3c;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .retrait-detail-page {
+    padding: 0.5rem;
+  }
+
+  .retrait-detail-card .card-header .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  .image-section {
+    padding: 0 1rem 1rem;
+  }
+
+  .actions-section .actions-grid {
+    flex-direction: column;
+    align-items: stretch;
+
+    .status-actions {
+      justify-content: center;
+    }
+  }
+
+  .assistance-section .assistance-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .retrait-detail-card {
+    .card-header {
+      padding: 1.5rem 1rem;
+    }
+
+    .amount-section {
+      padding: 1.5rem 1rem;
+    }
+  }
+
+  .detail-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.retrait-detail-card {
+  animation: fadeIn 0.6s ease-out;
 }

@@ -11,26 +11,35 @@
 
   <div *ngIf="loading">Chargement...</div>
 
-  <div *ngIf="transactions.length === 0 && !loading">
-    Aucune transaction à valider.
+  <div *ngIf="!loading && transactions.length === 0" class="empty">
+    Aucune transaction en attente.
   </div>
 
-  <mat-card *ngFor="let t of transactions" class="transaction-card">
-    <div><strong>Nom :</strong> {{ t.utilisateur?.prenomUtilisateur }} {{ t.utilisateur?.nomUtilisateur }}</div>
-    <div><strong>Montant :</strong> {{ t.montant | number:'1.0-0' }} FCFA</div>
-    <div><strong>Numéro :</strong> {{ t.numeroEnvoyant }}</div>
-    <div><strong>Date :</strong> {{ t.dateDepot || t.dateRetrait | date:'medium' }}</div>
-    <div><strong>Option :</strong> {{ t.optionDeTransaction }}</div>
+  <mat-card *ngFor="let t of transactions" class="transaction-card" [class.depot]="filter==='DEPOT'" [class.retrait]="filter==='RETRAIT'">
+    <div class="header">
+      <div class="who">
+        <strong>Client :</strong>
+        {{ t.utilisateur?.prenomUtilisateur || '—' }} {{ t.utilisateur?.nomUtilisateur || '' }}
+      </div>
+      <span class="badge pending">⏳ En attente</span>
+    </div>
 
-    <img *ngIf="t.file" [src]="toBase64(t.file)" alt="Capture" width="180" style="margin: 10px 0;" />
+    <div class="grid">
+      <div><strong>Montant :</strong> {{ t.montant | number:'1.0-0' }} FCFA</div>
+      <div><strong>Numéro :</strong> {{ t.numeroEnvoyant }}</div>
+      <div><strong>Plateforme :</strong> {{ t.optionDeTransaction }}</div>
+      <div><strong>ID Plateforme :</strong> {{ getIdPlateforme(t) }}</div>
+      <div><strong>Date :</strong> {{ dateOf(t) | date:'medium' }}</div>
+      <!-- <div><strong>Date :</strong> {{ (t.dateDepot || t.dateRetrait) | date:'medium' }}</div> -->
+      <div><strong>Pays :</strong> {{ t.pays || '—' }}</div>
+    </div>
+
+    <img *ngIf="getImageSrc(t) as img" [src]="img" alt="Capture" class="thumb"/>
 
     <div class="actions">
-      <button mat-raised-button color="primary" (click)="validerTransaction(t.idDepot || t.idRetrait)">
-        ✅ Valider
-      </button>
-      <button mat-stroked-button color="accent" (click)="voirDetails(t)">
-        🔎 Voir détails
-      </button>
+      <button mat-raised-button color="primary" (click)="validerTransaction(t)">✅ Valider</button>
+      <button mat-stroked-button color="warn" (click)="rejeterTransaction(t)">❌ Rejeter</button>
+      <button mat-stroked-button color="accent" (click)="voirDetails(t)">🔎 Détails</button>
     </div>
   </mat-card>
 </div>

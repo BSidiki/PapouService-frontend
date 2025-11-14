@@ -1,56 +1,213 @@
-<mat-card *ngIf="retrait" class="retrait-detail-card">
-  <div class="header">
-    <h2><span class="emoji">💼</span> Détail du retrait</h2>
-    <span class="badge"
-      [ngClass]="{
-        'pending': retrait.transactionState === 'PENDING',
-        'validated': retrait.transactionState === 'VALIDATED',
-        'rejected': retrait.transactionState === 'REJECTED'
-      }">
-      {{
-        retrait.transactionState === 'PENDING' ? '⏳ En attente' :
-        retrait.transactionState === 'VALIDATED' ? '✅ Validé' :
-        retrait.transactionState === 'REJECTED' ? '❌ Rejeté' : 'Inconnu'
-      }}
-    </span>
-  </div>
-  <!-- Affichage du motif si rejeté -->
-  <div *ngIf="retrait.transactionState === 'REJECTED'" class="rejection-section">
-    <mat-divider></mat-divider>
-    <p class="motif-title">❗ Motif du rejet :</p>
-    <p class="motif-texte">{{ motif || 'Nous avons rejeté votre retrait' }}</p>
-    <div class="call-admin">
-      <!-- <p>Pour plus d'information contacter nos assistances</p> -->
-      <a class="call-button" href="tel:+22660417255">📞 Appeler l’assistance</a>
-    </div>
+<div class="retrait-detail-page">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-progress-spinner diameter="50" color="primary"></mat-progress-spinner>
+    <p>Chargement du détail du retrait...</p>
   </div>
 
-  <h3 class="montant">{{ retrait.montant | number }} FCFA</h3>
-
-  <div class="infos-grid">
-    <p><strong>📞 Numéro :</strong> {{ retrait.numeroEnvoyant }}</p>
-    <p><strong>🌍 Pays :</strong> {{ retrait.pays }}</p>
-    <p><strong>💳 Option :</strong> {{ retrait.optionRetrait }}</p>
-    <p><strong>🏦 Plateforme :</strong> {{ retrait.optionDeTransaction }}</p>
-    <p><strong>🆔 ID Plateforme :</strong> {{ getIdPlateforme(retrait) }}</p>
-    <p><strong>📅 Date :</strong> {{ retrait.dateRetrait | date:'dd/MM/yyyy - HH:mm:ss' }}</p>
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-card class="error-card">
+      <div class="error-content">
+        <mat-icon class="error-icon">error_outline</mat-icon>
+        <h2>Retrait non trouvé</h2>
+        <p>Le retrait que vous recherchez n'existe pas ou est inaccessible.</p>
+        <button mat-raised-button color="primary" (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </button>
+      </div>
+    </mat-card>
   </div>
 
-  <div *ngIf="retrait.file" class="image-section">
-    <p><strong>🖼️ Justificatif :</strong></p>
-    <img
-      [src]="toBase64(retrait.file)"
-      alt="Justificatif retrait"
-      (click)="toggleZoom()"
-      [class.zoomed]="zoomed"
-    />
-  </div>
+  <!-- Success State -->
+  <div *ngIf="retrait && !loading" class="success-container">
+    <mat-card class="retrait-detail-card">
+      <!-- En-tête -->
+      <div class="card-header">
+        <div class="header-content">
+          <h1 class="main-title">
+            <mat-icon class="title-icon">savings</mat-icon>
+            Détail du Retrait
+          </h1>
+          <div class="status-badge" [class]="getStatusClass()">
+            <span class="status-icon">{{ getStatusIcon() }}</span>
+            <span class="status-text">{{ getStatusText() }}</span>
+          </div>
+        </div>
+      </div>
 
-  <div class="btn-retour">
-    <button mat-stroked-button color="primary" (click)="goBack()">⬅️ Retour</button>
-  </div>
-</mat-card>
+      <!-- Section motif de rejet -->
+      <div *ngIf="retrait.transactionState === 'REJECTED'" class="rejection-section">
+        <mat-divider></mat-divider>
+        <div class="rejection-content">
+          <mat-icon class="rejection-icon">warning</mat-icon>
+          <div class="rejection-text">
+            <h3>Motif du rejet</h3>
+            <p>{{ motif || 'Nous avons rejeté votre retrait' }}</p>
+          </div>
+        </div>
 
-<div class="empty" *ngIf="!retrait">
-  <p>Aucun retrait trouvé.</p>
+        <div class="assistance-section">
+          <p>Pour plus d'informations, contactez notre assistance :</p>
+          <div class="assistance-actions">
+            <a mat-stroked-button href="tel:+22660417255" class="assistance-btn">
+              <mat-icon>call</mat-icon>
+              Appeler l'assistance
+            </a>
+            <a mat-stroked-button href="https://wa.me/22660417255" target="_blank" class="assistance-btn">
+              <mat-icon>chat</mat-icon>
+              WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Montant -->
+      <div class="amount-section">
+        <div class="amount-display">
+          <span class="amount-value">{{ retrait.montant }}</span>
+          <span class="amount-currency">FCFA</span>
+        </div>
+        <div class="amount-label">Montant du retrait</div>
+      </div>
+
+      <!-- Informations détaillées -->
+      <div class="details-grid">
+        <div class="detail-item">
+          <mat-icon class="detail-icon">person</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Utilisateur</span>
+            <span class="detail-value">{{ getNomUtilisateur(retrait) }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <mat-icon class="detail-icon">phone</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Numéro</span>
+            <span class="detail-value">{{ retrait.numeroEnvoyant || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <mat-icon class="detail-icon">public</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Pays</span>
+            <span class="detail-value">{{ retrait.pays || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <mat-icon class="detail-icon">payments</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Option de retrait</span>
+            <span class="detail-value">{{ getOptionRetraitText(retrait.optionRetrait) }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <mat-icon class="detail-icon">casino</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Plateforme</span>
+            <span class="detail-value">{{ retrait.optionDeTransaction || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
+          <mat-icon class="detail-icon">badge</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">ID Plateforme</span>
+            <span class="detail-value">{{ getIdPlateforme(retrait) }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item full-width">
+          <mat-icon class="detail-icon">schedule</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Date et heure</span>
+            <span class="detail-value">{{ formatDate(retrait.dateRetrait) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image de justificatif -->
+      <div *ngIf="retrait.file" class="image-section">
+        <h3 class="section-title">
+          <mat-icon>receipt</mat-icon>
+          Justificatif de retrait
+        </h3>
+        <div class="image-container" [class.zoomed]="zoomed">
+          <div *ngIf="imageLoading" class="image-loading">
+            <mat-progress-spinner diameter="40" color="primary"></mat-progress-spinner>
+            <span>Chargement du justificatif...</span>
+          </div>
+          <img
+            [src]="toBase64(retrait.file)"
+            alt="Justificatif de retrait"
+            (load)="onImageLoad()"
+            (error)="onImageError()"
+            (click)="toggleZoom()"
+            [class.hidden]="imageLoading"
+            class="proof-image"
+          />
+          <div class="image-overlay" (click)="toggleZoom()" *ngIf="zoomed">
+            <mat-icon>zoom_out</mat-icon>
+            <span>Cliquez pour réduire</span>
+          </div>
+        </div>
+        <p class="image-hint">Cliquez sur l'image pour {{ zoomed ? 'réduire' : 'zoomer' }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-section">
+        <div class="actions-grid">
+          <button
+            mat-stroked-button
+            (click)="goBack()"
+            class="back-btn"
+          >
+            <mat-icon>arrow_back</mat-icon>
+            Retour
+          </button>
+
+          <!-- <div class="status-actions" *ngIf="retrait.transactionState === 'PENDING'">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="changerStatut('VALIDATED')"
+              [disabled]="changingStatus"
+              class="validate-btn"
+            >
+              <mat-progress-spinner
+                *ngIf="changingStatus"
+                diameter="20"
+                color="accent"
+                class="action-spinner"
+              ></mat-progress-spinner>
+              <mat-icon *ngIf="!changingStatus">check_circle</mat-icon>
+              {{ changingStatus ? 'Validation...' : 'Valider' }}
+            </button>
+
+            <button
+              mat-stroked-button
+              color="warn"
+              (click)="changerStatut('REJECTED')"
+              [disabled]="changingStatus"
+              class="reject-btn"
+            >
+              <mat-progress-spinner
+                *ngIf="changingStatus"
+                diameter="20"
+                color="accent"
+                class="action-spinner"
+              ></mat-progress-spinner>
+              <mat-icon *ngIf="!changingStatus">cancel</mat-icon>
+              {{ changingStatus ? 'Rejet...' : 'Rejeter' }}
+            </button>
+          </div> -->
+        </div>
+      </div>
+    </mat-card>
+  </div>
 </div>

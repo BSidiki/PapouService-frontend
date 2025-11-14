@@ -1,23 +1,307 @@
+<div class="admin-client-retraits">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="header-main">
+        <button mat-stroked-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </button>
+        <div class="header-title">
+          <h2>💸 Historique des Retraits</h2>
+          <p class="subtitle">Retraits effectués par le client #{{ clientId }}</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="fetchRetraits()" [disabled]="loading" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          {{ loading ? 'Actualisation...' : 'Actualiser' }}
+        </button>
+      </div>
+    </div>
+  </div>
 
-<div class="retrait-container">
-  <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
-    ⬅️ Retour à la liste
-  </button>
+  <!-- Stats Cards -->
+  <div class="stats-cards" *ngIf="!loading && !errorMsg">
+    <div class="stat-card primary">
+      <div class="stat-icon">💸</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalRetraits() }}</div>
+        <div class="stat-label">Total Retraits</div>
+      </div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getValidatedRetraits() }}</div>
+        <div class="stat-label">Validés</div>
+      </div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getPendingRetraits() }}</div>
+        <div class="stat-label">En Attente</div>
+      </div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon">❌</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getRejectedRetraits() }}</div>
+        <div class="stat-label">Rejetés</div>
+      </div>
+    </div>
+  </div>
 
-  <h2 class="img-text">💸 Retraits du client
-    <span class="logo" routerLink="/accueil">
-      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="50"/>
-    </span>
-  </h2>
+  <!-- Filters Section -->
+  <div class="filters-section" *ngIf="!loading && !errorMsg">
+    <div class="filter-group">
+      <mat-form-field appearance="outline" class="status-field">
+        <mat-label>Statut du retrait</mat-label>
+        <mat-select [(value)]="statusFilter" (selectionChange)="onStatusChange()">
+          <mat-option value="ALL">
+            <div class="status-option">
+              <span class="status-dot all"></span>
+              Tous les statuts
+            </div>
+          </mat-option>
+          <mat-option value="PENDING">
+            <div class="status-option">
+              <span class="status-dot pending"></span>
+              En attente
+            </div>
+          </mat-option>
+          <mat-option value="VALIDATED">
+            <div class="status-option">
+              <span class="status-dot validated"></span>
+              Validés
+            </div>
+          </mat-option>
+          <mat-option value="REJECTED">
+            <div class="status-option">
+              <span class="status-dot rejected"></span>
+              Rejetés
+            </div>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-  <div *ngIf="retraits.length === 0">Aucun retrait trouvé.</div>
+    <div class="results-info">
+      <span class="results-count">{{ length }} retrait(s) trouvé(s)</span>
+      <span class="loading-text" *ngIf="loading">Mise à jour...</span>
+    </div>
+  </div>
 
-  <mat-card *ngFor="let retrait of retraits" class="retrait-card" (click)="voirDetails(retrait.idRetrait)">
-    <div><strong>Montant :</strong> {{ retrait.montant | number:'1.0-0' }} FCFA</div>
-    <div><strong>Numéro :</strong> {{ retrait.numeroEnvoyant }}</div>
-    <div><strong>Pays :</strong> {{ retrait.pays }}</div>
-    <div><strong>Type :</strong> {{ retrait.optionDeTransaction }}</div>
-    <div><strong>Date :</strong> {{ retrait.dateRetrait | date:'medium' }}</div>
-    <div class="link-text">🔎 Voir le détail</div>
-  </mat-card>
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-content">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Chargement des retraits...</span>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!loading && errorMsg">
+    <div class="error-content">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <h3>Erreur de chargement</h3>
+      <p>{{ errorMsg }}</p>
+      <button mat-raised-button color="primary" (click)="fetchRetraits()" class="retry-btn">
+        <mat-icon>refresh</mat-icon>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Desktop Table -->
+  <div class="table-section" *ngIf="!loading && !errorMsg && pagedRetraits.length > 0">
+    <div class="desktop-view">
+      <div class="table-container">
+        <table mat-table [dataSource]="pagedRetraits" class="retraits-table">
+
+          <!-- Montant Column -->
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef>Montant</th>
+            <td mat-cell *matCellDef="let retrait">
+              <div class="amount-cell">
+                <span class="amount">{{ retrait.montant | number:'1.0-0' }}</span>
+                <span class="currency">FCFA</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Numéro Column -->
+          <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef>Numéro</th>
+            <td mat-cell *matCellDef="let retrait" class="phone-cell">
+              <mat-icon class="phone-icon">phone</mat-icon>
+              {{ formatNumero(retrait.numeroEnvoyant) }}
+            </td>
+          </ng-container>
+
+          <!-- Pays Column -->
+          <ng-container matColumnDef="pays">
+            <th mat-header-cell *matHeaderCellDef>Pays</th>
+            <td mat-cell *matCellDef="let retrait">
+              <span class="country" *ngIf="retrait.pays; else noData">
+                {{ retrait.pays }}
+              </span>
+              <ng-template #noData>
+                <span class="no-data">—</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <!-- Plateforme Column -->
+          <ng-container matColumnDef="plateforme">
+            <th mat-header-cell *matHeaderCellDef>Plateforme</th>
+            <td mat-cell *matCellDef="let retrait">
+              <span class="platform-badge">{{ retrait.optionDeTransaction }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let retrait">
+              <div class="date-cell" *ngIf="retrait.dateRetrait; else noDate">
+                <span class="date">{{ retrait.dateRetrait | date:'dd/MM/yyyy' }}</span>
+                <span class="time">{{ retrait.dateRetrait | date:'HH:mm' }}</span>
+              </div>
+              <ng-template #noDate>
+                <span class="no-data">—</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <!-- Statut Column -->
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let retrait">
+              <span class="status-badge" [ngClass]="getStatusClass(retrait.transactionState)">
+                {{ getStatusText(retrait.transactionState) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let retrait">
+              <button mat-raised-button
+                      color="primary"
+                      (click)="voirDetails(retrait.idRetrait)"
+                      class="action-btn"
+                      matTooltip="Voir les détails du retrait">
+                <mat-icon>visibility</mat-icon>
+                Détails
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['montant', 'numero', 'pays', 'plateforme', 'date', 'statut', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['montant', 'numero', 'pays', 'plateforme', 'date', 'statut', 'actions']"></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="mobile-view">
+      <div *ngFor="let retrait of pagedRetraits" class="retrait-card">
+        <div class="card-header">
+          <div class="retrait-amount">
+            <span class="amount">{{ retrait.montant | number:'1.0-0' }}</span>
+            <span class="currency">FCFA</span>
+          </div>
+          <div class="retrait-status">
+            <span class="status-badge" [ngClass]="getStatusClass(retrait.transactionState)">
+              {{ getStatusText(retrait.transactionState) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <div class="info-grid">
+            <div class="info-item">
+              <mat-icon class="info-icon">phone</mat-icon>
+              <div class="info-content">
+                <span class="label">Numéro</span>
+                <span class="value">{{ formatNumero(retrait.numeroEnvoyant) }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <mat-icon class="info-icon">flag</mat-icon>
+              <div class="info-content">
+                <span class="label">Pays</span>
+                <span class="value">{{ retrait.pays || '—' }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <mat-icon class="info-icon">casino</mat-icon>
+              <div class="info-content">
+                <span class="label">Plateforme</span>
+                <span class="value">{{ retrait.optionDeTransaction }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <mat-icon class="info-icon">schedule</mat-icon>
+              <div class="info-content">
+                <span class="label">Date</span>
+                <span class="value" *ngIf="retrait.dateRetrait">
+                  {{ retrait.dateRetrait | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+                <span class="value no-data" *ngIf="!retrait.dateRetrait">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button mat-stroked-button
+                  color="primary"
+                  (click)="voirDetails(retrait.idRetrait)"
+                  class="action-btn-mobile">
+            <mat-icon>visibility</mat-icon>
+            Voir détails
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator [length]="length"
+                   [pageIndex]="pageIndex"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="[5, 10, 25, 50]"
+                   (page)="onPageChange($event)"
+                   showFirstLastButtons
+                   class="custom-paginator">
+    </mat-paginator>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && !errorMsg && pagedRetraits.length === 0">
+    <div class="empty-content">
+      <mat-icon class="empty-icon">payments</mat-icon>
+      <h3>Aucun retrait trouvé</h3>
+      <p *ngIf="statusFilter !== 'ALL'">
+        Aucun retrait ne correspond au statut sélectionné.
+      </p>
+      <p *ngIf="statusFilter === 'ALL'">
+        Ce client n'a effectué aucun retrait pour le moment.
+      </p>
+      <button *ngIf="statusFilter !== 'ALL'"
+              mat-raised-button
+              color="primary"
+              (click)="resetFilters()"
+              class="reset-btn">
+        <mat-icon>clear_all</mat-icon>
+        Afficher tous les retraits
+      </button>
+    </div>
+  </div>
 </div>

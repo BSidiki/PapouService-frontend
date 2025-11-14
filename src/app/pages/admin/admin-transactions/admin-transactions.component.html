@@ -1,101 +1,281 @@
 <div class="transactions-container">
-  <h2>📊 Liste des transactions</h2>
-
-  <div class="filters">
-    <mat-form-field appearance="outline">
-      <mat-label>Type</mat-label>
-      <mat-select [(ngModel)]="type" (selectionChange)="applyFilter()">
-        <mat-option value="ALL">Tous</mat-option>
-        <mat-option value="DEPOT">Dépôts</mat-option>
-        <mat-option value="RETRAIT">Retraits</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Plateforme</mat-label>
-      <mat-select [(ngModel)]="plateforme" (selectionChange)="applyFilter()">
-        <mat-option value="">Toutes</mat-option>
-        <mat-option value="IXBET">1XBET</mat-option>
-        <mat-option value="BETWINNER">BETWINNER</mat-option>
-        <mat-option value="MELBET">MELBET</mat-option>
-        <mat-option value="IWIN">1WIN</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Statut</mat-label>
-      <mat-select [(ngModel)]="statut" (selectionChange)="applyFilter()">
-        <mat-option value="">Tous</mat-option>
-        <mat-option value="PENDING">En attente</mat-option>
-        <mat-option value="VALIDATED">Validé</mat-option>
-        <mat-option value="REJECTED">Rejeté</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="search-bar">
-      <mat-label>Rechercher un client</mat-label>
-      <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom, prénom ou numéro" />
-    </mat-form-field>
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h2>📊 Transactions</h2>
+      <button mat-raised-button color="primary" (click)="loadTransactions()" class="refresh-btn">
+        <mat-icon>refresh</mat-icon>
+        Actualiser
+      </button>
+    </div>
+    <p class="subtitle">Gestion des dépôts et retraits des clients</p>
   </div>
 
-  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
-      <td mat-cell *matCellDef="let t">{{ t.type }}</td>
-    </ng-container>
+  <!-- Stats Cards -->
+  <div class="stats-cards" *ngIf="dataSource.data.length > 0">
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalTransactions() }}</div>
+        <div class="stat-label">Total Transactions</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⬆️</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getDepotCount() }}</div>
+        <div class="stat-label">Dépôts</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⬇️</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getRetraitCount() }}</div>
+        <div class="stat-label">Retraits</div>
+      </div>
+    </div>
+  </div>
 
-    <ng-container matColumnDef="nom">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
-      <td mat-cell *matCellDef="let t">{{ t.utilisateur?.prenomUtilisateur }} {{ t.utilisateur?.nomUtilisateur }}</td>
-    </ng-container>
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="type" (selectionChange)="applyFilter()">
+          <mat-option value="ALL">Tous</mat-option>
+          <mat-option value="DEPOT">Dépôts</mat-option>
+          <mat-option value="RETRAIT">Retraits</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <ng-container matColumnDef="numero">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Numéro</th>
-      <td mat-cell *matCellDef="let t">{{ t.numeroEnvoyant }}</td>
-    </ng-container>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Plateforme</mat-label>
+        <mat-select [(ngModel)]="plateforme" (selectionChange)="applyFilter()">
+          <mat-option value="">Toutes</mat-option>
+          <mat-option value="1XBET">1XBET</mat-option>
+          <mat-option value="BETWINNER">BETWINNER</mat-option>
+          <mat-option value="MELBET">MELBET</mat-option>
+          <mat-option value="1WIN">1WIN</mat-option>
+          <mat-option value="888STARZ">888STARZ</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <ng-container matColumnDef="montant">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
-      <td mat-cell *matCellDef="let t">{{ t.montant | number:'1.0-0' }} FCFA</td>
-    </ng-container>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Statut</mat-label>
+        <mat-select [(ngModel)]="statut" (selectionChange)="applyFilter()">
+          <mat-option value="">Tous</mat-option>
+          <mat-option value="PENDING">En attente</mat-option>
+          <mat-option value="VALIDATED">Validé</mat-option>
+          <mat-option value="REJECTED">Rejeté</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-    <ng-container matColumnDef="plateforme">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Plateforme</th>
-      <td mat-cell *matCellDef="let t">{{ t.optionDeTransaction }}</td>
-    </ng-container>
+    <div class="search-group">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher</mat-label>
+        <input matInput
+               [(ngModel)]="search"
+               (ngModelChange)="applyFilter()"
+               placeholder="Nom, prénom, numéro..." />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
 
-    <ng-container matColumnDef="date">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-      <td mat-cell *matCellDef="let t">{{ t.dateDepot || t.dateRetrait | date:'short' }}</td>
-    </ng-container>
+      <button mat-stroked-button (click)="resetFilters()" class="reset-btn">
+        <mat-icon>clear_all</mat-icon>
+        Réinitialiser
+      </button>
+    </div>
+  </div>
 
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Actions</th>
-      <td mat-cell *matCellDef="let t">
-        <button mat-button color="primary" (click)="voirDetails(t)">Détails</button>
-      </td>
-    </ng-container>
+  <!-- Results Info -->
+  <div class="results-info">
+    <span class="results-count">
+      {{ dataSource.filteredData.length }} transaction(s) trouvée(s)
+    </span>
+    <span class="loading-text" *ngIf="loading">Chargement...</span>
+  </div>
 
-    <ng-container matColumnDef="statut">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
-      <td mat-cell *matCellDef="let t">
-        <span [ngClass]="{
-          'pending': t.statut === 'PENDING',
-          'validated': t.statut === 'VALIDATED',
-          'rejected': t.statut === 'REJECTED'
-        }">
-          {{
-            t.statut === 'PENDING' ? 'En attente' :
-            t.statut === 'VALIDATED' ? 'Validé' :
-            t.statut === 'REJECTED' ? 'Rejeté' : 'Inconnu'
-          }}
-        </span>
-      </td>
-    </ng-container>
+  <!-- Desktop Table -->
+  <div class="table-section" *ngIf="dataSource.filteredData.length > 0">
+    <div class="desktop-view">
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="transactions-table">
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+            <td mat-cell *matCellDef="let t">
+              <span class="type-badge" [class.depot]="t.type === 'DEPOT'" [class.retrait]="t.type === 'RETRAIT'">
+                {{ t.type === 'DEPOT' ? '⬆️ Dépôt' : '⬇️ Retrait' }}
+              </span>
+            </td>
+          </ng-container>
 
-  <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25]"></mat-paginator>
+          <!-- Nom Column -->
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
+            <td mat-cell *matCellDef="let t">
+              <div class="client-info">
+                <span class="client-name">{{ nomComplet(t.utilisateur) || '—' }}</span>
+                <span class="client-phone">{{ t.numero }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Numéro Column -->
+          <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Numéro</th>
+            <td mat-cell *matCellDef="let t">
+              {{ t.numero }}
+            </td>
+          </ng-container>
+
+          <!-- Montant Column -->
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
+            <td mat-cell *matCellDef="let t">
+              <span class="amount" [class.depot]="t.type === 'DEPOT'" [class.retrait]="t.type === 'RETRAIT'">
+                {{ t.montant | number:'1.0-0' }} FCFA
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Plateforme Column -->
+          <ng-container matColumnDef="plateforme">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Plateforme</th>
+            <td mat-cell *matCellDef="let t">
+              <span class="platform-badge">{{ t.plateforme }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Statut Column -->
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+            <td mat-cell *matCellDef="let t">
+              <span class="status-badge" [ngClass]="getStatusClass(t.statut)">
+                {{
+                  t.statut === 'PENDING' ? '⏳ En attente' :
+                  t.statut === 'VALIDATED' ? '✅ Validé' :
+                  t.statut === 'REJECTED' ? '❌ Rejeté' : '—'
+                }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+            <td mat-cell *matCellDef="let t">
+              <div class="date-info">
+                <span class="date">{{ dateOf(t) | date:'dd/MM/yy' }}</span>
+                <span class="time">{{ dateOf(t) | date:'HH:mm' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let t">
+              <button mat-raised-button
+                      color="primary"
+                      (click)="voirDetails(t)"
+                      class="action-btn"
+                      matTooltip="Voir les détails">
+                <mat-icon>visibility</mat-icon>
+                Détails
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="mobile-view">
+      <div *ngFor="let transaction of pagedFilteredData; trackBy: trackById" class="transaction-card">
+        <div class="card-header">
+          <div class="transaction-type">
+            <span class="type-badge" [class.depot]="transaction.type === 'DEPOT'" [class.retrait]="transaction.type === 'RETRAIT'">
+              {{ transaction.type === 'DEPOT' ? '⬆️ Dépôt' : '⬇️ Retrait' }}
+            </span>
+            <span class="status-badge" [ngClass]="getStatusClass(transaction.statut)">
+              {{
+                transaction.statut === 'PENDING' ? '⏳' :
+                transaction.statut === 'VALIDATED' ? '✅' :
+                transaction.statut === 'REJECTED' ? '❌' : '—'
+              }}
+            </span>
+          </div>
+          <div class="amount-mobile" [class.depot]="transaction.type === 'DEPOT'" [class.retrait]="transaction.type === 'RETRAIT'">
+            {{ transaction.montant | number:'1.0-0' }} FCFA
+          </div>
+        </div>
+
+        <div class="card-content">
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Client</span>
+              <span class="value">{{ nomComplet(transaction.utilisateur) || '—' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Numéro</span>
+              <span class="value">{{ transaction.numero }}</span>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-item">
+              <span class="label">Plateforme</span>
+              <span class="value platform">{{ transaction.plateforme }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Date</span>
+              <span class="value">{{ dateOf(transaction) | date:'dd/MM/yy HH:mm' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button mat-stroked-button
+                  color="primary"
+                  (click)="voirDetails(transaction)"
+                  class="action-btn-mobile">
+            <mat-icon>visibility</mat-icon>
+            Voir détails
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator [pageSize]="10"
+                  [pageSizeOptions]="[5, 10, 25, 50]"
+                  showFirstLastButtons
+                  class="custom-paginator">
+    </mat-paginator>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="dataSource.filteredData.length === 0 && !loading">
+    <div class="empty-icon">💸</div>
+    <h3>Aucune transaction trouvée</h3>
+    <p>Aucune transaction ne correspond à vos critères de recherche</p>
+    <button mat-raised-button color="primary" (click)="resetFilters()" class="retry-btn">
+      <mat-icon>refresh</mat-icon>
+      Réinitialiser les filtres
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    <span>Chargement des transactions...</span>
+  </div>
 </div>

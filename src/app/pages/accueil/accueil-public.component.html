@@ -2,72 +2,189 @@
 
 <div class="public-accueil">
 
-  <!-- 🔹 HERO: Carrousel pleine largeur -->
-  <section class="hero-carousel">
-    <app-annonces-public></app-annonces-public>
-  </section>
-
-  <!-- 🔹 À propos de nous -->
-  <section class="about-section">
-    <div class="about-content">
-      <div class="about-text">
-        <h2>✨ Bienvenue sur <strong>Papou Service</strong></h2>
-        <p>
-          Une solution rapide, simple et sécurisée pour vos dépôts et retraits sur vos plateformes de jeu préférées.
-        </p>
-        <p>
-          Inscrivez vous pour beneficier de nos services de façon rapide et fiable
-        </p>
-        <ul>
-          <li>✅ Transactions vérifiées</li>
-          <li>📞 Assistance 24h/24</li>
-          <li>🔒 Sécurité garantie</li>
-        </ul>
-      </div>
-      <div class="about-image">
-        <app-carousel-pubs></app-carousel-pubs>
-      </div>
+  <!-- HERO avec annonces -->
+  <section class="hero" aria-label="Annonces importantes">
+    <div class="hero-content">
+      <app-annonces-public></app-annonces-public>
     </div>
   </section>
+
+  <!-- Section principale -->
+  <main class="main-content">
+
+    <!-- À propos + pubs -->
+    <section class="welcome-section">
+      <div class="container">
+        <div class="welcome-card">
+          <div class="welcome-grid">
+
+            <!-- Texte de bienvenue -->
+            <div class="welcome-text">
+              <h1>✨ Bienvenue sur <strong class="brand">Papou Service</strong></h1>
+              <p class="lead">
+                La solution <strong>rapide</strong>, <strong>simple</strong> et <strong>sécurisée</strong>
+                pour vos dépôts et retraits sur vos plateformes de jeu préférées.
+              </p>
+
+              <div class="benefits-list">
+                <div class="benefit-item">
+                  <mat-icon class="benefit-icon">verified</mat-icon>
+                  <span>Transactions vérifiées</span>
+                </div>
+                <div class="benefit-item">
+                  <mat-icon class="benefit-icon">support_agent</mat-icon>
+                  <span>Assistance 24h/24</span>
+                </div>
+                <div class="benefit-item">
+                  <mat-icon class="benefit-icon">security</mat-icon>
+                  <span>Sécurité garantie</span>
+                </div>
+              </div>
+
+              <p class="cta-text">
+                Inscrivez-vous pour bénéficier de nos services de façon fiable et efficace.
+              </p>
+
+              <div class="action-buttons">
+                <a mat-raised-button color="primary" routerLink="/register" class="btn-primary">
+                  <mat-icon>person_add</mat-icon>
+                  Créer un compte
+                </a>
+                <a mat-stroked-button color="primary" routerLink="/login" class="btn-secondary">
+                  <mat-icon>login</mat-icon>
+                  Se connecter
+                </a>
+              </div>
+            </div>
+
+            <!-- Carousel pubs -->
+            <div class="welcome-media">
+              <div class="media-ratio">
+                <app-carousel-pubs></app-carousel-pubs>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Plateformes partenaires -->
+    <section class="partners-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>🎯 Nos plateformes partenaires</h2>
+          <p>Rejoignez les meilleures plateformes de gaming avec Papou Service</p>
+        </div>
+
+        <div class="partners-grid">
+
+          <!-- 1XBET -->
+          <div class="partner-card">
+            <div class="partner-image">
+              <img src="assets/images/1XBET.png" alt="1XBET" loading="lazy" />
+            </div>
+            <h3>1XBET</h3>
+            <div class="partner-actions">
+              <a mat-raised-button color="primary"
+                href="https://bit.ly/inscription-1xbet"
+                target="_blank"
+                rel="noopener"
+                class="partner-btn">
+                <mat-icon>open_in_new</mat-icon>
+                Créer un compte
+              </a>
+              <a mat-stroked-button
+                href="assets/apk/1xbet.apk"
+                download
+                class="partner-btn download">
+                <mat-icon>download</mat-icon>
+                Télécharger
+              </a>
+            </div>
+          </div>
+
+          <!-- BetWinner -->
+          <div class="partner-card">
+            <div class="partner-image">
+              <img src="assets/images/BETWINNER.png" alt="BetWinner" loading="lazy" />
+            </div>
+            <h3>BetWinner</h3>
+            <div class="partner-actions">
+              <a mat-raised-button color="primary"
+                href="https://bit.ly/inscription-betwinner"
+                target="_blank"
+                rel="noopener"
+                class="partner-btn">
+                <mat-icon>open_in_new</mat-icon>
+                Créer un compte
+              </a>
+              <a mat-stroked-button
+                href="assets/apk/betwinner.apk"
+                download
+                class="partner-btn download">
+                <mat-icon>download</mat-icon>
+                Télécharger
+              </a>
+            </div>
+          </div>
+
+          <!-- MelBet -->
+          <div class="partner-card">
+            <div class="partner-image">
+              <img src="assets/images/MELBET.png" alt="MelBet" loading="lazy" />
+            </div>
+            <h3>MelBet</h3>
+            <div class="partner-actions">
+              <a mat-raised-button color="primary"
+                href="https://bit.ly/inscription-melbet"
+                target="_blank"
+                rel="noopener"
+                class="partner-btn">
+                <mat-icon>open_in_new</mat-icon>
+                Créer un compte
+              </a>
+              <a mat-stroked-button
+                href="assets/apk/melbet.apk"
+                download
+                class="partner-btn download">
+                <mat-icon>download</mat-icon>
+                Télécharger
+              </a>
+            </div>
+          </div>
+
+          <!-- 888starz -->
+          <div class="partner-card">
+            <div class="partner-image">
+              <img src="assets/images/888STARZ.png" alt="888starz" loading="lazy" />
+            </div>
+            <h3>888starz</h3>
+            <div class="partner-actions">
+              <a mat-raised-button color="primary"
+                href="https://888starz.bet/fr/registration"
+                target="_blank"
+                rel="noopener"
+                class="partner-btn">
+                <mat-icon>open_in_new</mat-icon>
+                Créer un compte
+              </a>
+              <a mat-stroked-button
+                href="org.starz888.client-28-23370.apk"
+                download
+                class="partner-btn download">
+                <mat-icon>download</mat-icon>
+                Télécharger
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
 </div>
-<!-- 🔹 Plateformes Partenaires -->
-<section class="plateformes-section">
-  <h2>🎯 Nos plateformes partenaires</h2>
-  <div class="plateformes-grid">
-
-    <!-- 1XBET -->
-    <div class="platform-card">
-      <img src="assets/images/1XBET.png" alt="1XBET Logo" />
-      <h3>1XBET</h3>
-      <a mat-raised-button color="primary" href="https://bit.ly/inscription-1xbet" target="_blank">Créer un compte</a>
-      <a mat-stroked-button color="accent" href="assets/apk/1xbet.apk" download>Télécharger l'appli</a>
-    </div>
-
-    <!-- BetWinner -->
-    <div class="platform-card">
-      <img src="assets/images/BETWINNER.png" alt="BetWinner Logo" />
-      <h3>BetWinner</h3>
-      <a mat-raised-button color="primary" href="https://bit.ly/inscription-betwinner" target="_blank">Créer un compte</a>
-      <a mat-stroked-button color="accent" href="assets/apk/betwinner.apk" download>Télécharger l'appli</a>
-    </div>
-
-    <!-- MelBet -->
-    <div class="platform-card">
-      <img src="assets/images/MELBET.png" alt="MelBet Logo" />
-      <h3>MelBet</h3>
-      <a mat-raised-button color="primary" href="https://bit.ly/inscription-melbet" target="_blank">Créer un compte</a>
-      <a mat-stroked-button color="accent" href="assets/apk/melbet.apk" download>Télécharger l'appli</a>
-    </div>
-
-    <!-- 1Win -->
-    <div class="platform-card">
-      <img src="assets/images/1WIN.png" alt="1Win Logo" />
-      <h3>1Win</h3>
-      <a mat-raised-button color="primary" href="https://bit.ly/inscription-1win" target="_blank">Créer un compte</a>
-      <a mat-stroked-button color="accent" href="assets/apk/1win.apk" download>Télécharger l'appli</a>
-    </div>
-
-  </div>
-</section>
 
 <app-footer></app-footer>

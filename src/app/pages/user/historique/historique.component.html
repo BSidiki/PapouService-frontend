@@ -2,7 +2,6 @@
   <app-annonces-public></app-annonces-public>
 </section>
 
-<!-- ✅ Barres de filtres flexibles et responsives -->
 <div class="filter-bar">
   <mat-form-field appearance="fill" class="filter">
     <mat-label>Filtrer par type</mat-label>
@@ -24,32 +23,29 @@
   </mat-form-field>
 </div>
 
-<div *ngIf="filteredHistoriques.length === 0" class="no-result">
+<!-- états -->
+<div *ngIf="loading" class="loading">Chargement…</div>
+<div *ngIf="!loading && errorMsg" class="error">{{ errorMsg }}</div>
+<div *ngIf="!loading && !errorMsg && filteredHistoriques.length === 0" class="no-result">
   Aucune transaction trouvée.
 </div>
 
-<!-- ✅ Grille responsive -->
-<div class="transaction-list">
+<div class="transaction-list" *ngIf="!loading && !errorMsg">
   <mat-card
     *ngFor="let item of filteredHistoriques"
     class="transaction-card"
     (click)="goToDetails(item)"
-    [ngClass]="{
-      'depot-card': item.transaction === 'DEPOT',
-      'retrait-card': item.transaction === 'RETRAIT'
-    }"
+    [ngClass]="{ 'depot-card': item.transaction === 'DEPOT', 'retrait-card': item.transaction === 'RETRAIT' }"
   >
     <div class="contenu">
       <div class="transaction-header">
-        <span class="icon">
-          {{ item.transaction === 'DEPOT' ? '💸' : '💼' }}
-        </span>
+        <span class="icon">{{ item.transaction === 'DEPOT' ? '💸' : '💼' }}</span>
         <strong>{{ item.transaction }}</strong>
       </div>
 
       <div><strong>ID-TRANSACTION :</strong> N{{ item.id_transaction }}PS</div>
-      <div><strong>Montant :</strong> {{ item.details?.montant || '---' }} FCFA</div>
-      <div><strong>Numéro :</strong> {{ item.details?.numeroEnvoyant || '---' }}</div>
+      <div><strong>Montant :</strong> {{ item.details?.montant ?? '---' }} FCFA</div>
+      <div><strong>Numéro :</strong> {{ item.details?.numeroEnvoyant ?? '---' }}</div>
       <div *ngIf="item.date">
         <strong>Date :</strong> {{ item.date | date: 'dd/MM/yyyy - HH:mm' }}
       </div>

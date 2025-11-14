@@ -125,4 +125,7 @@
     font-size: 0.7rem;
     padding: 0.3rem 0.6rem;
   }
+
+  .loading { text-align:center; margin-top:1rem; color:#666; }
+  .error   { text-align:center; margin-top:1rem; color:#b00020; font-weight:600; }
 }

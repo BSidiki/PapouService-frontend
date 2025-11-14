@@ -1,36 +1,230 @@
-<footer class="footer-container">
-  <div class="footer-content">
-    <div class="footer-section brand">
-      <h3>PapouService</h3>
-      <img src="assets/images/logo.png" alt="Logo PapouService" class="logo-img" width="100" />
-      <p>Votre partenaire de confiance pour les transactions électroniques.</p>
+<!-- <footer class="footer" role="contentinfo" aria-label="Pied de page PapouService"> -->
+<footer class="footer footer--dense" role="contentinfo" aria-label="Pied de page PapouService">
+  <div class="footer__content">
+
+    <!-- Section principale -->
+    <div class="footer__main">
+
+      <!-- Colonne 1: Identité et mission -->
+      <section class="footer__brand" aria-label="À propos de PapouService">
+        <div class="brand-header">
+          <a routerLink="/accueil" class="brand__logo" aria-label="PapouService - Accueil">
+            <img
+              src="assets/images/logo.png"
+              alt="Logo PapouService"
+              width="80"
+              height="80"
+              loading="lazy"
+              decoding="async"
+              class="logo-img" />
+            <div class="brand-text">
+              <span class="brand__name">PapouService</span>
+              <span class="brand__tagline-mobile">Transactions sécurisées et rapides</span>
+            </div>
+          </a>
+        </div>
+
+        <p class="brand__tagline">
+          Votre partenaire de confiance pour des transactions financières rapides, sécurisées et accessibles à tous.
+        </p>
+
+        <!-- Badges de confiance -->
+        <div class="brand__badges" aria-label="Gages de confiance">
+          <div class="badge">
+            <mat-icon class="badge-icon">security</mat-icon>
+            <div class="badge-content">
+              <span class="badge-title">Sécurisé</span>
+              <span class="badge-desc">Données cryptées</span>
+            </div>
+          </div>
+          <div class="badge">
+            <mat-icon class="badge-icon">flash_on</mat-icon>
+            <div class="badge-content">
+              <span class="badge-title">Rapide</span>
+              <span class="badge-desc">Traitement instantané</span>
+            </div>
+          </div>
+          <div class="badge">
+            <mat-icon class="badge-icon">support_agent</mat-icon>
+            <div class="badge-content">
+              <span class="badge-title">Support 24/7</span>
+              <span class="badge-desc">Assistance continue</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Colonne 2: Navigation -->
+      <nav class="footer__nav" aria-label="Navigation principale">
+        <h3 class="nav-title">Navigation</h3>
+        <ul class="nav-list">
+          <li><a routerLink="/accueil" routerLinkActive="active" class="nav-link">
+            <mat-icon class="nav-link-icon">home</mat-icon>
+            <span>Accueil</span>
+          </a></li>
+          <li><a routerLink="/a-propos" routerLinkActive="active" class="nav-link">
+            <mat-icon class="nav-link-icon">info</mat-icon>
+            <span>À propos</span>
+          </a></li>
+          <li><a routerLink="/faq" routerLinkActive="active" class="nav-link">
+            <mat-icon class="nav-link-icon">help</mat-icon>
+            <span>FAQ</span>
+          </a></li>
+          <li><a routerLink="/contact" routerLinkActive="active" class="nav-link">
+            <mat-icon class="nav-link-icon">contact_support</mat-icon>
+            <span>Contact</span>
+          </a></li>
+          <li><a routerLink="/login" routerLinkActive="active" class="nav-link">
+            <mat-icon class="nav-link-icon">login</mat-icon>
+            <span>Connexion</span>
+          </a></li>
+          <li><a routerLink="/register" routerLinkActive="active" class="nav-link highlight">
+            <mat-icon class="nav-link-icon">person_add</mat-icon>
+            <span>Inscription</span>
+          </a></li>
+        </ul>
+      </nav>
+
+      <!-- Colonne 3: Contact -->
+      <section class="footer__contact" aria-label="Coordonnées et contact">
+        <h3 class="contact-title">Nous contacter</h3>
+        <div class="contact-info">
+          <address class="contact-address">
+            <div class="address-line">
+              <mat-icon class="address-icon">location_on</mat-icon>
+              <span>Ouagadougou, Burkina Faso</span>
+            </div>
+
+            <a class="contact__link" href="tel:+22670000000" aria-label="Appeler le +226 70 00 00 00">
+              <mat-icon class="contact-icon">call</mat-icon>
+              <div class="contact-details">
+                <span class="contact-label">Téléphone</span>
+                <span class="contact-value">+226 70 00 00 00</span>
+              </div>
+            </a>
+
+            <a class="contact__link" href="mailto:papouservice@gmail.com" aria-label="Envoyer un e-mail">
+              <mat-icon class="contact-icon">mail</mat-icon>
+              <div class="contact-details">
+                <span class="contact-label">Email</span>
+                <span class="contact-value">papouservice&#64;gmail.com</span>
+              </div>
+            </a>
+
+            <a class="contact__link" href="https://wa.me/22670000000" target="_blank" rel="noopener"
+               aria-label="Écrire sur WhatsApp">
+              <mat-icon class="contact-icon">chat</mat-icon>
+              <div class="contact-details">
+                <span class="contact-label">WhatsApp</span>
+                <span class="contact-value">+226 70 00 00 00</span>
+              </div>
+            </a>
+          </address>
+
+          <!-- Réseaux sociaux -->
+          <div class="social-links" aria-label="Réseaux sociaux">
+            <h4 class="social-title">Suivez-nous</h4>
+            <div class="social-grid">
+              <a class="social-btn facebook" href="https://www.facebook.com/share/1BSedKVaXc/" target="_blank" rel="noopener" aria-label="Facebook">
+                <div class="social-icon">
+                  <img src="assets/images/Facebook.png" alt="Facebook" width="24" height="24" loading="lazy" />
+                </div>
+                <div class="social-details">
+                  <span class="social-text">Facebook</span>
+                  <span class="social-followers">+5K abonnés</span>
+                </div>
+              </a>
+
+              <a class="social-btn tiktok" href="https://vm.tiktok.com/ZSHg6L8q1R5Ab-eTQrC/" target="_blank" rel="noopener" aria-label="TikTok">
+                <div class="social-icon">
+                  <img src="assets/images/tiktok.png" alt="TikTok" width="24" height="24" loading="lazy" />
+                </div>
+                <div class="social-details">
+                  <span class="social-text">TikTok</span>
+                  <span class="social-followers">+10K abonnés</span>
+                </div>
+              </a>
+
+              <a class="social-btn whatsapp" href="https://wa.me/22660417255" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <div class="social-icon">
+                  <img src="assets/images/WhatsApp.jpeg" alt="WhatsApp" width="24" height="24" loading="lazy" />
+                </div>
+                <div class="social-details">
+                  <span class="social-text">WhatsApp</span>
+                  <span class="social-followers">Support direct</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Colonne 4: Légal et newsletter -->
+      <section class="footer__legal" aria-label="Informations légales">
+        <h3 class="legal-title">Ressources</h3>
+
+        <ul class="legal-links">
+          <li><a href="#" class="legal-link" aria-disabled="true">
+            <mat-icon class="legal-icon">description</mat-icon>
+            <span>Conditions d'utilisation</span>
+          </a></li>
+          <li><a href="#" class="legal-link" aria-disabled="true">
+            <mat-icon class="legal-icon">privacy_tip</mat-icon>
+            <span>Politique de confidentialité</span>
+          </a></li>
+          <li><a href="#" class="legal-link" aria-disabled="true">
+            <mat-icon class="legal-icon">help_center</mat-icon>
+            <span>FAQ</span>
+          </a></li>
+          <li><a href="#" class="legal-link" aria-disabled="true">
+            <mat-icon class="legal-icon">support</mat-icon>
+            <span>Centre d'aide</span>
+          </a></li>
+        </ul>
+
+        <!-- Call-to-action newsletter -->
+        <div class="newsletter-cta" aria-label="Inscription newsletter">
+          <div class="newsletter-header">
+            <mat-icon class="newsletter-main-icon">notifications_active</mat-icon>
+            <h4 class="newsletter-title">Restez informé</h4>
+          </div>
+          <p class="newsletter-desc">Recevez nos dernières actualités et offres exclusives.</p>
+          <a routerLink="/register" class="newsletter-btn">
+            <mat-icon class="btn-icon">notifications</mat-icon>
+            <span>S'inscrire aux alertes</span>
+            <mat-icon class="btn-arrow">arrow_forward</mat-icon>
+          </a>
+        </div>
+      </section>
+
     </div>
 
-    <div class="footer-section links">
-      <h4>Navigation</h4>
-      <a routerLink="/accueil">Accueil</a>
-      <a routerLink="/faq">FAQ</a>
-      <a routerLink="/a-propos">À propos</a>
-      <a routerLink="/contact">Contact</a>
-    </div>
+    <!-- Section de copyright -->
+    <div class="footer__bottom">
+      <div class="footer-bottom-content">
+        <div class="copyright-section">
+          <div class="copyright">
+            <span>&copy; {{ currentYear }} PapouService — Tous droits réservés.</span>
+          </div>
 
-    <div class="footer-section social">
-      <h4>Suivez-nous</h4>
-      <div class="social-icons">
-        <a href="https://www.facebook.com/share/1BSedKVaXc/" target="_blank" rel="noopener">
-          <img src="assets/images/Facebook.png" alt="Facebook" width="30" />
-        </a>
-        <a href="https://vm.tiktok.com/ZSHg6L8q1R5Ab-eTQrC/" target="_blank" rel="noopener">
-          <img src="assets/images/tiktok.png" alt="TikTok" width="30" />
-        </a>
-        <a href="https://wa.me/22660417255" target="_blank" rel="noopener">
-          <img src="assets/images/WhatsApp.jpeg" alt="WhatsApp" width="30" />
-        </a>
+          <div class="footer-meta">
+            <span class="version">Version {{ appVersion }}</span>
+            <span class="separator" aria-hidden="true">•</span>
+            <span class="made-with">
+              <mat-icon class="heart-icon">favorite</mat-icon>
+              Fait avec passion au Burkina Faso
+            </span>
+          </div>
+        </div>
+
+        <div class="footer-actions">
+          <button class="back-to-top" (click)="scrollToTop()" aria-label="Remonter en haut de la page">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+            <span class="back-to-top-text">Haut de page</span>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="footer-bottom">
-    &copy; {{ currentYear }} PapouService. Tous droits réservés.
   </div>
 </footer>

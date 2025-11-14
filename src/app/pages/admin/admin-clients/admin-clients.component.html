@@ -1,72 +1,283 @@
 <div class="admin-clients">
-  <!-- <span class="logo" routerLink="/accueil">
-    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" />
-  </span> -->
-  <h2>👥 Liste des clients</h2>
-  <div class="filters-reshearch">
-    <mat-form-field appearance="outline" class="search-bar">
-      <mat-label>Rechercher</mat-label>
-      <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()" placeholder="Nom, Prénom ou Numéro" />
-    </mat-form-field>
-
-    <!-- 🎯 Filtres par nombre d’étoiles -->
-    <div class="filter-section">
-      <label>Filtrer par fidélité : </label>
-      <select [(ngModel)]="selectedStarFilter" (change)="filterByStars()">
-        <option value="">Toutes</option>
-        <option *ngFor="let star of [0,1,2,3,4,5]" [value]="star">{{ star }} ⭐</option>
-      </select>
-      <button mat-button color="primary" (click)="resetFilter()">Réinitialiser</button>
-    </div>
-
-    <!-- 📊 Graphique fidélité -->
-    <div class="chart-container">
-      <canvas baseChart
-        [data]="{ labels: chartLabels, datasets: [{ data: chartData, label: 'Clients par fidélité' }] }"
-        [type]="'bar'">
-      </canvas>
+  <!-- Header -->
+  <div class="header-row">
+    <div class="header-content">
+      <h2>👥 Gestion des Clients</h2>
+      <div class="tools">
+        <button mat-stroked-button (click)="loadClientsData()" [disabled]="loading" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          {{ loading ? 'Actualisation...' : 'Actualiser' }}
+        </button>
+      </div>
     </div>
   </div>
 
-  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
-    <ng-container matColumnDef="prenom">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Prénom</th>
-      <td mat-cell *matCellDef="let client">{{ client.prenomUtilisateur }}</td>
-    </ng-container>
+  <!-- Loading State -->
+  <div class="state" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <span>Chargement des données clients...</span>
+    </div>
+  </div>
 
-    <ng-container matColumnDef="nom">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
-      <td mat-cell *matCellDef="let client">{{ client.nomUtilisateur }}</td>
-    </ng-container>
+  <ng-container *ngIf="!loading">
+    <!-- Stats Cards -->
+    <div class="stat-cards">
+      <mat-card class="stat-card primary">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <div class="stat-label">Total Clients</div>
+          <div class="stat-value">{{ totalClients }}</div>
+        </div>
+      </mat-card>
 
-    <ng-container matColumnDef="numero">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Numéro</th>
-      <td mat-cell *matCellDef="let client">{{ client.numeroUtilisateur }}</td>
-    </ng-container>
+      <mat-card class="stat-card accent">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <div class="stat-label">Clients Fidèles</div>
+          <div class="stat-value">{{ fideleClients }}</div>
+        </div>
+      </mat-card>
 
-    <ng-container matColumnDef="fidelity">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Fidélité</th>
-      <td mat-cell *matCellDef="let client">
-        <span class="stars">{{ client.fidelityStars }}</span>
-        <span
-          *ngIf="client.isFidele"
-          class="badge"
-          matTooltip="Client fidèle : 25 dépôts validés ou plus 🎖"
-          >🎖 Fidèle</span
-        >
-      </td>
-    </ng-container>
+      <mat-card class="stat-card warn">
+        <div class="stat-icon">📊</div>
+        <div class="stat-content">
+          <div class="stat-label">Niveau Moyen</div>
+          <div class="stat-value">
+            {{ getAverageStars() }}⭐
+          </div>
+        </div>
+      </mat-card>
+    </div>
 
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Actions</th>
-      <td mat-cell *matCellDef="let client">
-        <button mat-button color="primary" (click)="voirProfil(client.idUtilisateur)">Profil</button>
-        <button mat-button color="accent" (click)="voirHistorique(client.idUtilisateur)">Historique</button>
-<!--         <button mat-button color="warn" (click)="supprimer(client.idUtilisateur)">Supprimer</button>
- -->      </td>
-    </ng-container>
+    <!-- Analytics Section -->
+    <div class="analytics-section">
+      <div class="chart-card">
+        <h3>📈 Répartition par Niveau de Fidélité</h3>
+        <div class="chart-container">
+          <canvas baseChart
+                  [data]="chartDataConfig"
+                  [options]="chartOptions"
+                  [type]="chartType">
+          </canvas>
+        </div>
+      </div>
+    </div>
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
+    <!-- Filters Section -->
+    <div class="filters-section">
+      <div class="filter-bar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Rechercher un client</mat-label>
+          <input matInput
+                 [(ngModel)]="search"
+                 (ngModelChange)="applyFilter()"
+                 placeholder="Nom, prénom ou numéro"
+                 [disabled]="loading">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Niveau de fidélité</mat-label>
+          <mat-select [(value)]="selectedStarFilter" (selectionChange)="applyFilter()" [disabled]="loading">
+            <mat-option value="">Tous les niveaux</mat-option>
+            <mat-option *ngFor="let star of [0,1,2,3,4,5]" [value]="star.toString()">
+              {{ star }} ⭐
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-stroked-button (click)="resetFilter()" class="reset-btn" [disabled]="loading">
+          <mat-icon>clear_all</mat-icon>
+          Réinitialiser
+        </button>
+      </div>
+
+      <div class="results-info">
+        <span class="results-count">{{ dataSource.filteredData.length }} client(s) trouvé(s)</span>
+        <span class="loading-text" *ngIf="loading">(Mise à jour...)</span>
+      </div>
+    </div>
+
+    <!-- Clients Table -->
+    <div class="table-section">
+      <div *ngIf="dataSource.filteredData.length === 0 && !loading" class="no-data">
+        <div class="no-data-icon">🔍</div>
+        <h4>Aucun client trouvé</h4>
+        <p>Aucun client ne correspond à vos critères de recherche</p>
+        <button mat-raised-button color="primary" (click)="resetFilter()" class="retry-btn">
+          <mat-icon>refresh</mat-icon>
+          Réinitialiser les filtres
+        </button>
+      </div>
+
+      <!-- Desktop View -->
+      <div class="desktop-view" *ngIf="dataSource.filteredData.length > 0">
+        <div class="table-container">
+          <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
+            <!-- Prénom Column -->
+            <ng-container matColumnDef="prenom">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Prénom</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="client-name">
+                  <span class="name">{{ client.prenomUtilisateur || 'Non renseigné' }}</span>
+                  <span class="activity"
+                        [style.color]="getActivityColor(client.lastActivity)"
+                        [matTooltip]="activityTooltip(client.lastActivity)">
+                    {{ getActivityBadge(client.lastActivity) }}
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Nom Column -->
+            <ng-container matColumnDef="nom">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+              <td mat-cell *matCellDef="let client">{{ client.nomUtilisateur || 'Non renseigné' }}</td>
+            </ng-container>
+
+            <!-- Numéro Column -->
+            <ng-container matColumnDef="numero">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Numéro</th>
+              <td mat-cell *matCellDef="let client" class="phone-cell">
+                <mat-icon class="phone-icon">phone</mat-icon>
+                {{ client.numeroUtilisateur || 'Non renseigné' }}
+              </td>
+            </ng-container>
+
+            <!-- Stats Column -->
+            <ng-container matColumnDef="stats">
+              <th mat-header-cell *matHeaderCellDef>Activité</th>
+              <td mat-cell *matCellDef="let client" class="stats-cell">
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <span class="stat-label">Dépôts</span>
+                    <span class="stat-value">{{ client.depotCount || 0 }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Retraits</span>
+                    <span class="stat-value">{{ client.retraitCount || 0 }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-value total">{{ getTotalAmount(client) | number }} FCFA</span>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Fidélité Column -->
+            <ng-container matColumnDef="fidelity">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Fidélité</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="fidelity-display">
+                  <span class="stars" [class.fidele]="client.isFidele" [matTooltip]="'Niveau ' + client.stars + ' étoiles'">
+                    {{ client.fidelityStars }}
+                  </span>
+                  <span *ngIf="client.isFidele" class="fidele-badge" matTooltip="Client fidèle 🎖">
+                    🎖 Fidèle
+                  </span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let client">
+                <div class="action-buttons">
+                  <button mat-raised-button color="primary" class="action-btn"
+                          (click)="voirProfil(client.idUtilisateur)"
+                          [disabled]="loading"
+                          matTooltip="Voir le profil du client">
+                    <mat-icon>person</mat-icon>
+                    Profil
+                  </button>
+                  <button mat-raised-button color="accent" class="action-btn"
+                          (click)="voirHistorique(client.idUtilisateur)"
+                          [disabled]="loading"
+                          matTooltip="Voir l'historique des transactions">
+                    <mat-icon>history</mat-icon>
+                    Historique
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile View -->
+      <div class="mobile-view" *ngIf="dataSource.filteredData.length > 0">
+        <div *ngFor="let client of dataSource.filteredData" class="client-card">
+          <div class="card-header">
+            <div class="client-info">
+              <h4>{{ client.prenomUtilisateur }} {{ client.nomUtilisateur }}</h4>
+              <div class="client-meta">
+                <span class="phone">
+                  <mat-icon>phone</mat-icon>
+                  {{ client.numeroUtilisateur }}
+                </span>
+                <span class="activity" [style.color]="getActivityColor(client.lastActivity)"
+                      [matTooltip]="'Dernière activité: ' + (client.lastActivity ? formatDate(client.lastActivity) : 'Inconnue')">
+                  {{ getActivityBadge(client.lastActivity) }}
+                </span>
+              </div>
+            </div>
+            <div class="fidelity-mobile">
+              <span class="stars" [class.fidele]="client.isFidele" [matTooltip]="'Niveau ' + client.stars + ' étoiles'">
+                {{ client.fidelityStars }}
+              </span>
+              <span *ngIf="client.isFidele" class="fidele-badge" matTooltip="Client fidèle">🎖</span>
+            </div>
+          </div>
+
+          <div class="card-stats">
+            <div class="stat-row">
+              <div class="stat">
+                <span class="label">Dépôts</span>
+                <span class="value">{{ client.depotCount }}</span>
+              </div>
+              <div class="stat">
+                <span class="label">Retraits</span>
+                <span class="value">{{ client.retraitCount }}</span>
+              </div>
+              <div class="stat">
+                <span class="label">Total</span>
+                <span class="value total">{{ getTotalAmount(client) | number }} FCFA</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button mat-stroked-button color="primary" class="action-btn-mobile"
+                    (click)="voirProfil(client.idUtilisateur)"
+                    [disabled]="loading">
+              <mat-icon>person</mat-icon>
+              Profil
+            </button>
+            <button mat-stroked-button color="accent" class="action-btn-mobile"
+                    (click)="voirHistorique(client.idUtilisateur)"
+                    [disabled]="loading">
+              <mat-icon>history</mat-icon>
+              Historique
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator *ngIf="dataSource.filteredData.length > 0"
+                    [pageSizeOptions]="[10, 25, 50]"
+                    [pageSize]="10"
+                    showFirstLastButtons
+                    [length]="dataSource.filteredData.length"
+                    class="custom-paginator"
+                    [disabled]="loading">
+      </mat-paginator>
+    </div>
+  </ng-container>
 </div>

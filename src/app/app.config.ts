@@ -1,15 +1,12 @@
-import { CotesSportivesComponent } from './pages/cotes-sportives/cotes-sportives.component';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, Component } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
-import { routes } from './app.routes';
 import { LoginComponent } from './pages/login/login.component';
 import { provideHttpClient } from '@angular/common/http';
 import { RegisterComponent } from './pages/register/register.component';
-import { UserHomeComponent } from './pages/user/user-home.component';
+import { UserHomeComponent } from './pages/user/home/user-home.component';
 import { authGuard } from './guards/auth.guard-guard';
 import { roleGuard } from './guards/role-guard';
-import { AdminHomeComponent } from './pages/admin/admin-home.component';
+import { AdminHomeComponent } from './pages/admin/admin-home/admin-home.component';
 import { AccueilPublicComponent } from './pages/accueil/accueil-public.component';
 import { AnnoncesPublicComponent } from './pages/annonces/annonces-public.component';
 import { FaqComponent } from './pages/faq/faq.component';
@@ -36,7 +33,6 @@ import { AdminAnnoncesComponent } from './pages/admin/admin-annonces/admin-annon
 import { AdminPubsComponent } from './pages/admin/admin-pubs/admin-pubs.component';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { MotDePasseComponent } from './pages/mot-de-passe/mot-de-passe.component';
-import { OddsComponent } from './pages/odds/odds.component';
 import { MatchsComponent } from './pages/matchs/matchs.component';
 
 export const appConfig: ApplicationConfig = {
@@ -54,8 +50,6 @@ export const appConfig: ApplicationConfig = {
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'mot-de-passe', component: MotDePasseComponent },
-      { path: 'cotes', component: OddsComponent },
-      { path: 'sportives', component: CotesSportivesComponent },
       { path: 'matchs', component: MatchsComponent },
       {
         path: 'user',

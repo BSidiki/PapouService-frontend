@@ -1,62 +1,612 @@
-.retrait-container {
-  padding: 1.5rem;
-  font-family: 'Roboto', sans-serif;
+.admin-client-retraits {
+  padding: 1rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+  font-family: 'Roboto', 'Open Sans', sans-serif;
 
-  .retour-btn {
-    margin-bottom: 1rem;
+  // Header Section
+  .header-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .header-main {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .back-button {
+          border-radius: 12px;
+          margin-top: 0.25rem;
+
+          mat-icon {
+            margin-right: 0.5rem;
+          }
+        }
+
+        .header-title {
+          h2 {
+            color: #991f23; // Rouge officiel
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin: 0 0 0.25rem;
+          }
+
+          .subtitle {
+            color: #64748b;
+            margin: 0;
+            font-size: 0.875rem;
+            font-family: 'Poppins', sans-serif;
+          }
+        }
+      }
+
+      .header-actions {
+        .refresh-btn {
+          border-radius: 12px;
+
+          mat-icon {
+            margin-right: 0.5rem;
+          }
+        }
+      }
+    }
   }
 
-  .img-text {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    font-size: 1.1rem;
-    color: #991f23;
+  // Stats Cards
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid transparent;
+
+      &.primary {
+        border-left-color: #991f23; // Rouge officiel
+      }
+
+      &.accent {
+        border-left-color: #00adef; // Bleu officiel
+      }
+
+      &.warn {
+        border-left-color: #f59e0b;
+      }
+
+      &.danger {
+        border-left-color: #ef4444;
+      }
+
+      .stat-icon {
+        font-size: 2rem;
+        opacity: 0.8;
+      }
+
+      .stat-content {
+        .stat-value {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #1e293b;
+          line-height: 1;
+        }
+
+        .stat-label {
+          font-size: 0.875rem;
+          color: #64748b;
+          margin-top: 0.25rem;
+          font-family: 'Poppins', sans-serif;
+        }
+      }
+    }
   }
 
-  h2 {
-    color: #991f23;
-    font-size: 1.8rem;
-    font-weight: bold;
-    font-family: 'Montserrat', sans-serif;
-    margin-bottom: 1rem;
-  }
+  // Filters Section
+  .filters-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
-  .retrait-card {
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-left: 4px solid #991f23;
-    background: #fff4f4;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
+    .filter-group {
+      .status-field {
+        min-width: 250px;
+      }
 
-    &:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      .status-option {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+
+          &.all {
+            background: #64748b;
+          }
+
+          &.pending {
+            background: #f59e0b;
+          }
+
+          &.validated {
+            background: #10b981;
+          }
+
+          &.rejected {
+            background: #ef4444;
+          }
+        }
+      }
     }
 
-    .contenu {
-      font-size: 1rem;
-      font-family: 'Roboto', sans-serif;
-      color: #333;
+    .results-info {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+
+      .results-count {
+        font-weight: 600;
+        color: #1e293b;
+      }
+
+      .loading-text {
+        color: #00adef;
+        margin-left: 1rem;
+        font-weight: 500;
+      }
     }
   }
 
-  .link-text {
-    margin-top: 0.5rem;
-    color: #991f23;
-    font-weight: bold;
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: text-decoration 0.2s;
+  // Loading State
+  .loading-state {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 
-    &:hover {
-      text-decoration: underline;
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      span {
+        color: #64748b;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Error State
+  .error-state {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+    .error-content {
+      .error-icon {
+        font-size: 4rem;
+        width: 64px;
+        height: 64px;
+        color: #ef4444;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        color: #1e293b;
+        margin: 0 0 0.5rem;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+      }
+
+      p {
+        color: #64748b;
+        margin: 0 0 1.5rem;
+      }
+
+      .retry-btn {
+        border-radius: 12px;
+
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  // Table Section
+  .table-section {
+    .desktop-view {
+      display: block;
+
+      @media (max-width: 1024px) {
+        display: none;
+      }
+
+      .table-container {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1.5rem;
+      }
+
+      .retraits-table {
+        width: 100%;
+
+        th.mat-header-cell {
+          background: #991f23; // Rouge officiel
+          color: white;
+          font-weight: 600;
+          padding: 1rem;
+          font-size: 0.875rem;
+          font-family: 'Poppins', sans-serif;
+        }
+
+        td.mat-cell {
+          padding: 1rem;
+          border-bottom: 1px solid #f1f5f9;
+          vertical-align: top;
+        }
+
+        .amount-cell {
+          .amount {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #1e293b;
+          }
+
+          .currency {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-left: 0.25rem;
+          }
+        }
+
+        .phone-cell {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .phone-icon {
+            font-size: 1rem;
+            width: 16px;
+            height: 16px;
+            color: #64748b;
+          }
+        }
+
+        .country {
+          font-weight: 500;
+          color: #1e293b;
+        }
+
+        .platform-badge {
+          background: #e0f2fe;
+          color: #0369a1;
+          padding: 0.375rem 0.75rem;
+          border-radius: 8px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+
+        .date-cell {
+          display: flex;
+          flex-direction: column;
+
+          .date {
+            font-weight: 500;
+            color: #1e293b;
+          }
+
+          .time {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+          }
+        }
+
+        .no-data {
+          color: #94a3b8;
+          font-style: italic;
+        }
+
+        .status-badge {
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-align: center;
+          display: inline-block;
+          min-width: 80px;
+
+          &.pending {
+            background: #fffbeb;
+            color: #d97706;
+          }
+
+          &.validated {
+            background: #f0fdf4;
+            color: #16a34a;
+          }
+
+          &.rejected {
+            background: #fef2f2;
+            color: #dc2626;
+          }
+        }
+
+        .action-btn {
+          border-radius: 8px;
+          padding: 0.375rem 0.75rem;
+          font-size: 0.75rem;
+
+          mat-icon {
+            font-size: 1rem;
+            width: 16px;
+            height: 16px;
+            margin-right: 0.25rem;
+          }
+        }
+      }
+    }
+
+    // Mobile View
+    .mobile-view {
+      display: none;
+
+      @media (max-width: 1024px) {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .retrait-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          padding-bottom: 1rem;
+          border-bottom: 1px solid #f1f5f9;
+
+          .retrait-amount {
+            .amount {
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: #1e293b;
+            }
+
+            .currency {
+              font-size: 1rem;
+              color: #64748b;
+              margin-left: 0.25rem;
+            }
+          }
+
+          .retrait-status {
+            .status-badge {
+              padding: 0.375rem 0.75rem;
+              border-radius: 20px;
+              font-size: 0.75rem;
+              font-weight: 600;
+
+              &.pending {
+                background: #fffbeb;
+                color: #d97706;
+              }
+
+              &.validated {
+                background: #f0fdf4;
+                color: #16a34a;
+              }
+
+              &.rejected {
+                background: #fef2f2;
+                color: #dc2626;
+              }
+            }
+          }
+        }
+
+        .card-content {
+          .info-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+
+            .info-item {
+              display: flex;
+              align-items: center;
+              gap: 0.75rem;
+
+              .info-icon {
+                color: #64748b;
+                font-size: 1.25rem;
+                width: 20px;
+                height: 20px;
+                flex-shrink: 0;
+              }
+
+              .info-content {
+                flex: 1;
+
+                .label {
+                  display: block;
+                  font-size: 0.75rem;
+                  color: #64748b;
+                  font-weight: 500;
+                  margin-bottom: 0.25rem;
+                }
+
+                .value {
+                  display: block;
+                  font-size: 0.875rem;
+                  color: #1e293b;
+                  font-weight: 500;
+
+                  &.no-data {
+                    color: #94a3b8;
+                    font-style: italic;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .card-actions {
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid #f1f5f9;
+
+          .action-btn-mobile {
+            width: 100%;
+            border-radius: 8px;
+            padding: 0.5rem;
+
+            mat-icon {
+              margin-right: 0.5rem;
+            }
+          }
+        }
+      }
+    }
+
+    // Pagination
+    .custom-paginator {
+      background: white;
+      border-radius: 12px;
+      margin-top: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  // Empty State
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+    .empty-content {
+      .empty-icon {
+        font-size: 4rem;
+        width: 64px;
+        height: 64px;
+        color: #94a3b8;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      h3 {
+        color: #64748b;
+        margin: 0 0 0.5rem;
+        font-weight: 600;
+        font-family: 'Montserrat', sans-serif;
+      }
+
+      p {
+        color: #94a3b8;
+        margin: 0 0 1.5rem;
+      }
+
+      .reset-btn {
+        border-radius: 12px;
+
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  // Material Overrides
+  ::ng-deep {
+    .mat-form-field-appearance-outline {
+      .mat-form-field-outline {
+        color: #e2e8f0;
+      }
+
+      &.mat-focused {
+        .mat-form-field-outline-thick {
+          color: #00adef; // Bleu officiel
+        }
+      }
+    }
+
+    .mat-raised-button[disabled] {
+      background-color: #94a3b8 !important;
+    }
+  }
+
+  // Dark Mode Support
+  @media (prefers-color-scheme: dark) {
+    background: #0f172a;
+    color: #e2e8f0;
+
+    .header-section,
+    .stats-cards .stat-card,
+    .filters-section,
+    .loading-state,
+    .error-state,
+    .table-section .desktop-view .table-container,
+    .table-section .mobile-view .retrait-card,
+    .custom-paginator,
+    .empty-state {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-color: #334155;
+    }
+
+    .stats-cards .stat-card .stat-content .stat-value,
+    .header-title h2,
+    .results-info .results-count,
+    .error-content h3,
+    .amount-cell .amount,
+    .mobile-view .retrait-amount .amount {
+      color: #e2e8f0;
+    }
+
+    .retraits-table {
+      td.mat-cell {
+        border-bottom-color: #334155;
+      }
+    }
+
+    .mobile-view .retrait-card {
+      border-color: #475569;
     }
   }
 }

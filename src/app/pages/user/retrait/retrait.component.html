@@ -1,86 +1,305 @@
 <section class="hero-carousel">
   <app-annonces-public></app-annonces-public>
 </section>
-<div class="retrait-container">
-  <h2>💸 Faire un retrait</h2>
 
-  <div class="page-depot">
-    <div class="page-depot1">
-      <form (ngSubmit)="submitRetrait()">
-        <div *ngIf="transactionOptionsDisponibles.length === 0" class="alert-message">
-          ⚠️ Attention! Vous n'avez aucun ID enregistrer.<br> Vous pouvez modifier votre profil en ajoutant vos ID
-        </div>
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Pays</mat-label>
-          <mat-select [(ngModel)]="form.pays" name="pays" (selectionChange)="onPaysChange()" required>
-            <mat-option *ngFor="let pays of paysOptions" [value]="pays.nom">{{ pays.nom }}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <div class="numero-container">
-          <mat-form-field appearance="fill" class="indicatif">
-            <mat-label>Indicatif</mat-label>
-            <input matInput [value]="form.indicatif" disabled />
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="numero">
-            <mat-label>Numéro</mat-label>
-            <input matInput [(ngModel)]="form.numeroEnvoyant" name="numero" required />
-          </mat-form-field>
-        </div>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Option de transaction</mat-label>
-          <mat-select [(ngModel)]="form.optionDeTransaction" name="optionDeTransaction" required>
-            <mat-option *ngFor="let opt of transactionOptionsDisponibles" [value]="opt.value">
-              {{ opt.label }}
-              <img [src]="'assets/images/' + opt.label + '.png'" [alt]="opt.label" class="logo-option" height="16" />
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Option de retrait</mat-label>
-          <mat-select [(ngModel)]="form.optionRetrait" name="optionRetrait" required>
-            <mat-option value="O">Orange Money
-              <img src="assets/images/OrangeMoney.png" alt="Orange Money" class="logo-option" height="20"/>
-            </mat-option>
-            <mat-option value="M">Moov Money
-              <img src="assets/images/MoovMoney.png" alt="Moov Money" class="logo-option" height="22"/>
-            </mat-option>
-            <mat-option value="W">Wave Money
-              <img src="assets/images/WaveMoney.png" alt="Wave Money" class="logo-option" height="22"/>
-            </mat-option>
-            <mat-option value="S">Sank Money
-              <img src="assets/images/SankMoney.jpeg" alt="Sank Money" class="logo-option" height="22"/>
-            </mat-option>
-            <mat-option value="C">Carte Bancaire
-              <img src="assets/images/CarteBancaire.jpeg" alt="Carte Bancaire" class="logo-option" height="20"/>
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Code de retrait</mat-label>
-          <input matInput [(ngModel)]="form.codeRetrait" name="codeRetrait" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="full-width">
-          <mat-label>Montant</mat-label>
-          <input matInput type="number" [(ngModel)]="form.montant" name="montant" required>
-        </mat-form-field>
-
-        <div class="full-width file-zone">
-          <label for="file">Capture de dépôt :</label>
-          <input type="file" id="file" (change)="onFileSelected($event)" required />
-        </div>
-
-        <button mat-raised-button color="primary" type="submit">Soumettre</button>
-      </form>
+<div class="retrait-page">
+  <div class="retrait-container">
+    <!-- En-tête -->
+    <div class="retrait-header">
+      <h1 class="main-title">
+        <mat-icon class="title-icon">savings</mat-icon>
+        Faire un Retrait
+      </h1>
+      <p class="subtitle">Remplissez le formulaire pour effectuer votre retrait</p>
     </div>
-    <div class="page-depot2">
-      <app-matchs></app-matchs>
+
+    <div class="retrait-content">
+      <!-- Formulaire de retrait -->
+      <mat-card class="retrait-form-card">
+        <div class="card-header">
+          <mat-icon class="card-icon">payments</mat-icon>
+          <h2>Formulaire de Retrait</h2>
+        </div>
+
+        <form (ngSubmit)="submitRetrait()" class="retrait-form">
+          <!-- Message d'alerte si pas d'IDs plateforme -->
+          <div *ngIf="transactionOptionsDisponibles.length === 0" class="alert-message">
+            <mat-icon>warning</mat-icon>
+            <div class="alert-content">
+              <h3>Aucun ID de plateforme configuré</h3>
+              <p>
+                Veuillez configurer vos identifiants de plateforme dans votre profil
+                avant de faire un retrait.
+              </p>
+              <button
+                mat-stroked-button
+                routerLink="/user/profil"
+                class="profile-btn"
+              >
+                <mat-icon>person</mat-icon>
+                Aller au profil
+              </button>
+            </div>
+          </div>
+
+          <!-- Informations utilisateur -->
+          <div *ngIf="userInfo" class="user-info">
+            <mat-icon>person</mat-icon>
+            <span>Connecté en tant que : <strong>{{ userInfo }}</strong></span>
+          </div>
+
+          <!-- Grille des champs -->
+          <div class="form-grid">
+            <!-- Pays -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Pays</mat-label>
+              <mat-select
+                [(ngModel)]="form.pays"
+                name="pays"
+                (selectionChange)="onPaysChange()"
+                required
+              >
+                <mat-option *ngFor="let pays of paysOptions" [value]="pays.nom">
+                  {{ pays.nom }}
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>public</mat-icon>
+            </mat-form-field>
+
+            <!-- Numéro de téléphone -->
+            <div class="phone-group">
+              <mat-form-field appearance="outline" class="indicatif-field">
+                <mat-label>Indicatif</mat-label>
+                <input matInput [value]="form.indicatif" disabled />
+                <mat-icon matPrefix>phone</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="numero-field">
+                <mat-label>Numéro de téléphone</mat-label>
+                <input
+                  matInput
+                  [(ngModel)]="form.numeroEnvoyant"
+                  name="numeroEnvoyant"
+                  required
+                  placeholder="Ex: 70123456"
+                />
+              </mat-form-field>
+            </div>
+
+            <!-- Montant -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Montant (FCFA)</mat-label>
+              <input
+                matInput
+                type="number"
+                [(ngModel)]="form.montant"
+                name="montant"
+                min="1"
+                required
+                placeholder="Ex: 5000"
+              />
+              <mat-icon matPrefix>attach_money</mat-icon>
+              <mat-hint>Montant minimum : 1 FCFA</mat-hint>
+            </mat-form-field>
+
+            <!-- Plateforme -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Plateforme de jeu</mat-label>
+              <mat-select
+                [(ngModel)]="form.optionDeTransaction"
+                name="optionDeTransaction"
+                required
+              >
+                <mat-option
+                  *ngFor="let opt of transactionOptionsDisponibles"
+                  [value]="opt.value"
+                >
+                  <div class="platform-option">
+                    <img
+                      [src]="getPlatformLogo(opt.label)"
+                      [alt]="opt.label"
+                      class="platform-logo"
+                    />
+                    <span>{{ opt.label }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>casino</mat-icon>
+            </mat-form-field>
+
+            <!-- Option de retrait -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Moyen de retrait</mat-label>
+              <mat-select
+                [(ngModel)]="form.optionRetrait"
+                name="optionRetrait"
+                required
+              >
+                <mat-option value="O">
+                  <div class="payment-option">
+                    <img
+                      [src]="getPaymentLogo('O')"
+                      alt="Orange Money"
+                      class="payment-logo"
+                    />
+                    <span>Orange Money</span>
+                  </div>
+                </mat-option>
+                <mat-option value="M">
+                  <div class="payment-option">
+                    <img
+                      [src]="getPaymentLogo('M')"
+                      alt="Moov Money"
+                      class="payment-logo"
+                    />
+                    <span>Moov Money</span>
+                  </div>
+                </mat-option>
+                <mat-option value="W">
+                  <div class="payment-option">
+                    <img
+                      [src]="getPaymentLogo('W')"
+                      alt="Wave"
+                      class="payment-logo"
+                    />
+                    <span>Wave</span>
+                  </div>
+                </mat-option>
+                <mat-option value="S">
+                  <div class="payment-option">
+                    <img
+                      src="assets/images/SankMoney.png"
+                      alt="SankMoney"
+                      loading="lazy"
+                      style="width: 50px;"
+                    />
+                    <span>Sank Money</span>
+                  </div>
+                </mat-option>
+                <mat-option value="C">
+                  <div class="payment-option">
+                    <img
+                      src="assets/images/CarteBancaire.png"
+                      alt="CarteBancaire"
+                      loading="lazy"
+                      style="width: 50px;"
+                    />
+                    <span>Carte Bancaire</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>account_balance_wallet</mat-icon>
+            </mat-form-field>
+
+            <!-- Code de retrait -->
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Code de retrait</mat-label>
+              <input
+                matInput
+                [(ngModel)]="form.codeRetrait"
+                name="codeRetrait"
+                required
+                placeholder="Votre code de retrait"
+              />
+              <mat-icon matPrefix>vpn_key</mat-icon>
+              <mat-hint>Code fourni par la plateforme de jeu</mat-hint>
+            </mat-form-field>
+          </div>
+
+          <!-- Upload de fichier -->
+          <div class="file-upload-section">
+            <h4 class="section-title">
+              <mat-icon>receipt</mat-icon>
+              Justificatif de retrait (optionnel)
+            </h4>
+
+            <p class="section-subtext">
+              Ajouter un justificatif est <strong>facultatif</strong> mais
+              <strong>recommandé</strong> pour accélérer la validation.
+            </p>
+
+            <div class="file-upload-zone" [class.has-file]="filePreview">
+              <input
+                id="file"
+                type="file"
+                accept="image/*"
+                (change)="onFileSelected($event)"
+                class="file-input"
+              />
+              <label for="file" class="file-label">
+                <mat-icon class="upload-icon">cloud_upload</mat-icon>
+                <span class="upload-text">
+                  {{ filePreview ? 'Changer le justificatif' : 'Ajouter un justificatif (optionnel)' }}
+                </span>
+                <span class="upload-hint">PNG, JPG - Max 5 Mo</span>
+              </label>
+
+              <div *ngIf="filePreview" class="file-preview">
+                <img
+                  [src]="filePreview"
+                  alt="Aperçu justificatif"
+                  class="preview-image"
+                />
+                <button
+                  type="button"
+                  mat-icon-button
+                  class="remove-btn"
+                  (click)="file = null; filePreview = null;"
+                >
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations importantes -->
+          <div class="info-section">
+            <mat-icon>info</mat-icon>
+            <div class="info-content">
+              <h4>Informations importantes</h4>
+              <ul>
+                <li>Assurez-vous que le code de retrait est correct</li>
+                <li>Vérifiez que le montant correspond à votre demande</li>
+                <li>
+                  Si vous ajoutez un justificatif, il doit être clair et lisible
+                </li>
+                <li>Le traitement peut prendre quelques heures</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Bouton de soumission -->
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="isSubmitDisabled()"
+            class="submit-btn"
+          >
+            <div class="button-content">
+              <mat-progress-spinner
+                *ngIf="submitting"
+                diameter="20"
+                mode="indeterminate"
+                color="accent"
+                class="spinner"
+              >
+              </mat-progress-spinner>
+              <mat-icon *ngIf="!submitting" class="btn-icon">send</mat-icon>
+              <span class="btn-text">
+                {{ submitting ? 'Soumission en cours...' : 'Soumettre le retrait' }}
+              </span>
+            </div>
+          </button>
+        </form>
+      </mat-card>
+
+      <!-- Section matchs -->
+      <div class="matchs-section">
+        <app-matchs></app-matchs>
+      </div>
     </div>
   </div>
 </div>
+
 <app-footer></app-footer>

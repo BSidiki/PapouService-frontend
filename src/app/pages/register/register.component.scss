@@ -1,139 +1,519 @@
-.register-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem 1rem;
-  background: #f3f6f9;
+// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500;600&family=Roboto:wght@400;500&display=swap');
+
+.register-container {
   min-height: 100vh;
-  font-family: 'Roboto', 'Open Sans', sans-serif;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #00adef 0%, #008bc1 50%, #991f23 100%);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,0 1000,1000 0,1000"/></svg>');
+    background-size: cover;
+  }
+}
+
+.register-background {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.register-card-wrapper {
+  width: 100%;
+  max-width: 600px;
+  animation: slideUp 0.6s ease-out;
 }
 
 .register-card {
-  width: 100%;
-  max-width: 640px;
-  padding: 2rem;
-  border-radius: 16px;
-  background-color: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  padding: 2.5rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-height: 90vh;
+  overflow-y: auto;
 
-  .logo-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 1.5rem;
-
-    .logo-img {
-      height: 60px;
-      margin-bottom: 0.5rem;
-    }
-
-    h2 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      font-size: 1.6rem;
-      color: #991f23;
-      margin: 0;
-      text-align: center;
-    }
-
-    .welcome-message {
-      font-family: 'Poppins', sans-serif;
-      font-size: 0.95rem;
-      color: #555;
-      text-align: center;
-      margin-top: 0.5rem;
-    }
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-
-    mat-form-field {
-      width: 100%;
-      margin-bottom: 1.2rem;
-      font-family: 'Roboto', sans-serif;
-    }
-  }
-
-  .id-title {
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 1rem 0 0.5rem;
-    color: #444;
-  }
-
-  .submit-btn {
-    width: 100%;
-    margin-top: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: #00adef !important;
-    color: #fff;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-    padding: 0.75rem;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #008ec1 !important;
-    }
-
-    &:disabled {
-      background-color: #ccc !important;
-      cursor: not-allowed;
-    }
-  }
-
-  .redirect-login {
-    margin-top: 1.5rem;
+  .card-header {
     text-align: center;
-    font-size: 0.9rem;
+    margin-bottom: 2rem;
 
-    a {
-      color: #00adef;
-      text-decoration: none;
-      font-weight: 500;
+    .logo {
+      display: inline-block;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+      cursor: pointer;
 
       &:hover {
-        text-decoration: underline;
+        transform: scale(1.05);
+      }
+
+      .logo-img {
+        width: 120px;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
     }
-  }
 
-  .success-message {
-    color: #2e7d32;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 1rem;
-  }
+    .main-title {
+      color: #991f23;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: bold;
+      font-size: clamp(1.8rem, 4vw, 2.2rem);
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
 
-  .error-message {
-    color: #d32f2f;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 1rem;
+    .subtitle {
+      color: #666;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.1rem;
+      margin: 0;
+    }
   }
 }
 
-@media (max-width: 600px) {
-  .register-card {
-    padding: 1.5rem;
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 
-    .logo-section .logo-img {
-      height: 50px;
+  .form-section {
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #00adef;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e1f5fe;
+
+      mat-icon {
+        color: #00adef;
+      }
+
+      .optional-badge {
+        background: #ff9800;
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        margin-left: 0.5rem;
+      }
     }
 
-    h2 {
-      font-size: 1.4rem;
+    .section-description {
+      color: #666;
+      font-family: 'Roboto', sans-serif;
+      font-size: 0.95rem;
+      margin: -1rem 0 1.5rem 0;
     }
 
-    .submit-btn {
-      font-size: 0.9rem;
+    &.optional-section {
+      background: rgba(0, 173, 239, 0.03);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 173, 239, 0.1);
     }
   }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  // Personnalisation des champs Material
+  ::ng-deep {
+    .mat-form-field {
+      .mat-form-field-outline {
+        border-radius: 12px;
+      }
+
+      .mat-form-field-appearance-outline .mat-form-field-outline-thick {
+        color: #00adef;
+      }
+
+      .mat-form-field.mat-focused .mat-form-field-label {
+        color: #991f23;
+      }
+
+      .mat-input-element {
+        font-family: 'Roboto', sans-serif;
+        font-size: 1rem;
+      }
+
+      .mat-form-field-label {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+      }
+
+      mat-icon {
+        color: #00adef;
+      }
+
+      .match-hint {
+        color: #4caf50 !important;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Indicateur de force du mot de passe
+.password-strength {
+  margin-top: 0.5rem;
+
+  .strength-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .strength-fill {
+    height: 100%;
+    transition: all 0.3s ease;
+    border-radius: 3px;
+
+    &.weak {
+      width: 33%;
+      background: #f44336;
+    }
+
+    &.medium {
+      width: 66%;
+      background: #ff9800;
+    }
+
+    &.strong {
+      width: 100%;
+      background: #4caf50;
+    }
+  }
+
+  .strength-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    .weak & { color: #f44336; }
+    .medium & { color: #ff9800; }
+    .strong & { color: #4caf50; }
+  }
+}
+
+// Grille des plateformes
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-field {
+    ::ng-deep .mat-form-field-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .platform-logo {
+      height: 20px;
+      width: auto;
+      border-radius: 3px;
+    }
+
+    .platform-text {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #991f23, #c82333);
+  color: white;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(153, 31, 35, 0.4);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: #cccccc;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .spinner {
+    margin: 0;
+  }
+
+  .btn-icon {
+    margin-right: 0.5rem;
+  }
+
+  .btn-text {
+    font-weight: 600;
+  }
+}
+
+// Messages de statut
+.success-message,
+.error-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  animation: slideIn 0.5s ease-out;
+
+  .success-icon {
+    color: #4caf50;
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .error-icon {
+    color: #f44336;
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .message-content {
+    h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: bold;
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+    }
+
+    p {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+.success-message {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+
+.error-message {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  border: 1px solid #f44336;
+  color: #c62828;
+}
+
+// Redirection connexion
+.login-redirect {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+
+  p {
+    font-family: 'Roboto', sans-serif;
+    color: #666;
+    margin-bottom: 1rem;
+  }
+
+  .login-btn {
+    border-radius: 10px;
+    border-color: #00adef;
+    color: #00adef;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(0, 173, 239, 0.1);
+      transform: translateY(-1px);
+    }
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// Notice de sécurité
+.security-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(0, 173, 239, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 173, 239, 0.2);
+  margin-top: 1.5rem;
+
+  .security-icon {
+    color: #00adef;
+    font-size: 1.2rem;
+  }
+
+  p {
+    margin: 0;
+    color: #666;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
+
+// Animations
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .register-background {
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
+  .register-card-wrapper {
+    max-width: 100%;
+  }
+
+  .register-card {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
+    margin-top: 1rem;
+  }
+
+  .card-header {
+    .logo-img {
+      width: 100px;
+    }
+
+    .main-title {
+      font-size: 1.6rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  .form-section.optional-section {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-card {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+
+  .register-form {
+    gap: 1.5rem;
+  }
+
+  .submit-btn {
+    padding: 0.875rem;
+    font-size: 1rem;
+  }
+
+  .platforms-grid {
+    gap: 0.75rem;
+  }
+}
+
+// Scrollbar personnalisée
+.register-card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.register-card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.register-card::-webkit-scrollbar-thumb {
+  background: #00adef;
+  border-radius: 3px;
+}
+
+.register-card::-webkit-scrollbar-thumb:hover {
+  background: #008bc1;
 }

@@ -1,72 +1,579 @@
+@use "sass:color";
+
+/* === Variables === */
+$rouge: #991f23;
+$bleu: #00adef;
+$blanc: #ffffff;
+$texte-fonce: #333333;
+$texte-gris: #666666;
+$fond-clair: #f8f9fa;
+$bordure: #e8ecef;
+$ombre: 0 4px 20px rgba(0, 0, 0, 0.1);
+
 .pubs-carousel {
   position: relative;
   width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background: $blanc;
+  border-radius: 16px;
   overflow: hidden;
-  padding: 1rem 0;
-  background-color: #f9f9f9;
+  box-shadow: $ombre;
+  transition: box-shadow .3s ease, transform .3s ease;
 
-  .carousel-wrapper {
+  &:focus {
+    outline: 2px solid $bleu;
+    outline-offset: 2px;
+  }
+
+  /* === Statut (page / pause) === */
+  .carousel-status {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    z-index: 20;
+    display: flex; align-items: center; gap: .75rem;
+    background: rgba(0, 0, 0, 0.65);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    padding: .45rem .75rem;
+    border-radius: 20px;
+    color: $blanc;
+    font-family: 'Poppins', sans-serif;
+    font-size: .8rem; font-weight: 500;
+
+    .pause-indicator {
+      opacity: 0; transition: opacity .3s ease;
+      &.active { opacity: 1; }
+      .pause-icon { font-size: .9rem; }
+    }
+  }
+
+  /* === Flèches === */
+  .carousel-controls {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 .5rem;
+    z-index: 15;
+    pointer-events: none;
+
+    .control-btn {
+      pointer-events: auto;
+      width: 44px; height: 44px;
+      border: none; border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6); color: $blanc;
+      cursor: pointer; display: grid; place-items: center;
+      transition: background .2s ease, transform .15s ease, box-shadow .2s ease;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.5rem;
+
+      &:hover { background: $bleu; transform: scale(1.08); box-shadow: 0 4px 12px rgba(0,173,239,.35); }
+      &:active { transform: scale(.95); }
+      &:focus-visible { outline: 2px solid $bleu; outline-offset: 2px; }
+    }
+  }
+
+  /* === Wrapper: scroll + ratio === */
+  .carousel-wrapper {
+    width: 100%;
+    height: 600px;
+    overflow: auto hidden;         /* ← horizontal scroll uniquement */
     scroll-behavior: smooth;
-    overflow-x: auto;
+    border-radius: 16px;
+
+    /* Ratio moderne - SIMPLIFIÉ : uniquement aspect-ratio */
+    aspect-ratio: 16 / 9;
+
+    /* Masque scrollbar */
+    &::-webkit-scrollbar { display: none; }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    /* snap pour un meilleur swipe */
     scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
 
-    .carousel-slide {
-      flex: 0 0 100%;
-      scroll-snap-align: start;
+    .carousel-track {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0.5rem;
-      box-sizing: border-box;
+      height: 100%;
+      width: 100%;
+    }
+  }
 
-      img {
-        max-width: 100%;
-        border-radius: 12px;
-        object-fit: cover;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease;
+  /* === Slides === */
+  .carousel-slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    scroll-snap-align: start;
+    height: 100%; /* IMPORTANT: Prend toute la hauteur du wrapper */
 
-        &:hover {
-          transform: scale(1.02);
+    .pub-link,
+    .pub-static {
+      display: block;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      cursor: zoom-in;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      transition: transform .45s ease;
+      background: $fond-clair;
+    }
+
+    /* Hover zoom sur les deux types */
+    .pub-link:hover img,
+    .pub-static:hover img { transform: scale(1.045); }
+
+    /* Overlay titre + aide zoom */
+    .slide-overlay {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1.2rem 1rem .9rem;
+      color: $blanc;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.55) 100%);
+
+      .slide-title {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        font-size: 1.08rem;
+        line-height: 1.3;
+        margin: 0 0 .5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,.45);
+      }
+
+      .zoom-hint {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .35rem .6rem;
+        border-radius: 6px;
+        background: rgba(0,0,0,.65);
+        font-family: 'Roboto', sans-serif;
+        font-size: .74rem;
+        color: $blanc;
+        opacity: 0;
+        transition: opacity .25s ease;
+
+        .zoom-icon {
+          font-size: .95rem;
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+
+      /* Affiche l'aide au survol desktop */
+      .carousel-slide:hover & .zoom-hint { opacity: 1; }
+    }
+  }
+
+  /* === Indicateurs === */
+  .carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: .5rem;
+    padding: 1rem;
+    background: $fond-clair;
+
+    .indicator {
+      position: relative;
+      width: 40px;
+      height: 4px;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      background: rgba($texte-gris, .3);
+      transition: transform .15s ease, background .2s ease;
+      overflow: hidden;
+
+      &:hover {
+        background: rgba($texte-gris, .6);
+        transform: scaleY(1.5);
+      }
+
+      &:focus-visible {
+        outline: 2px solid $bleu;
+        outline-offset: 2px;
+      }
+
+      &.active {
+        background: $bleu;
+
+        .indicator-progress {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: $bleu;
+          transform-origin: left;
+          animation: progress 5s linear infinite;
         }
       }
     }
   }
 
-  .dots {
+  /* === Etat vide === */
+  .empty-state {
+    display: grid;
+    place-items: center;
+    gap: .75rem;
+    padding: 3rem 2rem;
+    text-align: center;
+    color: $texte-gris;
+    // Hauteur fixe cohérente avec le ratio
+    aspect-ratio: 16 / 9;
+
+    .empty-icon {
+      font-size: 3rem;
+      opacity: .5;
+    }
+
+    .empty-text {
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.05rem;
+      margin: 0;
+    }
+  }
+}
+
+/* === Progress bar animation === */
+@keyframes progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* === Desktop large === */
+@media (min-width: 1200px) {
+  .pubs-carousel {
+    .carousel-wrapper {
+      aspect-ratio: 20 / 9; // Plus panoramique sur grand écran
+    }
+
+    .empty-state {
+      aspect-ratio: 20 / 9;
+    }
+  }
+}
+
+/* === Tablette === */
+@media (max-width: 768px) {
+  .pubs-carousel {
+    border-radius: 12px;
+
+    .carousel-status {
+      top: .75rem; right: .75rem;
+      padding: .35rem .55rem; font-size: .75rem;
+    }
+
+    .carousel-controls .control-btn {
+      width: 38px;
+      height: 38px;
+      font-size: 1.25rem;
+    }
+
+    .carousel-wrapper {
+      aspect-ratio: 4 / 3; // Plus carré sur tablette
+    }
+
+    .carousel-slide .slide-overlay {
+      padding: .9rem .75rem .45rem;
+
+      .slide-title { font-size: 1rem; }
+      .zoom-hint {
+        font-size: .7rem;
+        padding: .3rem .5rem;
+      }
+    }
+
+    .carousel-indicators {
+      padding: .75rem;
+      .indicator { width: 30px; height: 3px; }
+    }
+
+    .empty-state {
+      aspect-ratio: 4 / 3;
+    }
+  }
+}
+
+/* === Mobile === */
+@media (max-width: 480px) {
+  .pubs-carousel {
+    border-radius: 8px;
+    margin: 0 -.5rem;
+    width: calc(100% + 1rem);
+
+    .carousel-status {
+      top: .5rem;
+      right: .5rem;
+      padding: .3rem .5rem;
+    }
+
+    .carousel-controls .control-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 1.1rem;
+    }
+
+    .carousel-wrapper {
+      aspect-ratio: 1 / 1; // Carré sur mobile
+      border-radius: 8px;
+    }
+
+    .carousel-slide .slide-overlay {
+      padding: .7rem .5rem .25rem;
+
+      .slide-title {
+        font-size: .92rem;
+        margin-bottom: .25rem;
+      }
+
+      .zoom-hint  {
+        font-size: .65rem;
+        opacity: 1; // Toujours visible mobile
+      }
+    }
+
+    .carousel-indicators {
+      padding: .55rem;
+      gap: .4rem;
+      .indicator { width: 25px; height: 2px; }
+    }
+
+    .empty-state {
+      padding: 2rem 1rem;
+      aspect-ratio: 1 / 1;
+
+      .empty-icon { font-size: 2.4rem; }
+      .empty-text { font-size: .98rem; }
+    }
+  }
+}
+
+/* === Très petits écrans === */
+@media (max-width: 360px) {
+  .pubs-carousel .carousel-wrapper {
+    aspect-ratio: 1 / 1; // Reste carré
+  }
+}
+
+/* === Modal de zoom === */
+.zoom-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.9);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .zoom-modal-content {
+    background: $blanc;
+    border-radius: 16px;
+    width: min(95vw, 1400px);
+    height: min(95vh, 860px);
     display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  }
 
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background-color: #ccc;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+  .zoom-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.2rem;
+    background: $fond-clair;
+    border-bottom: 1px solid $bordure;
 
-      &.active {
-        background-color: #00adef;
+    .zoom-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: $texte-fonce;
+      margin: 0;
+    }
+
+    .zoom-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+
+      .zoom-level {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        font-size: .9rem;
+        color: $texte-gris;
+        min-width: 42px;
+        text-align: center;
+      }
+
+      .zoom-btn {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        border: 1px solid $bordure;
+        background: $blanc;
+        color: $texte-fonce;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease, border-color .2s ease;
+
+        &:hover {
+          background: $bleu;
+          color: $blanc;
+          border-color: $bleu;
+        }
+
+        &.close-btn:hover {
+          background: $rouge;
+          border-color: $rouge;
+        }
+
+        mat-icon {
+          font-size: 1.2rem;
+          width: 1.2rem;
+          height: 1.2rem;
+        }
       }
     }
   }
 
-  @media (max-width: 768px) {
-    .carousel-wrapper {
-      .carousel-slide img {
-        max-height: 200px;
+  .zoom-body {
+    flex: 1;
+    position: relative;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow: hidden;
+
+    .zoom-navigation {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      height: 100%;
+
+      .nav-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(255,255,255,.2);
+        color: $blanc;
+        border: 0;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: transform .15s ease, background .2s ease;
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+
+        &:hover {
+          background: $bleu;
+          transform: scale(1.08);
+        }
+      }
+
+      .zoom-image-container {
+        flex: 1;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        cursor: grab;
+
+        &:active {
+          cursor: grabbing;
+        }
+
+        .zoom-image {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+          user-select: none;
+          -webkit-user-drag: none;
+          transition: transform .1s ease;
+        }
       }
     }
+  }
 
-    .dots {
-      .dot {
-        width: 10px;
-        height: 10px;
+  .zoom-footer {
+    padding: .9rem 1.2rem;
+    background: $fond-clair;
+    border-top: 1px solid $bordure;
+
+    .zoom-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .pub-counter {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+        color: $texte-gris;
+        font-size: .9rem;
       }
+
+      .zoom-help .help-text {
+        font-family: 'Roboto', sans-serif;
+        font-size: .8rem;
+        color: $texte-gris;
+      }
+    }
+  }
+}
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+  .pubs-carousel {
+    .carousel-wrapper { scroll-behavior: auto; }
+    .carousel-slide img { transition: none; }
+    .carousel-controls .control-btn {
+      transition: none;
+      &:hover { transform: none; }
+    }
+    .indicator .indicator-progress {
+      animation: none;
+      transform: none;
+      width: 100% !important;
+    }
+  }
+
+  @keyframes progress {
+    from, to {
+      transform: none;
+      width: 100%;
     }
   }
 }

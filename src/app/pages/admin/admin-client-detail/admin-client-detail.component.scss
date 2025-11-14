@@ -1,122 +1,503 @@
-.client-detail-container {
-  padding: 1.5rem;
-  font-family: 'Roboto', sans-serif;
-  color: #333;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  box-sizing: border-box;
-  overflow-y: auto;
-  width: 100%;
+.admin-client-detail {
+  padding: 1rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+  font-family: 'Roboto', 'Open Sans', sans-serif;
 
-  mat-card {
+  // Loading State
+  .loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin: 2rem auto;
+    max-width: 500px;
+
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+
+      h3 {
+        color: #1e293b;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      p {
+        color: #64748b;
+        margin: 0;
+      }
+    }
+  }
+
+  // Error State
+  .error-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin: 2rem auto;
+    max-width: 500px;
+
+    .error-content {
+      .error-icon {
+        font-size: 4rem;
+        width: 64px;
+        height: 64px;
+        color: #ef4444;
+        margin-bottom: 1.5rem;
+      }
+
+      h3 {
+        color: #1e293b;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+        margin: 0 0 1rem;
+      }
+
+      p {
+        color: #64748b;
+        margin: 0 0 2rem;
+        line-height: 1.5;
+      }
+
+      .back-btn {
+        border-radius: 12px;
+
+        mat-icon {
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  // Client Profile
+  .client-profile {
+    max-width: 1200px;
     margin: 0 auto;
-    width: 100%;
-    max-width: 600px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    padding: 1.5rem;
-    transition: transform 0.2s ease;
-    display: flex;
-    flex-direction: column;
 
-    &:hover {
-      transform: translateY(-4px);
+    // Header Section
+    .header-section {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+      .header-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .back-button {
+          border-radius: 12px;
+          margin-top: 0.25rem;
+
+          mat-icon {
+            margin-right: 0.5rem;
+          }
+        }
+
+        .header-title {
+          flex: 1;
+
+          h1 {
+            color: #991f23; // Rouge officiel
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin: 0 0 0.25rem;
+          }
+
+          .subtitle {
+            color: #64748b;
+            margin: 0;
+            font-size: 0.875rem;
+            font-family: 'Poppins', sans-serif;
+          }
+        }
+      }
     }
 
-    @media (max-width: 600px) {
-      width: 90%;
+    // Stats Section
+    .stats-section {
+      margin-bottom: 1.5rem;
+
+      .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+
+        .stat-card {
+          background: white;
+          border-radius: 12px;
+          padding: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+          border-left: 4px solid #e2e8f0;
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
+          &.primary {
+            border-left-color: #991f23; // Rouge officiel
+          }
+
+          &.accent {
+            border-left-color: #00adef; // Bleu officiel
+          }
+
+          &.fidele {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, #fffbf0, #fff3cd);
+          }
+
+          .stat-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+          }
+
+          .stat-content {
+            .stat-value {
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: #1e293b;
+              line-height: 1;
+            }
+
+            .stat-label {
+              font-size: 0.875rem;
+              color: #64748b;
+              margin-top: 0.25rem;
+              font-family: 'Poppins', sans-serif;
+            }
+          }
+        }
+      }
+
+      // Fidelity Section
+      .fidelity-section {
+        .fidelity-card {
+          background: white;
+          border-radius: 16px;
+          padding: 1.5rem;
+          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+          text-align: center;
+
+          .fidelity-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+
+            .fidelity-icon {
+              font-size: 2rem;
+              color: #00adef; // Bleu officiel
+            }
+
+            h3 {
+              color: #1e293b;
+              font-family: 'Montserrat', sans-serif;
+              font-weight: 600;
+              margin: 0;
+            }
+          }
+
+          .fidelity-stars {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+
+            .stars {
+              font-size: 2.5rem;
+              color: #fbbf24;
+              letter-spacing: 0.2rem;
+              position: relative;
+              z-index: 2;
+            }
+
+            .stars-placeholder {
+              font-size: 2.5rem;
+              color: #e5e7eb;
+              letter-spacing: 0.2rem;
+              position: absolute;
+              top: 0;
+              left: 0;
+              z-index: 1;
+            }
+          }
+
+          .fidelity-info {
+            p {
+              color: #64748b;
+              margin: 0 0 1rem;
+              font-family: 'Poppins', sans-serif;
+            }
+
+            .fidelity-badge {
+              background: linear-gradient(135deg, #f59e0b, #d97706);
+              color: white;
+              padding: 0.5rem 1rem;
+              border-radius: 20px;
+              font-size: 0.875rem;
+              font-weight: 600;
+              font-family: 'Poppins', sans-serif;
+            }
+          }
+        }
+      }
     }
 
-    @media (min-width: 601px) and (max-width: 960px) {
-      width: 80%;
+    // Content Grid
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: 1fr;
+      }
+
+      .info-card, .platforms-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 1.5rem 1.5rem 1rem;
+          border-bottom: 1px solid #f1f5f9;
+
+          .card-icon {
+            font-size: 1.5rem;
+            color: #00adef; // Bleu officiel
+          }
+
+          h3 {
+            color: #1e293b;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.25rem;
+          }
+        }
+
+        mat-card-content {
+          padding: 1.5rem;
+        }
+      }
+
+      // Info Card
+      .info-card {
+        .info-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+
+          .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .label {
+              font-size: 0.875rem;
+              color: #64748b;
+              font-weight: 500;
+              font-family: 'Poppins', sans-serif;
+            }
+
+            .value {
+              font-size: 1rem;
+              color: #1e293b;
+              font-weight: 600;
+
+              &.phone {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                mat-icon {
+                  font-size: 1.25rem;
+                  width: 20px;
+                  height: 20px;
+                  color: #00adef; // Bleu officiel
+                }
+              }
+
+              &.id {
+                background: #f1f5f9;
+                padding: 0.5rem 0.75rem;
+                border-radius: 8px;
+                font-family: 'Monaco', 'Consolas', monospace;
+                color: #991f23; // Rouge officiel
+              }
+            }
+          }
+        }
+      }
+
+      // Platforms Card
+      .platforms-card {
+        .platforms-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+
+          .platform-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: #f0f9ff;
+              border-color: #00adef; // Bleu officiel
+            }
+
+            .platform-icon {
+              width: 40px;
+              height: 40px;
+              object-fit: contain;
+              border-radius: 8px;
+              flex-shrink: 0;
+            }
+
+            .platform-info {
+              flex: 1;
+
+              .platform-name {
+                display: block;
+                font-size: 0.875rem;
+                color: #64748b;
+                font-weight: 500;
+                margin-bottom: 0.25rem;
+                font-family: 'Poppins', sans-serif;
+              }
+
+              .platform-id {
+                display: block;
+                font-size: 1rem;
+                color: #1e293b;
+                font-weight: 600;
+                font-family: 'Monaco', 'Consolas', monospace;
+              }
+            }
+          }
+
+          .no-platforms {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            color: #94a3b8;
+            text-align: center;
+
+            mat-icon {
+              font-size: 2rem;
+              width: 32px;
+              height: 32px;
+            }
+
+            span {
+              font-size: 0.875rem;
+            }
+          }
+        }
+      }
     }
 
-    @media (min-width: 961px) {
-      width: 70%;
+    // Actions Section
+    .actions-section {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+
+      .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+
+        .action-btn {
+          border-radius: 12px;
+          padding: 0.75rem 1.5rem;
+          min-width: 160px;
+
+          mat-icon {
+            margin-right: 0.5rem;
+          }
+        }
+      }
     }
   }
 
-  mat-card-title {
-    font-size: 1.6rem;
-    margin-bottom: 1rem;
-    color: #00adef; // ✅ Bleu officiel
-    font-family: 'Montserrat', sans-serif;
-    font-weight: bold;
-  }
-
-  mat-card-content p {
-    margin: 0.5rem 0;
-    font-size: 1rem;
-    font-family: 'Roboto', sans-serif;
-  }
-
-  .action-buttons {
-    margin-top: 1.5rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-  }
-
-  .stars {
-    font-size: 1.4rem;
-    color: gold;
-    margin-left: 0.5rem;
-    display: inline-block;
-    cursor: default;
-    font-family: 'Arial', sans-serif;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: scale(1.1);
+  // Material Overrides
+  ::ng-deep {
+    .mat-raised-button[disabled] {
+      background-color: #94a3b8 !important;
     }
   }
 
-  .badge {
-    background-color: #00adef; // ✅ Bleu officiel
-    color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    margin-left: 0.5rem;
-    font-family: 'Poppins', sans-serif;
-    transition: background-color 0.3s ease;
+  // Dark Mode Support
+  @media (prefers-color-scheme: dark) {
+    background: #0f172a;
 
-    &:hover {
-      background-color: #008ec0;
+    .header-section,
+    .stats-cards .stat-card,
+    .fidelity-card,
+    .info-card,
+    .platforms-card,
+    .actions-section,
+    .loading-state,
+    .error-state {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-color: #334155;
+    }
+
+    .header-title h1,
+    .stat-content .stat-value,
+    .fidelity-header h3,
+    .card-header h3,
+    .info-item .value,
+    .platform-id {
+      color: #e2e8f0;
+    }
+
+    .info-item .value.id {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .platform-item {
+      background: #334155 !important;
+      border-color: #475569 !important;
+
+      &:hover {
+        background: #3f4a5f !important;
+      }
     }
   }
-
-  .fid {
-    font-size: 1.1rem;
-    margin: 0.5rem 0;
-    margin-left: 15px;
-    color: #444;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 500;
-
-    strong {
-      color: #00adef;
-    }
-
-    span {
-      font-size: 1.3rem;
-      color: #ff9800;
-      margin-left: 0.5rem;
-    }
-  }
-}
-
-.loading {
-  text-align: center;
-  margin-top: 2rem;
-  color: #666;
-  font-family: 'Roboto', sans-serif;
 }

@@ -1,25 +1,133 @@
-<mat-card class="password-card">
-  <h2>🔒 Changer mon mot de passe</h2>
+<div class="password-page">
+  <mat-card class="password-card">
+    <div class="card-header">
+      <a class="logo" routerLink="/accueil" aria-label="Retour à l'accueil">
+        <img
+          src="assets/images/logo.png"
+          alt="PapouService Logo"
+          class="logo-img"
+        />
+        <span class="logo-text">PapouService</span>
+      </a>
+      <h1 class="title">🔒 Changer mon mot de passe</h1>
+      <p class="subtitle">
+        Pour votre sécurité, choisissez un mot de passe fort et unique.
+      </p>
+    </div>
 
-  <form (ngSubmit)="onSubmit()">
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Ancien mot de passe</mat-label>
-      <input matInput type="password" [(ngModel)]="form.ancienMotDePasse" name="ancienMotDePasse" required>
-    </mat-form-field>
+    <form #passwordForm="ngForm" (ngSubmit)="onSubmit(passwordForm)" novalidate>
+      <!-- Ancien mot de passe -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Ancien mot de passe</mat-label>
+        <input
+          matInput
+          [type]="showOld ? 'text' : 'password'"
+          [(ngModel)]="form.ancienMotDePasse"
+          name="ancienMotDePasse"
+          required
+          minlength="4"
+          autocomplete="current-password"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="showOld = !showOld"
+          [attr.aria-label]="showOld ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+        >
+          <mat-icon>{{ showOld ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordForm.submitted && passwordForm.controls['ancienMotDePasse']?.invalid">
+          L'ancien mot de passe est obligatoire.
+        </mat-error>
+      </mat-form-field>
 
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Nouveau mot de passe</mat-label>
-      <input matInput type="password" [(ngModel)]="form.nouveauMotDePasse" name="nouveauMotDePasse" required>
-    </mat-form-field>
+      <!-- Nouveau mot de passe -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nouveau mot de passe</mat-label>
+        <input
+          matInput
+          [type]="showNew ? 'text' : 'password'"
+          [(ngModel)]="form.nouveauMotDePasse"
+          name="nouveauMotDePasse"
+          required
+          minlength="6"
+          autocomplete="new-password"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="showNew = !showNew"
+          [attr.aria-label]="showNew ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+        >
+          <mat-icon>{{ showNew ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordForm.submitted && passwordForm.controls['nouveauMotDePasse']?.errors?.['required']">
+          Le nouveau mot de passe est obligatoire.
+        </mat-error>
+        <mat-error *ngIf="passwordForm.submitted && passwordForm.controls['nouveauMotDePasse']?.errors?.['minlength']">
+          Le nouveau mot de passe doit contenir au moins 6 caractères.
+        </mat-error>
+      </mat-form-field>
 
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Confirmer le mot de passe</mat-label>
-      <input matInput type="password" [(ngModel)]="form.confirmation" name="confirmation" required>
-    </mat-form-field>
+      <!-- Confirmation -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Confirmer le mot de passe</mat-label>
+        <input
+          matInput
+          [type]="showConfirm ? 'text' : 'password'"
+          [(ngModel)]="form.confirmation"
+          name="confirmation"
+          required
+          minlength="6"
+          autocomplete="new-password"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="showConfirm = !showConfirm"
+          [attr.aria-label]="showConfirm ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+        >
+          <mat-icon>{{ showConfirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordForm.submitted && passwordForm.controls['confirmation']?.errors?.['required']">
+          La confirmation du mot de passe est obligatoire.
+        </mat-error>
+      </mat-form-field>
 
-    <button mat-raised-button color="primary" type="submit">Mettre à jour</button>
-  </form>
+      <div class="password-hints">
+        <p>✅ Conseils :</p>
+        <ul>
+          <li>Au moins 6 caractères</li>
+          <li>Combiner lettres, chiffres et symboles</li>
+          <li>Éviter les informations faciles à deviner</li>
+        </ul>
+      </div>
 
-  <p class="success" *ngIf="message">{{ message }}</p>
-  <p class="error" *ngIf="error">{{ error }}</p>
-</mat-card>
+      <button
+        mat-raised-button
+        color="primary"
+        class="submit-btn"
+        type="submit"
+        [disabled]="passwordForm.invalid || isSubmitting"
+      >
+        <mat-icon *ngIf="!isSubmitting">lock_reset</mat-icon>
+        <span *ngIf="!isSubmitting">Mettre à jour</span>
+        <span *ngIf="isSubmitting">Traitement en cours...</span>
+      </button>
+    </form>
+
+    <div class="feedback-wrapper" *ngIf="hasFeedback">
+      <p class="feedback success" *ngIf="message">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ message }}</span>
+      </p>
+      <p class="feedback error" *ngIf="error">
+        <mat-icon>error</mat-icon>
+        <span>{{ error }}</span>
+      </p>
+    </div>
+  </mat-card>
+</div>

@@ -51,7 +51,7 @@ export class AdminAlbumsComponent implements OnInit {
   }
 
   loadAlbums() {
-    this.http.get<any[]>('http://192.168.57.230:8080/albums').subscribe(data => {
+    this.http.get<any[]>('http://192.168.11.124:8080/albums').subscribe(data => {
       this.dataSource.data = data;
       this.dataSource.sort = this.sort;
     });
@@ -79,8 +79,8 @@ export class AdminAlbumsComponent implements OnInit {
     }
 
     const request = this.isEditing
-      ? this.http.put(`http://192.168.57.230:8080/albums/${this.editId}`, formData)
-      : this.http.post('http://192.168.57.230:8080/albums', formData);
+      ? this.http.put(`http://192.168.11.119:8080/albums/${this.editId}`, formData)
+      : this.http.post('http://192.168.11.119:8080/albums', formData);
 
     request.subscribe({
       next: () => {
@@ -103,7 +103,7 @@ export class AdminAlbumsComponent implements OnInit {
 
   deleteAlbum(id: number) {
     if (confirm('Supprimer cet album ?')) {
-      this.http.delete(`http://192.168.57.230:8080/albums/${id}`).subscribe(() => this.loadAlbums());
+      this.http.delete(`http://192.168.11.119:8080/albums/${id}`).subscribe(() => this.loadAlbums());
     }
   }
 }

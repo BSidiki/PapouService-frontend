@@ -1,16 +1,140 @@
 <app-header-public></app-header-public>
-<div class="faq-page">
-  <h2>❓ Foire Aux Questions (FAQ)</h2>
 
-  <mat-accordion class="faq-accordion">
-    <mat-expansion-panel *ngFor="let faq of faqs">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          {{ faq.question }}
-        </mat-panel-title>
-      </mat-expansion-panel-header>
-      <p>{{ faq.answer }}</p>
-    </mat-expansion-panel>
-  </mat-accordion>
+<!-- JSON-LD SEO -->
+<div [innerHTML]="faqJsonLd"></div>
+
+<div class="faq-page">
+  <!-- En-tête -->
+  <div class="faq-header">
+    <h1 class="main-title">❓ Foire Aux Questions</h1>
+    <p class="subtitle">Trouvez rapidement des réponses à vos questions les plus fréquentes</p>
+  </div>
+
+  <!-- Barre d'outils -->
+  <section class="faq-toolbar">
+    <div class="search-container">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher dans la FAQ</mat-label>
+        <input matInput
+               [(ngModel)]="search"
+               (ngModelChange)="onSearchChange()"
+               placeholder="Ex. retrait, Orange Money, compte…"
+               aria-label="Rechercher dans les questions fréquentes" />
+        <mat-icon matSuffix>search</mat-icon>
+        <button *ngIf="search"
+                mat-icon-button
+                matSuffix
+                aria-label="Effacer la recherche"
+                (click)="search=''; onSearchChange()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
+    <div class="toolbar-actions">
+      <button mat-stroked-button
+              color="primary"
+              (click)="toggleAll()"
+              class="toggle-all-btn">
+        <mat-icon>{{ expandedAll ? 'unfold_less' : 'unfold_more' }}</mat-icon>
+        {{ expandedAll ? 'Tout fermer' : 'Tout ouvrir' }}
+      </button>
+    </div>
+  </section>
+
+  <!-- Statistiques de recherche -->
+  <div *ngIf="search" class="search-stats">
+    <p>
+      <strong>{{ filteredFaqs.length }}</strong>
+      résultat{{ filteredFaqs.length > 1 ? 's' : '' }} trouvé{{ filteredFaqs.length > 1 ? 's' : '' }} pour
+      « <strong>{{ search }}</strong> »
+    </p>
+  </div>
+
+  <!-- Liste des FAQ -->
+  <section class="faq-content">
+    <mat-accordion class="faq-accordion" [multi]="true">
+      <mat-expansion-panel
+        *ngFor="let faq of filteredFaqs; trackBy: trackById; let i = index"
+        [expanded]="expandedAll || expandedId === faq.id"
+        (opened)="setExpanded(faq.id)"
+        (closed)="setExpanded(null)"
+        class="faq-panel"
+      >
+        <mat-expansion-panel-header class="faq-header-panel">
+          <mat-panel-title class="faq-question">
+            <span class="question-number">{{ i + 1 }}.</span>
+            {{ faq.question }}
+          </mat-panel-title>
+          <mat-panel-description class="faq-indicator">
+            <mat-icon *ngIf="expandedAll || expandedId === faq.id">expand_less</mat-icon>
+            <mat-icon *ngIf="!(expandedAll || expandedId === faq.id)">expand_more</mat-icon>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="faq-answer">
+          <p>{{ faq.answer }}</p>
+
+          <!-- Mots-clés -->
+          <div *ngIf="faq.keywords && faq.keywords.length > 0" class="faq-keywords">
+            <span class="keywords-label">Mots-clés :</span>
+            <div class="keywords-list">
+              <span *ngFor="let keyword of faq.keywords" class="keyword-tag">
+                {{ keyword }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-actions">
+          <button mat-button
+                  color="primary"
+                  (click)="copyLink(faq)"
+                  class="share-btn">
+            <mat-icon>link</mat-icon>
+            Partager cette question
+          </button>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <!-- Aucun résultat -->
+    <div *ngIf="filteredFaqs.length === 0" class="no-results">
+      <div class="no-results-icon">
+        <mat-icon>search_off</mat-icon>
+      </div>
+      <h3>Aucun résultat trouvé</h3>
+      <p>Nous n'avons trouvé aucune réponse pour « <strong>{{ search }}</strong> ».</p>
+      <div class="no-results-actions">
+        <button mat-stroked-button (click)="search = ''; onSearchChange()">
+          <mat-icon>clear</mat-icon>
+          Effacer la recherche
+        </button>
+        <button mat-raised-button color="primary" routerLink="/contact">
+          <mat-icon>contact_support</mat-icon>
+          Nous contacter
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section d'aide supplémentaire -->
+  <section *ngIf="filteredFaqs.length > 0 && !search" class="help-section">
+    <div class="help-card">
+      <mat-icon class="help-icon">support_agent</mat-icon>
+      <div class="help-content">
+        <h3>Vous ne trouvez pas la réponse ?</h3>
+        <p>Notre équipe de support est disponible pour vous aider personnellement</p>
+      </div>
+      <button mat-raised-button
+              color="primary"
+              routerLink="/contact"
+              class="help-button">
+        <mat-icon>chat</mat-icon>
+        Contactez-nous
+      </button>
+    </div>
+  </section>
 </div>
+
 <app-footer></app-footer>

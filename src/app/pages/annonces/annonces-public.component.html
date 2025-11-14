@@ -1,31 +1,84 @@
-<div class="annonces-slider">
-  <div class="slider-wrapper">
+<div class="annonces-slider"
+     (mouseenter)="onMouseEnter()"
+     (mouseleave)="onMouseLeave()"
+     (touchstart)="onTouchStart($event)"
+     (touchmove)="onTouchMove($event)"
+     (touchend)="onTouchEnd()">
+
+  <!-- État : chargement -->
+  <div class="state state-loading" *ngIf="loading" aria-live="polite">
+    <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+    <span>Chargement des annonces…</span>
+  </div>
+
+  <!-- État : erreur -->
+  <div class="state state-error" *ngIf="!loading && error">
+    <p>Impossible de charger les annonces pour le moment.</p>
+  </div>
+
+  <!-- État : vide -->
+  <div class="state state-empty" *ngIf="!loading && !error && annonces.length === 0">
+    <p>Aucune annonce disponible pour l’instant.</p>
+  </div>
+
+  <!-- Carrousel -->
+  <div class="slider-wrapper"
+       *ngIf="!loading && !error && annonces.length > 0">
+
+    <!-- Indicateur de pause -->
+    <div class="paused-indicator" [class.visible]="paused">
+      <mat-icon>pause</mat-icon>
+      Pause
+    </div>
+
+    <!-- Slide courante -->
     <div class="slider-transition" [@fadeSlide]="currentIndex">
-      <mat-card class="slider-card" *ngIf="annonces.length > 0">
+      <mat-card class="slider-card">
         <img
-          *ngIf="annonces[currentIndex]?.media"
-          [src]="toBase64(annonces[currentIndex].media)"
-          alt="Annonce image"
+          [src]="getMediaUrl(annonces[currentIndex].media, 960)"
+          [srcset]="
+            getMediaUrl(annonces[currentIndex].media, 480) + ' 480w, ' +
+            getMediaUrl(annonces[currentIndex].media, 768) + ' 768w, ' +
+            getMediaUrl(annonces[currentIndex].media, 960) + ' 960w, ' +
+            getMediaUrl(annonces[currentIndex].media, 1280) + ' 1280w'
+          "
+          sizes="(max-width: 480px) 100vw, (max-width: 768px) 92vw, 1200px"
+          width="1200" height="600"
+          decoding="async"
+          fetchpriority="high"
+          loading="eager"
+          alt="Annonce PapouService"
+          (error)="onImgError($event)"
         />
+
         <div class="slider-text">
-          <h2>{{ annonces[currentIndex]?.titre }}</h2>
-          <p>{{ annonces[currentIndex]?.texte }}</p>
+          <h2>{{ annonces[currentIndex].titre }}</h2>
+          <p>{{ annonces[currentIndex].texte }}</p>
         </div>
       </mat-card>
     </div>
-  </div>
 
-  <div class="slider-controls">
-    <button mat-icon-button (click)="previous()"><mat-icon>chevron_left</mat-icon></button>
-    <button mat-icon-button (click)="next()"><mat-icon>chevron_right</mat-icon></button>
-  </div>
-  <div class="slider-indicators">
-    <span
-      *ngFor="let _, index as i of annonces"
-      class="dot"
-      [class.active]="i === currentIndex"
-      (click)="goToSlide(i)">
-    </span>
-  </div>
+    <!-- Flèches -->
+    <div class="slider-controls">
+      <button mat-icon-button aria-label="Annonce précédente" (click)="previous()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Annonce suivante" (click)="next()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
 
+    <!-- Indicateurs -->
+    <div class="slider-indicators" role="tablist" aria-label="Indicateurs du carrousel">
+      <button
+        class="dot"
+        role="tab"
+        *ngFor="let a of annonces; let i = index"
+        [class.active]="i === currentIndex"
+        [attr.aria-selected]="i === currentIndex"
+        [attr.aria-label]="'Aller à l’annonce ' + (i + 1)"
+        (click)="goToSlide(i)">
+      </button>
+    </div>
+  </div>
 </div>

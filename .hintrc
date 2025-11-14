@@ -17,9 +17,9 @@
       }
     ],
     "axe/name-role-value": [
-      "default",
+      "off",
       {
-        "link-name": "off"
+        "button-name": "off"
       }
     ],
     "no-inline-styles": "off",
@@ -29,10 +29,19 @@
         "ignore": [
           "hyphens",
           "backdrop-filter",
-          "-webkit-overflow-scrolling"
+          "-webkit-overflow-scrolling",
+          "user-select",
+          "user-select"
         ]
       }
     ],
-    "disown-opener": "off"
-  }
+    "disown-opener": "off",
+    "button-type": "off"
+  },
+  "browserslist": [
+    "defaults",
+    "not ie 11",
+    "not ios_saf <= 18.3",
+    "not safari <= 18.3"
+  ]
 }

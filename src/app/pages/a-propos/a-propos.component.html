@@ -1,75 +1,138 @@
 <app-header-public></app-header-public>
 
 <mat-card class="a-propos-container">
+  <!-- Bannière principale -->
   <div class="banner">
-    <img src="assets/images/ps.jpg" alt="PapouService Banner" />
+    <img src="assets/images/ps.jpg" alt="PapouService Banner" loading="lazy" />
   </div>
 
-  <h2>👋 À propos de PapouService</h2>
+  <!-- Section principale -->
+  <main class="main-content">
+    <h1 class="main-title">👋 À propos de PapouService</h1>
 
-  <p>
-    <strong>Papou Service</strong> est une maison burkinabè née en 2020 au cœur de la cité de Naaba Kango à Ouahigouya. Fondée sur des valeurs d’ambition, d’innovation et de confiance, elle s’est imposée comme une référence incontournable dans les domaines des <strong>paris sportifs</strong>, des <strong>transactions mobiles</strong>, du <strong>divertissement</strong> et du <strong>soutien à la jeunesse</strong>.
-  </p>
+    <div class="content-grid">
+      <section class="text-content">
+        <p class="intro-text">
+          <strong>Papou Service</strong> est une maison burkinabè née en 2020 au cœur de la cité de Naaba Kango à Ouahigouya. Fondée sur des valeurs d'ambition, d'innovation et de confiance, elle s'est imposée comme une référence incontournable dans les domaines des <strong>paris sportifs</strong>, des <strong>transactions mobiles</strong>, du <strong>divertissement</strong> et du <strong>soutien à la jeunesse</strong>.
+        </p>
 
-  <p>
-    Papou Service, c’est bien plus qu’une entreprise. C’est un <strong>partenaire fiable</strong>, un <strong>moteur culturel</strong>, un <strong>acteur sportif</strong>, un <strong>allié des artistes</strong> et une <strong>source de détente</strong> pour les jeunes.
-  </p>
+        <p>
+          Papou Service, c'est bien plus qu'une entreprise. C'est un <strong>partenaire fiable</strong>, un <strong>moteur culturel</strong>, un <strong>acteur sportif</strong>, un <strong>allié des artistes</strong> et une <strong>source de détente</strong> pour les jeunes.
+        </p>
 
-  <p>
-    En 2024, Papou Service étend son empreinte à Dédougou au secteur 06, non loin du rond-point de la Femme. Puis en 2025, elle franchit un nouveau cap avec une nouvelle implantation à Ouagadougou (quartier Tampouy), à deux pas du rond-point de la Jeunesse.
-  </p>
+        <p>
+          En 2024, Papou Service étend son empreinte à Dédougou au secteur 06, non loin du rond-point de la Femme. Puis en 2025, elle franchit un nouveau cap avec une nouvelle implantation à Ouagadougou (quartier Tampouy), à deux pas du rond-point de la Jeunesse.
+        </p>
 
-  <p>
-    À travers des initiatives comme le <strong>Mercredi du Paiya</strong>, des compétitions sportives, et un appui constant aux actions sociales, éducatives et environnementales, Papou Service affirme son rôle de <strong>pilier du développement local</strong> et de la <strong>créativité</strong>.
-  </p>
+        <p>
+          À travers des initiatives comme le <strong>Mercredi du Paiya</strong>, des compétitions sportives, et un appui constant aux actions sociales, éducatives et environnementales, Papou Service affirme son rôle de <strong>pilier du développement local</strong> et de la <strong>créativité</strong>.
+        </p>
+      </section>
 
-  <div class="team-photo">
-    <img src="/assets/images/eq.jpg" alt="Équipe PapouService" />
-    <p class="caption">Simple, Rapide et Fiable — Papou Service.</p>
-  </div>
-
-  <hr />
-
-  <div class="info-emplacement">
-    <div class="partie">
-      <h3>📍 Siège social</h3>
-      <p>
-        Secteur 10, Ouahigouya, Burkina Faso<br />
-        📞 <a href="tel:+22676055792">+226 76 05 57 92</a><br />
-        💬 <a href="https://wa.me/22667872831" target="_blank">WhatsApp</a><br />
-        Code promo : <strong>KANGO226</strong>
-      </p>
+      <!-- Photo d'équipe -->
+      <section class="team-section">
+        <div class="team-photo">
+          <img src="/assets/images/eq.jpg" alt="Équipe PapouService" loading="lazy" />
+          <p class="caption">Simple, Rapide et Fiable — Papou Service.</p>
+        </div>
+      </section>
     </div>
+  </main>
 
-    <div class="partie">
-      <h3>🏢 Présence</h3>
-      <p>📍 Ouahigouya</p>
-      <p>📍 Dédougou</p>
-      <p>📍 Ouagadougou (Tampouy)</p>
+  <hr class="section-divider" />
+
+  <!-- Informations de contact et localisation -->
+  <section class="contact-section">
+    <h2 class="section-title">📞 Contact & Localisation</h2>
+
+    <div class="info-grid">
+      <!-- Siège social -->
+      <div class="info-card">
+        <div class="card-icon">🏢</div>
+        <h3>📍 Siège social</h3>
+        <div class="contact-info">
+          <p>Secteur 10, Ouahigouya, Burkina Faso</p>
+          <a href="tel:+22676055792" class="contact-link">
+            <span class="icon">📞</span>
+            +226 76 05 57 92
+          </a>
+          <a href="https://wa.me/22667872831" target="_blank" class="contact-link whatsapp">
+            <span class="icon">💬</span>
+            WhatsApp
+          </a>
+          <div class="promo-code">
+            <span>Code promo :</span>
+            <strong>KANGO226</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Présence géographique -->
+      <div class="info-card">
+        <div class="card-icon">🌍</div>
+        <h3>🏢 Présence</h3>
+        <div class="location-list">
+          <div class="location-item">
+            <span class="location-icon">📍</span>
+            <span>Ouahigouya</span>
+          </div>
+          <div class="location-item">
+            <span class="location-icon">📍</span>
+            <span>Dédougou</span>
+          </div>
+          <div class="location-item">
+            <span class="location-icon">📍</span>
+            <span>Ouagadougou (Tampouy)</span>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="partie">
-      <img src="assets/images/1XBET.png" alt="1xbet Logo" class="logo-img" />
-      <p>+226 57132626</p>
-      <p>+226 60076161</p>
-      <p>+226 64000019</p>
+  <hr class="section-divider" />
+
+  <!-- Partenaires de paris sportifs -->
+  <section class="partners-section">
+    <h2 class="section-title">🎯 Nos Partenaires Paris Sportifs</h2>
+
+    <div class="partners-grid">
+      <!-- 1xBet -->
+      <div class="partner-card">
+        <div class="partner-logo">
+          <img src="assets/images/1XBET.png" alt="1xbet Logo" loading="lazy" />
+        </div>
+        <div class="partner-contacts">
+          <a href="tel:+22657132626" class="contact-link">+226 57132626</a>
+          <a href="tel:+22660076161" class="contact-link">+226 60076161</a>
+          <a href="tel:+22664000019" class="contact-link">+226 64000019</a>
+        </div>
+      </div>
+
+      <!-- BetWinner -->
+      <div class="partner-card">
+        <div class="partner-logo">
+          <img src="assets/images/BETWINNER.png" alt="BetWinner Logo" loading="lazy" />
+        </div>
+        <div class="partner-contacts">
+          <a href="tel:+22664868649" class="contact-link">+226 64868649</a>
+          <a href="tel:+22663593838" class="contact-link">+226 63593838</a>
+          <a href="tel:+22604004100" class="contact-link">+226 04004100</a>
+        </div>
+      </div>
+
+      <!-- MelBet -->
+      <div class="partner-card">
+        <div class="partner-logo">
+          <img src="assets/images/MELBET.png" alt="MelBet Logo" loading="lazy" />
+        </div>
+        <div class="partner-contacts">
+          <a href="tel:+22674233802" class="contact-link">+226 74233802</a>
+          <a href="tel:+22674233802" class="contact-link">+226 74233802</a>
+          <a href="tel:+22674233802" class="contact-link">+226 74233802</a>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="partie">
-      <img src="assets/images/BETWINNER.png" alt="BetWinner Logo" class="logo-img" />
-      <p>+226 64868649</p>
-      <p>+226 63593838</p>
-      <p>+226 04004100</p>
-    </div>
-
-    <div class="partie">
-      <img src="assets/images/MELBET.png" alt="MelBet Logo" class="logo-img" />
-      <p>+226 74233802</p>
-      <p>+226 74233802</p>
-      <p>+226 74233802</p>
-    </div>
-  </div>
-
-  <hr />
   <app-footer></app-footer>
 </mat-card>

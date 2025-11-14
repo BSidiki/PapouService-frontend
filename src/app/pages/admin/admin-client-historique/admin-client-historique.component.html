@@ -1,14 +1,18 @@
 <div class="historique-container">
   <div class="top-bar">
-    <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
-      ⬅️ Retour
+    <button mat-stroked-button (click)="goBack()" class="back-button">
+      <span class="back-icon">←</span>
+      Retour
     </button>
-    <h2 class="header-title">
-      📜 Historique du client
-      <span class="logo" routerLink="/accueil" matTooltip="Accueil">
-        <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="45" />
-      </span>
-    </h2>
+
+    <div class="header-section">
+      <h2 class="header-title">
+        Historique du client
+      </h2>
+      <div class="logo" routerLink="/accueil" matTooltip="Accueil">
+        <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" />
+      </div>
+    </div>
   </div>
 
   <!-- Filtres -->
@@ -33,13 +37,40 @@
     </mat-form-field>
   </div>
 
-  <!-- Aucun résultat -->
-  <div *ngIf="filtered.length === 0" class="no-result">
-    <p>🔍 Aucun résultat trouvé.</p>
+  <!-- Statistiques rapides -->
+  <div class="stats-container">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-info">
+        <div class="stat-value">{{totalTransactions}}</div>
+        <div class="stat-label">Total transactions</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💸</div>
+      <div class="stat-info">
+        <div class="stat-value">{{depotsCount}}</div>
+        <div class="stat-label">Dépôts</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💼</div>
+      <div class="stat-info">
+        <div class="stat-value">{{retraitsCount}}</div>
+        <div class="stat-label">Retraits</div>
+      </div>
+    </div>
   </div>
 
-  <!-- Liste -->
-  <div class="transaction-list">
+  <!-- Aucun résultat -->
+  <div *ngIf="filtered.length === 0" class="no-result">
+    <div class="no-result-icon">🔍</div>
+    <h3>Aucun résultat trouvé</h3>
+    <p>Aucune transaction ne correspond à vos critères de filtrage.</p>
+  </div>
+
+  <!-- Liste des transactions -->
+  <div class="transaction-list" *ngIf="filtered.length > 0">
     <mat-card
       *ngFor="let item of filtered"
       class="transaction-card"
@@ -49,37 +80,50 @@
         'retrait-card': item.transaction === 'RETRAIT'
       }"
     >
-      <div class="contenu">
-        <div class="transaction-header">
-          <span class="icon">
-            {{ item.transaction === 'DEPOT' ? '💸' : '💼' }}
+      <div class="card-header">
+        <div class="transaction-type">
+          <span class="type-icon">
+            {{ getTransactionIcon(item.transaction) }}
           </span>
-          <strong>{{ item.transaction }}</strong>
+          <span class="type-text">{{ item.transaction }}</span>
+        </div>
+        <div class="transaction-id">N{{ item.id_transaction }}PS</div>
+      </div>
+
+      <div class="card-content">
+        <div class="info-row">
+          <span class="info-label">Montant :</span>
+          <span class="info-value">{{ item.details?.montant || '---' }} FCFA</span>
         </div>
 
-        <div><strong>ID-TRANSACTION :</strong> N{{ item.id_transaction }}PS</div>
-        <div><strong>Montant :</strong> {{ item.details?.montant || '---' }} FCFA</div>
-        <div><strong>Numéro :</strong> {{ item.details?.numeroEnvoyant || '---' }}</div>
-        <div *ngIf="item.date">
-          <strong>Date :</strong> {{ item.date | date: 'dd/MM/yyyy - HH:mm' }}
+        <div class="info-row">
+          <span class="info-label">Numéro :</span>
+          <span class="info-value">{{ item.details?.numeroEnvoyant || '---' }}</span>
         </div>
-        <div>
-          <strong>Statut :</strong>
+
+        <div class="info-row" *ngIf="item.date">
+          <span class="info-label">Date :</span>
+          <span class="info-value">{{ item.date | date: 'dd/MM/yyyy - HH:mm' }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Statut :</span>
           <span [ngClass]="{
-            'badge': true,
+            'status-badge': true,
             'pending': item.statut === 'PENDING',
             'validated': item.statut === 'VALIDATED',
             'rejected': item.statut === 'REJECTED'
           }">
-            {{
-              item.statut === 'PENDING' ? 'En attente' :
-              item.statut === 'VALIDATED' ? 'Validé' :
-              item.statut === 'REJECTED' ? 'Rejeté' : 'Inconnu'
-            }}
+            {{ getStatusText(item.statut) }}
           </span>
         </div>
+      </div>
 
-        <div class="link-text">📂 Voir les détails</div>
+      <div class="card-footer">
+        <span class="details-link">
+          Voir les détails
+          <span class="link-arrow">→</span>
+        </span>
       </div>
     </mat-card>
   </div>

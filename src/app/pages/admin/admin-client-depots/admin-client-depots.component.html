@@ -1,22 +1,316 @@
-<div class="depot-container">
-  <button mat-stroked-button color="primary" (click)="goBack()" class="back-button">
-    ⬅️ Retour à la liste
-  </button>
+<div class="admin-client-depots">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="header-main">
+        <button mat-stroked-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </button>
+        <div class="header-title">
+          <h2>💰 Historique des Dépôts</h2>
+          <p class="subtitle">Dépôts effectués par le client #{{ clientId }}</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="load()" [disabled]="loading" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          {{ loading ? 'Actualisation...' : 'Actualiser' }}
+        </button>
+      </div>
+    </div>
+  </div>
 
-  <h2 class="img-text">💰 Dépôts du client
-    <span class="logo" routerLink="/accueil">
-      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="50"/>
-    </span>
-  </h2>
+  <!-- Stats Cards -->
+  <div class="stats-cards" *ngIf="!loading && !error">
+    <div class="stat-card primary">
+      <div class="stat-icon">💰</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getTotalDepots() }}</div>
+        <div class="stat-label">Total Dépôts</div>
+      </div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-icon">✅</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getValidatedDepots() }}</div>
+        <div class="stat-label">Validés</div>
+      </div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getPendingDepots() }}</div>
+        <div class="stat-label">En Attente</div>
+      </div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon">❌</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getRejectedDepots() }}</div>
+        <div class="stat-label">Rejetés</div>
+      </div>
+    </div>
+  </div>
 
-  <div *ngIf="depots.length === 0">Aucun dépôt trouvé.</div>
+  <!-- Filters Section -->
+  <div class="filters-section" *ngIf="!loading && !error">
+    <div class="filter-group">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher un dépôt</mat-label>
+        <input matInput
+               [(ngModel)]="q"
+               (ngModelChange)="onSearchChange()"
+               placeholder="Numéro, pays ou plateforme..." />
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
 
-  <mat-card *ngFor="let depot of depots" class="depot-card" (click)="voirDetails(depot.idDepot)">
-    <div><strong>Montant :</strong> {{ depot.montant | number:'1.0-0' }} FCFA</div>
-    <div><strong>Numéro :</strong> {{ depot.numeroEnvoyant }}</div>
-    <div><strong>Pays :</strong> {{ depot.pays }}</div>
-    <div><strong>Type :</strong> {{ depot.optionDeTransaction }}</div>
-    <div><strong>Date :</strong> {{ depot.dateDepot | date:'medium' }}</div>
-    <div class="link-text">🔎 Voir le détail</div>
-  </mat-card>
+      <mat-form-field appearance="outline" class="status-field">
+        <mat-label>Statut du dépôt</mat-label>
+        <mat-select [(value)]="statusFilter" (selectionChange)="onStatusChange()">
+          <mat-option value="ALL">
+            <div class="status-option">
+              <span class="status-dot all"></span>
+              Tous les statuts
+            </div>
+          </mat-option>
+          <mat-option value="PENDING">
+            <div class="status-option">
+              <span class="status-dot pending"></span>
+              En attente
+            </div>
+          </mat-option>
+          <mat-option value="VALIDATED">
+            <div class="status-option">
+              <span class="status-dot validated"></span>
+              Validés
+            </div>
+          </mat-option>
+          <mat-option value="REJECTED">
+            <div class="status-option">
+              <span class="status-dot rejected"></span>
+              Rejetés
+            </div>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="results-info">
+      <span class="results-count">{{ length }} dépôt(s) trouvé(s)</span>
+      <span class="loading-text" *ngIf="loading">Mise à jour...</span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-content">
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Chargement des dépôts...</span>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!loading && error">
+    <div class="error-content">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <h3>Erreur de chargement</h3>
+      <p>Impossible de charger les dépôts du client. Veuillez réessayer.</p>
+      <button mat-raised-button color="primary" (click)="load()" class="retry-btn">
+        <mat-icon>refresh</mat-icon>
+        Réessayer
+      </button>
+    </div>
+  </div>
+
+  <!-- Desktop Table -->
+  <div class="table-section" *ngIf="!loading && !error && pagedDepots.length > 0">
+    <div class="desktop-view">
+      <div class="table-container">
+        <table mat-table [dataSource]="pagedDepots" class="depots-table">
+
+          <!-- Montant Column -->
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef>Montant</th>
+            <td mat-cell *matCellDef="let depot">
+              <div class="amount-cell">
+                <span class="amount">{{ depot.montant | number:'1.0-0' }}</span>
+                <span class="currency">FCFA</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Numéro Column -->
+          <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef>Numéro</th>
+            <td mat-cell *matCellDef="let depot" class="phone-cell">
+              <mat-icon class="phone-icon">phone</mat-icon>
+              {{ formatNumero(depot.numeroEnvoyant) }}
+            </td>
+          </ng-container>
+
+          <!-- Pays Column -->
+          <ng-container matColumnDef="pays">
+            <th mat-header-cell *matHeaderCellDef>Pays</th>
+            <td mat-cell *matCellDef="let depot">
+              <span class="country" *ngIf="depot.pays; else noData">
+                {{ depot.pays }}
+              </span>
+              <ng-template #noData>
+                <span class="no-data">—</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <!-- Plateforme Column -->
+          <ng-container matColumnDef="plateforme">
+            <th mat-header-cell *matHeaderCellDef>Plateforme</th>
+            <td mat-cell *matCellDef="let depot">
+              <span class="platform-badge">{{ depot.optionDeTransaction }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let depot">
+              <div class="date-cell" *ngIf="depot.dateDepot; else noDate">
+                <span class="date">{{ depot.dateDepot | date:'dd/MM/yyyy' }}</span>
+                <span class="time">{{ depot.dateDepot | date:'HH:mm' }}</span>
+              </div>
+              <ng-template #noDate>
+                <span class="no-data">—</span>
+              </ng-template>
+            </td>
+          </ng-container>
+
+          <!-- Statut Column -->
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let depot">
+              <span class="status-badge" [ngClass]="getStatusClass(depot.transactionState)">
+                {{ getStatusText(depot.transactionState) }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let depot">
+              <button mat-raised-button
+                      color="primary"
+                      (click)="voirDetails(depot.idDepot)"
+                      class="action-btn"
+                      matTooltip="Voir les détails du dépôt">
+                <mat-icon>visibility</mat-icon>
+                Détails
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['montant', 'numero', 'pays', 'plateforme', 'date', 'statut', 'actions']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['montant', 'numero', 'pays', 'plateforme', 'date', 'statut', 'actions']"></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile Cards -->
+    <div class="mobile-view">
+      <div *ngFor="let depot of pagedDepots" class="depot-card">
+        <div class="card-header">
+          <div class="depot-amount">
+            <span class="amount">{{ depot.montant | number:'1.0-0' }}</span>
+            <span class="currency">FCFA</span>
+          </div>
+          <div class="depot-status">
+            <span class="status-badge" [ngClass]="getStatusClass(depot.transactionState)">
+              {{ getStatusText(depot.transactionState) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <div class="info-grid">
+            <div class="info-item">
+              <mat-icon class="info-icon">phone</mat-icon>
+              <div class="info-content">
+                <span class="label">Numéro</span>
+                <span class="value">{{ formatNumero(depot.numeroEnvoyant) }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <mat-icon class="info-icon">flag</mat-icon>
+              <div class="info-content">
+                <span class="label">Pays</span>
+                <span class="value">{{ depot.pays || '—' }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <mat-icon class="info-icon">casino</mat-icon>
+              <div class="info-content">
+                <span class="label">Plateforme</span>
+                <span class="value">{{ depot.optionDeTransaction }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <mat-icon class="info-icon">schedule</mat-icon>
+              <div class="info-content">
+                <span class="label">Date</span>
+                <span class="value" *ngIf="depot.dateDepot">
+                  {{ depot.dateDepot | date:'dd/MM/yyyy HH:mm' }}
+                </span>
+                <span class="value no-data" *ngIf="!depot.dateDepot">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button mat-stroked-button
+                  color="primary"
+                  (click)="voirDetails(depot.idDepot)"
+                  class="action-btn-mobile">
+            <mat-icon>visibility</mat-icon>
+            Voir détails
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <mat-paginator [length]="length"
+                   [pageIndex]="pageIndex"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="[5, 10, 25, 50]"
+                   (page)="onPageChange($event)"
+                   showFirstLastButtons
+                   class="custom-paginator">
+    </mat-paginator>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && !error && pagedDepots.length === 0">
+    <div class="empty-content">
+      <mat-icon class="empty-icon">payments</mat-icon>
+      <h3>Aucun dépôt trouvé</h3>
+      <p *ngIf="q || statusFilter !== 'ALL'">
+        Aucun dépôt ne correspond à vos critères de recherche.
+      </p>
+      <p *ngIf="!q && statusFilter === 'ALL'">
+        Ce client n'a effectué aucun dépôt pour le moment.
+      </p>
+      <button *ngIf="q || statusFilter !== 'ALL'"
+              mat-raised-button
+              color="primary"
+              (click)="resetFilters()"
+              class="reset-btn">
+        <mat-icon>clear_all</mat-icon>
+        Réinitialiser les filtres
+      </button>
+    </div>
+  </div>
 </div>

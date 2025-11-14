@@ -1,18 +1,167 @@
-<mat-toolbar color="primary" class="public-toolbar">
-  <button mat-icon-button class="mobile-toggle" (click)="toggleMenu()" aria-label="Ouvrir/fermer menu">
-    <mat-icon>{{ showMenu ? 'close' : 'menu' }}</mat-icon>
+<mat-toolbar class="public-toolbar">
+  <!-- Bouton hamburger (mobile) -->
+  <button class="mobile-toggle" mat-icon-button (click)="toggleMenu()" aria-label="Ouvrir le menu">
+    <mat-icon>menu</mat-icon>
   </button>
 
-  <span class="logo" routerLink="/accueil">
-    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" width="100%" />
-  </span>
+  <!-- Logo -->
+  <a class="logo" routerLink="/accueil" aria-label="PapouService accueil">
+    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" />
+    <span class="logo-text">PapouService</span>
+  </a>
 
-  <nav class="nav-links" [class.open]="showMenu">
-    <a mat-button routerLink="/accueil" routerLinkActive="active">Accueil</a>
-    <a mat-button routerLink="/faq" routerLinkActive="active">FAQ</a>
-    <a mat-button routerLink="/contact" routerLinkActive="active">Contact</a>
-    <a mat-button routerLink="/a-propos" routerLinkActive="active">À propos</a>
-    <a mat-button routerLink="/login" routerLinkActive="active">Connexion</a>
-    <a mat-stroked-button color="accent" routerLink="/register">Inscription</a>
+  <!-- Menu desktop -->
+  <nav class="nav-desktop">
+    <a mat-button routerLink="/accueil" routerLinkActive="active" class="nav-link">
+      <mat-icon class="nav-icon">home</mat-icon>
+      <span class="nav-text">Accueil</span>
+    </a>
+    <a mat-button routerLink="/faq" routerLinkActive="active" class="nav-link">
+      <mat-icon class="nav-icon">help</mat-icon>
+      <span class="nav-text">FAQ</span>
+    </a>
+    <a mat-button routerLink="/contact" routerLinkActive="active" class="nav-link">
+      <mat-icon class="nav-icon">contact_support</mat-icon>
+      <span class="nav-text">Contact</span>
+    </a>
+    <a mat-button routerLink="/a-propos" routerLinkActive="active" class="nav-link">
+      <mat-icon class="nav-icon">info</mat-icon>
+      <span class="nav-text">À propos</span>
+    </a>
+
+    <!-- Zone droite: si connecté => avatar + menu ; sinon => login/inscription -->
+    <div class="nav-right">
+      <ng-container *ngIf="loggedIn; else guestActions">
+        <button mat-button [matMenuTriggerFor]="userMenu" class="user-chip">
+          <div class="avatar-container">
+            <ng-container *ngIf="avatarSrc; else initialsAvatar">
+              <img [src]="avatarSrc" alt="Avatar" class="avatar-img" />
+            </ng-container>
+            <ng-template #initialsAvatar>
+              <span class="avatar-fallback">{{ initials }}</span>
+            </ng-template>
+          </div>
+          <span class="user-name">
+            {{ (user?.prenomUtilisateur || user?.email || 'Mon compte') | slice:0:18 }}
+          </span>
+          <mat-icon class="expand-icon">expand_more</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before" yPosition="below">
+          <div class="menu-header">
+            <div class="menu-avatar">
+              <ng-container *ngIf="avatarSrc; else menuInitials">
+                <img [src]="avatarSrc" alt="Avatar" class="avatar-img" />
+              </ng-container>
+              <ng-template #menuInitials>
+                <span class="avatar-fallback">{{ initials }}</span>
+              </ng-template>
+            </div>
+            <div class="menu-user-info">
+              <div class="menu-user-name">{{ user?.prenomUtilisateur || user?.email || 'Mon compte' }}</div>
+              <div class="menu-user-role">{{ getUserRoleText(user?.role) }}</div>
+            </div>
+          </div>
+          <button mat-menu-item (click)="goToAccount()" class="menu-item">
+            <mat-icon>account_circle</mat-icon>
+            <span>Mon espace</span>
+          </button>
+          <button mat-menu-item (click)="logout()" class="menu-item logout">
+            <mat-icon>logout</mat-icon>
+            <span>Déconnexion</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+
+      <ng-template #guestActions>
+        <div class="auth-buttons">
+          <a mat-button routerLink="/login" routerLinkActive="active" class="login-btn">
+            <mat-icon class="btn-icon">login</mat-icon>
+            <span class="btn-text">Connexion</span>
+          </a>
+          <a mat-stroked-button routerLink="/register" class="register-btn">
+            <mat-icon class="btn-icon">person_add</mat-icon>
+            <span class="btn-text">Inscription</span>
+          </a>
+        </div>
+      </ng-template>
+    </div>
   </nav>
 </mat-toolbar>
+
+<!-- Backdrop mobile -->
+<div class="backdrop" *ngIf="showMenu" (click)="closeMenu()"></div>
+
+<!-- Menu mobile -->
+<nav class="nav-mobile" [class.open]="showMenu" aria-label="Menu principal">
+  <div class="mobile-header">
+    <div class="mobile-logo">
+      <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img" />
+      <span class="logo-text">PapouService</span>
+    </div>
+    <button class="close-btn" mat-icon-button (click)="closeMenu()" aria-label="Fermer le menu">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="mobile-nav-content">
+    <a (click)="onNavClick()" routerLink="/accueil" routerLinkActive="active" class="mobile-nav-link">
+      <mat-icon>home</mat-icon>
+      <span>Accueil</span>
+    </a>
+    <a (click)="onNavClick()" routerLink="/faq" routerLinkActive="active" class="mobile-nav-link">
+      <mat-icon>help</mat-icon>
+      <span>FAQ</span>
+    </a>
+    <a (click)="onNavClick()" routerLink="/contact" routerLinkActive="active" class="mobile-nav-link">
+      <mat-icon>contact_support</mat-icon>
+      <span>Contact</span>
+    </a>
+    <a (click)="onNavClick()" routerLink="/a-propos" routerLinkActive="active" class="mobile-nav-link">
+      <mat-icon>info</mat-icon>
+      <span>À propos</span>
+    </a>
+
+    <div class="mobile-divider"></div>
+
+    <!-- Bloc utilisateur en mobile -->
+    <ng-container *ngIf="loggedIn; else mobileGuest">
+      <div class="mobile-user">
+        <div class="user-avatar">
+          <ng-container *ngIf="avatarSrc; else mobileInitials">
+            <img [src]="avatarSrc" alt="Avatar" class="avatar-img" />
+          </ng-container>
+          <ng-template #mobileInitials>
+            <span class="avatar-fallback">{{ initials }}</span>
+          </ng-template>
+        </div>
+        <div class="user-info">
+          <div class="user-name">
+            {{ user?.prenomUtilisateur || user?.email || 'Mon compte' }}
+          </div>
+          <div class="user-role">{{ getUserRoleText(user?.role) }}</div>
+        </div>
+      </div>
+
+      <a (click)="goToAccount()" class="mobile-nav-link account-link">
+        <mat-icon>account_circle</mat-icon>
+        <span>Mon espace</span>
+      </a>
+      <a (click)="logout()" class="mobile-nav-link logout-link">
+        <mat-icon>logout</mat-icon>
+        <span>Déconnexion</span>
+      </a>
+    </ng-container>
+
+    <ng-template #mobileGuest>
+      <a (click)="onNavClick()" class="mobile-nav-link login-mobile" routerLink="/login">
+        <mat-icon>login</mat-icon>
+        <span>Connexion</span>
+      </a>
+      <a (click)="onNavClick()" class="mobile-nav-link register-link" routerLink="/register">
+        <mat-icon>person_add</mat-icon>
+        <span>Inscription</span>
+      </a>
+    </ng-template>
+  </div>
+</nav>

@@ -1,67 +1,232 @@
-<!-- ✅ Encapsule le formulaire dans une grille responsive -->
 <section class="hero-carousel">
   <app-annonces-public></app-annonces-public>
 </section>
 
-<div class="header-profil">
+<div class="profil-page">
   <div class="profil-container">
-    <h2>👤 Mon profil</h2>
+    <!-- En-tête du profil -->
+    <div class="profil-header">
+      <div class="header-content">
+        <h1 class="main-title">👤 Mon Profil</h1>
+        <p class="subtitle">Gérez vos informations personnelles et suivez votre fidélité</p>
+      </div>
 
-    <div class="profil-fidelity">
-      <div>
-        <button mat-stroked-button color="accent" (click)="toggleAffichage()">
-          {{ afficherProfil ? 'Masquer' : 'Voir' }} le détail
-        </button>
-      </div>
-      <div class="fidelity-info" *ngIf="fidelityStars">
-        <span class="stars">{{ fidelityStars }}</span>
-        <span *ngIf="isFidele" class="badge">🎖 Fidèle</span>
-        <p class="subtext">Vous avez effectué {{ depotCount }} dépôts validés.</p>
-      </div>
+      <button mat-stroked-button color="primary" (click)="toggleAffichage()" class="toggle-btn">
+        <mat-icon>{{ afficherProfil ? 'visibility_off' : 'visibility' }}</mat-icon>
+        {{ afficherProfil ? 'Masquer' : 'Voir' }} le profil
+      </button>
     </div>
 
-    <form *ngIf="afficherProfil" (ngSubmit)="modifierProfil()" class="profil-form">
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Nom</mat-label>
-        <input matInput [(ngModel)]="user.nomUtilisateur" name="nomUtilisateur" />
-      </mat-form-field>
+    <!-- Carte de fidélité -->
+    <mat-card class="fidelity-card" *ngIf="fidelityStars || loadingFidelity">
+      <div class="card-header">
+        <mat-icon class="card-icon">loyalty</mat-icon>
+        <h3>Programme de Fidélité</h3>
+      </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Prénom</mat-label>
-        <input matInput [(ngModel)]="user.prenomUtilisateur" name="prenomUtilisateur" />
-      </mat-form-field>
+      <div class="card-content">
+        <div *ngIf="loadingFidelity" class="loading-fidelity">
+          <mat-progress-spinner diameter="40" mode="indeterminate"></mat-progress-spinner>
+          <span>Chargement de votre fidélité...</span>
+        </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>Numéro</mat-label>
-        <input matInput [(ngModel)]="user.numeroUtilisateur" name="numeroUtilisateur" />
-      </mat-form-field>
+        <div *ngIf="!loadingFidelity" class="fidelity-content">
+          <div class="stars-display">
+            <div class="stars-container">
+              <span class="stars">{{ fidelityStars }}</span>
+              <span class="stars-empty">★</span>
+            </div>
+            <span class="fidelity-level">Niveau {{ fidelityLevel }}/5</span>
+          </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>ID 1XBET</mat-label>
-        <input matInput [(ngModel)]="user.id_1XBET" name="id_1XBET" />
-      </mat-form-field>
+          <div class="fidelity-stats">
+            <div class="stat-item">
+              <mat-icon>payments</mat-icon>
+              <div class="stat-content">
+                <span class="stat-value">{{ depotCount }}</span>
+                <span class="stat-label">Dépôts validés</span>
+              </div>
+            </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>ID BETWINNER</mat-label>
-        <input matInput [(ngModel)]="user.id_BETWINNER" name="id_BETWINNER" />
-      </mat-form-field>
+            <div class="stat-item">
+              <mat-icon>trending_up</mat-icon>
+              <div class="stat-content">
+                <span class="stat-value">{{ getNextLevelDepots() }}</span>
+                <span class="stat-label">Dépôts jusqu'au niveau {{ fidelityLevel + 1 }}</span>
+              </div>
+            </div>
+          </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>ID MELBET</mat-label>
-        <input matInput [(ngModel)]="user.id_MELBET" name="id_MELBET" />
-      </mat-form-field>
+          <!-- Barre de progression -->
+          <div class="progress-section">
+            <div class="progress-label">
+              <span>Progression vers le niveau {{ fidelityLevel + 1 }}</span>
+              <span>{{ getFidelityProgress().toFixed(0) }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getFidelityProgress()"></div>
+            </div>
+          </div>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>ID 1WIN</mat-label>
-        <input matInput [(ngModel)]="user.id_1WIN" name="id_1WIN" />
-      </mat-form-field>
+          <div *ngIf="isFidele" class="fidelity-badge">
+            <mat-icon>verified</mat-icon>
+            <span>🎖 Client Fidèle - Niveau Maximum Atteint !</span>
+          </div>
+        </div>
+      </div>
+    </mat-card>
 
-      <mat-form-field appearance="fill" class="full-width">
-        <mat-label>ID 888STARZ</mat-label>
-        <input matInput [(ngModel)]="user.id_888STARZ" name="id_888STARZ" />
-      </mat-form-field>
+    <!-- Formulaire de profil -->
+    <mat-card *ngIf="afficherProfil" class="profil-form-card">
+      <div class="card-header">
+        <mat-icon class="card-icon">edit</mat-icon>
+        <h3>Modifier mes informations</h3>
+      </div>
 
-      <button mat-raised-button color="primary" type="submit">Modifier</button>
-    </form>
+      <form (ngSubmit)="modifierProfil()" class="profil-form">
+        <!-- Informations personnelles -->
+        <section class="form-section">
+          <h4 class="section-title">
+            <mat-icon>person</mat-icon>
+            Informations Personnelles
+          </h4>
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nom</mat-label>
+              <input
+                matInput
+                [(ngModel)]="user.nomUtilisateur"
+                name="nomUtilisateur"
+                required
+                placeholder="Votre nom"
+              />
+              <mat-icon matPrefix>badge</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Prénom</mat-label>
+              <input
+                matInput
+                [(ngModel)]="user.prenomUtilisateur"
+                name="prenomUtilisateur"
+                required
+                placeholder="Votre prénom"
+              />
+              <mat-icon matPrefix>person</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>📱 Numéro de téléphone</mat-label>
+            <input
+              matInput
+              [(ngModel)]="user.numeroUtilisateur"
+              name="numeroUtilisateur"
+              required
+              placeholder="Votre numéro"
+            />
+            <mat-icon matPrefix>phone</mat-icon>
+            <mat-hint>Format: XXXXXXXX ou +226XXXXXXXX</mat-hint>
+          </mat-form-field>
+        </section>
+
+        <!-- Identifiants de plateforme -->
+        <section class="form-section">
+          <h4 class="section-title">
+            <mat-icon>casino</mat-icon>
+            Identifiants de Plateforme
+            <span class="optional-badge">Facultatif</span>
+          </h4>
+          <p class="section-description">Synchronisez vos comptes de paris sportifs</p>
+
+          <div class="platforms-grid">
+            <mat-form-field appearance="outline" class="platform-field">
+              <mat-label>
+                <img src="assets/images/1XBET.png" alt="1XBET" class="platform-logo" />
+                ID 1XBET
+              </mat-label>
+              <input matInput [(ngModel)]="user.id_1XBET" name="id_1XBET" />
+              <mat-icon matPrefix>sports_esports</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="platform-field">
+              <mat-label>
+                <img src="assets/images/BETWINNER.png" alt="BETWINNER" class="platform-logo" />
+                ID BETWINNER
+              </mat-label>
+              <input matInput [(ngModel)]="user.id_BETWINNER" name="id_BETWINNER" />
+              <mat-icon matPrefix>sports_esports</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="platform-field">
+              <mat-label>
+                <img src="assets/images/MELBET.png" alt="MELBET" class="platform-logo" />
+                ID MELBET
+              </mat-label>
+              <input matInput [(ngModel)]="user.id_MELBET" name="id_MELBET" />
+              <mat-icon matPrefix>sports_esports</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="platform-field">
+              <mat-label>
+                <span class="platform-text">1WIN</span>
+              </mat-label>
+              <input matInput [(ngModel)]="user.id_1WIN" name="id_1WIN" />
+              <mat-icon matPrefix>sports_esports</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="platform-field">
+              <mat-label>
+                <span class="platform-text">888STARZ</span>
+              </mat-label>
+              <input matInput [(ngModel)]="user.id_888STARZ" name="id_888STARZ" />
+              <mat-icon matPrefix>sports_esports</mat-icon>
+            </mat-form-field>
+          </div>
+        </section>
+
+        <!-- Boutons d'action -->
+        <div class="form-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="saving"
+            class="submit-btn"
+          >
+            <div class="button-content">
+              <mat-progress-spinner
+                *ngIf="saving"
+                diameter="20"
+                mode="indeterminate"
+                color="accent"
+                class="spinner"
+              ></mat-progress-spinner>
+              <mat-icon *ngIf="!saving" class="btn-icon">save</mat-icon>
+              <span class="btn-text">
+                {{ saving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+              </span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Information -->
+        <div class="form-info">
+          <mat-icon>info</mat-icon>
+          <p>
+            <strong>Note :</strong> Si vous modifiez votre numéro, votre fidélité sera recalculée
+            à partir des dépôts validés associés à votre nouveau numéro.
+          </p>
+        </div>
+      </form>
+    </mat-card>
+
+    <!-- Message si profil masqué -->
+    <div *ngIf="!afficherProfil" class="profile-hidden">
+      <mat-icon class="hidden-icon">visibility_off</mat-icon>
+      <h3>Profil masqué</h3>
+      <p>Cliquez sur "Voir le profil" pour afficher et modifier vos informations</p>
+    </div>
   </div>
 </div>

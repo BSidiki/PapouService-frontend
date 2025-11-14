@@ -1,132 +1,323 @@
+// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500&family=Roboto:wght@400;500&display=swap');
+
 .a-propos-container {
-  max-width: 80%;
-  margin: 2rem auto;
-  padding: 2rem;
+  max-width: 1200px;
+  margin: 1rem auto;
+  padding: 1rem;
   font-family: 'Roboto', 'Open Sans', sans-serif;
   background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 
-  h2 {
+  // Bannière
+  .banner {
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+
+    img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+    }
+  }
+
+  // Titres
+  .main-title {
     text-align: center;
     color: #991f23;
     font-family: 'Montserrat', sans-serif;
     font-weight: bold;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin-bottom: 2rem;
+    line-height: 1.2;
   }
 
-  h3 {
-    margin-top: 1.5rem;
-    color: #00adef;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    font-size: 1.2rem;
+  .section-title {
+    text-align: center;
+    color: #991f23;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: 2rem;
   }
 
-  p, ul {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #444;
+  // Contenu principal
+  .main-content {
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+
+      @media (min-width: 768px) {
+        grid-template-columns: 2fr 1fr;
+        align-items: start;
+      }
+    }
+
+    .text-content {
+      p {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #444;
+        margin-bottom: 1.5rem;
+        text-align: justify;
+
+        &.intro-text {
+          font-size: 1.1rem;
+          color: #333;
+        }
+
+        strong {
+          color: #991f23;
+          font-weight: 600;
+        }
+      }
+    }
   }
 
-  a {
-    color: #00adef;
-    font-weight: 500;
-    text-decoration: none;
+  // Photo d'équipe
+  .team-section {
+    .team-photo {
+      text-align: center;
+      margin: 0;
+
+      img {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+        }
+      }
+
+      .caption {
+        font-style: italic;
+        margin-top: 1rem;
+        color: #666;
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.95rem;
+      }
+    }
+  }
+
+  // Séparateurs
+  .section-divider {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00adef, transparent);
+    margin: 3rem 0;
+  }
+
+  // Cartes d'information
+  .info-grid, .partners-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .info-card, .partner-card {
+    background: linear-gradient(135deg, #f8fdff 0%, #e3f7fb 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 173, 239, 0.1);
+    border: 1px solid #e1f5fe;
+    transition: all 0.3s ease;
+    text-align: center;
 
     &:hover {
-      text-decoration: underline;
-      color: #008bc1;
-    }
-  }
-
-  ul {
-    list-style: disc;
-    padding-left: 1.5rem;
-    li {
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  .banner img {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-
-  .team-photo {
-    text-align: center;
-    margin: 2rem 0;
-
-    img {
-      max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 173, 239, 0.15);
     }
 
-    .caption {
-      font-style: italic;
-      margin-top: 0.5rem;
-      color: #777;
-      font-family: 'Poppins', sans-serif;
-    }
-  }
-
-  .info-emplacement {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding: 1rem;
-    border-radius: 8px;
-    background-color: #e3f7fb;
-
-    .partie {
-      flex: 1 1 180px;
-      padding: 1rem;
-      background-color: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-      text-align: center;
-
-      h3 {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-      }
-
-      img.logo-img {
-        width: 80px;
-        margin-bottom: 0.5rem;
-      }
-
-      p {
-        margin: 0.2rem 0;
-      }
-    }
-  }
-
-  // Responsive adjustments
-  @media (max-width: 768px) {
-    .info-emplacement {
-      flex-direction: column;
-      align-items: center;
-
-      .partie {
-        width: 100%;
-        max-width: 100%;
-      }
-    }
-
-    h2 {
-      font-size: 1.6rem;
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
 
     h3 {
+      color: #00adef;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  // Contacts
+  .contact-info, .partner-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #00adef;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    background: rgba(0, 173, 239, 0.05);
+
+    &:hover {
+      background: rgba(0, 173, 239, 0.1);
+      text-decoration: none;
+      color: #008bc1;
+    }
+
+    &.whatsapp {
+      background: rgba(37, 211, 102, 0.1);
+      color: #25d366;
+
+      &:hover {
+        background: rgba(37, 211, 102, 0.2);
+      }
+    }
+
+    .icon {
       font-size: 1.1rem;
     }
+  }
+
+  // Code promo
+  .promo-code {
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: linear-gradient(135deg, #991f23, #c82333);
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+
+    strong {
+      font-size: 1.1rem;
+      margin-left: 0.5rem;
+    }
+  }
+
+  // Liste des localisations
+  .location-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .location-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+  }
+
+  // Partenaires
+  .partners-section {
+    .partner-card {
+      .partner-logo {
+        margin-bottom: 1rem;
+
+        img {
+          width: 120px;
+          height: 60px;
+          object-fit: contain;
+          transition: transform 0.3s ease;
+
+          &:hover {
+            transform: scale(1.05);
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    margin: 0.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+
+    .banner img {
+      height: 200px;
+    }
+
+    .info-grid, .partners-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .content-grid {
+      gap: 1.5rem;
+    }
+
+    .team-photo img {
+      max-width: 100%;
+    }
+
+    .contact-link {
+      font-size: 0.9rem;
+      padding: 0.8rem;
+    }
+
+    .info-card, .partner-card {
+      padding: 1.2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.8rem;
+
+    .main-title {
+      font-size: 1.6rem;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+    }
+
+    .text-content p {
+      font-size: 0.95rem;
+      text-align: left;
+    }
+
+    .banner img {
+      height: 150px;
+    }
+
+    .contact-link {
+      font-size: 0.85rem;
+    }
+  }
+
+  // Animations
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .info-card, .partner-card, .team-photo {
+    animation: fadeInUp 0.6s ease-out;
   }
 }

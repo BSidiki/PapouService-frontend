@@ -1,214 +1,505 @@
-@use 'sass:color';
+// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500;600&family=Roboto:wght@400;500&display=swap');
+
+.depot-page {
+  background: linear-gradient(135deg, #f8fdff 0%, #e3f7fb 100%);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
 .depot-container {
-  max-width: 100%;
-  margin: 2rem auto;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// En-tête
+.depot-header {
+  text-align: center;
+  margin-bottom: 2rem;
   padding: 2rem;
-  border-radius: 12px;
-  background: url('/assets/images/bac2.png') no-repeat center;
-  background-size: cover;
-  box-shadow: 0 4px 16px rgba(0, 173, 239, 0.2);
-  font-family: 'Roboto', sans-serif;
-  color: #333;
+  background: linear-gradient(135deg, #991f23, #c82333);
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 8px 32px rgba(153, 31, 35, 0.2);
 
-  form {
-    border-radius: 12px;
-    border: 2px solid #00adef;
-    width: 60%;
-    margin-left: 10%;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 1.5rem;
-  }
-
-  .page-depot {
-    display: flex;
-
-    .page-depot2 {
-      width: 50%;
-      margin-left: auto;
-      background-color: #00adef;
-    }
-  }
-
-  h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 1.8rem;
+  .main-title {
     font-family: 'Montserrat', sans-serif;
     font-weight: bold;
-    color: #991f23;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-    background: rgba(255, 255, 255, 0.9);
-    padding: 0.8rem;
-    border-radius: 8px;
-    border: 2px solid #991f23;
-    transition: transform 0.3s ease;
-  }
-
-  .full-width {
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-    padding: 0.5rem;
-  }
-
-  .numero-container {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease;
-
-    .indicatif {
-      width: 25%;
-    }
-
-    .numero {
-      width: 75%;
-    }
-  }
-
-  .file-zone {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    margin: 0 0 1rem 0;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    .title-icon {
+      font-size: 2.5rem;
+    }
+  }
+
+  .subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    margin: 0;
+    opacity: 0.9;
+  }
+}
+
+// Contenu principal
+.depot-content {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+// Carte formulaire
+.depot-form-card {
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1f5fe;
+  overflow: hidden;
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #00adef, #008bc1);
+    color: white;
+
+    .card-icon {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin: 0;
+    }
+  }
+}
+
+.depot-form {
+  padding: 2rem;
+
+  .alert-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border: 1px solid #ff9800;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+
+    mat-icon {
+      color: #f57c00;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .alert-content {
+      h3 {
+        color: #e65100;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+      }
+
+      p {
+        color: #666;
+        font-family: 'Roboto', sans-serif;
+        margin: 0 0 1rem 0;
+      }
+
+      .profile-btn {
+        border-radius: 8px;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 500;
+
+        mat-icon {
+          font-size: 1.2rem;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(0, 173, 239, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(0, 173, 239, 0.2);
+    margin-bottom: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+
+    mat-icon {
+      color: #00adef;
+    }
+
+    strong {
+      color: #991f23;
+    }
+  }
+}
+
+// Grille formulaire
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.phone-group {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Personnalisation des champs Material
+::ng-deep {
+  .mat-form-field {
+    .mat-form-field-outline {
+      border-radius: 12px;
+    }
+
+    .mat-form-field-appearance-outline .mat-form-field-outline-thick {
+      color: #00adef;
+    }
+
+    .mat-form-field.mat-focused .mat-form-field-label {
+      color: #991f23;
+    }
+
+    .mat-input-element {
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .mat-form-field-label {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+    }
+
+    mat-icon {
+      color: #00adef;
+    }
+  }
+
+  .mat-select-panel {
+    border-radius: 12px !important;
+  }
+}
+
+// Options personnalisées
+.platform-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+
+  .platform-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    object-fit: contain;
+  }
+
+  span {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+  }
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  mat-icon {
+    color: #00adef;
+    font-size: 1.2rem;
+  }
+
+  span {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+  }
+}
+
+// Actions de paiement
+.payment-actions {
+  margin: 2rem 0;
+
+  .ussd-action,
+  .app-action {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8fdff, #e3f7fb);
+    border-radius: 12px;
+    border: 2px solid #00adef;
+
+    .action-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      mat-icon {
+        color: #00adef;
+        font-size: 1.5rem;
+      }
+
+      h4 {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold;
+        color: #991f23;
+        margin: 0;
+        font-size: 1.1rem;
+      }
+    }
+
+    p {
+      color: #666;
+      font-family: 'Roboto', sans-serif;
+      margin: 0 0 1rem 0;
+    }
+
+    .action-btn {
+      border-radius: 10px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+
+      mat-icon {
+        margin-right: 0.5rem;
+      }
+    }
+
+    .action-hint {
+      font-size: 0.9rem;
+      color: #666;
+      font-family: 'Poppins', sans-serif;
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+  }
+}
+
+// Upload de fichier
+.file-upload-section {
+  margin: 2rem 0;
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #991f23;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: bold;
+    font-size: 1.2rem;
     margin-bottom: 1rem;
-    font-size: 0.95rem;
-    color: #555;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    border: 2px dashed #ccc;
-    transition: border-color 0.3s ease;
+
+    mat-icon {
+      color: #00adef;
+    }
+  }
+
+  .file-upload-zone {
+    border: 2px dashed #00adef;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: rgba(0, 173, 239, 0.02);
+
+    &.has-file {
+      border-style: solid;
+      background: rgba(0, 173, 239, 0.05);
+    }
 
     &:hover {
-      border-color: #00adef;
-    }
-
-    &:focus-within {
-      border-color: #00adef;
-      box-shadow: 0 0 0 2px rgba(0, 173, 239, 0.3);
-    }
-
-    .file-label {
-      background-color: #00adef;
-      color: white;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      text-align: center;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        // background-color: darken(#00adef, 10%);
-        background-color: color.adjust(#00adef, $lightness: -10%);
-      }
+      background: rgba(0, 173, 239, 0.05);
     }
 
     .file-input {
       display: none;
     }
-  }
 
-  button {
-    width: 100%;
-    background-color: #00adef;
-    color: white;
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 0.75rem;
-    margin-top: 1rem;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #008cbf;
-    }
-
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-  }
-
-  .instruction {
-    font-size: 0.9rem;
-    color: #444;
-    font-family: 'Poppins', sans-serif;
-  }
-
-  .depot-success {
-    text-align: center;
-    margin-top: 1rem;
-    color: #2e7d32;
-    font-weight: bold;
-  }
-
-  .ussd-block {
-    text-align: center;
-    margin-top: 2rem;
-
-    p {
-      font-size: 1rem;
-      font-weight: bold;
-      color: #1976d2;
-      background: #e3f2fd;
-      padding: 0.7rem 1rem;
-      border-radius: 8px;
-      border: 2px solid #1976d2;
-      transition: transform 0.2s ease;
-
-      &:hover {
-        transform: scale(1.03);
-      }
-    }
-  }
-
-  .tel-button {
-    display: inline-block;
-    background-color: #991f23;
-    color: white;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #7e191d;
-    }
-  }
-
-  @media (max-width: 768px) {
-    form {
-      width: 90%;
-      margin-left: 0;
-      margin-bottom: 1.5rem;
-    }
-
-    .page-depot {
-      flex-direction: column;
-
-      .page-depot2 {
-        width: 100%;
-        margin-left: 0;
-        margin-top: 1rem;
-      }
-    }
-
-    .numero-container {
+    .file-label {
+      cursor: pointer;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
 
-      .indicatif,
-      .numero {
-        width: 100%;
+      .upload-icon {
+        font-size: 3rem;
+        color: #00adef;
+      }
+
+      .upload-text {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #991f23;
+      }
+
+      .upload-hint {
+        color: #666;
+        font-family: 'Roboto', sans-serif;
+        font-size: 0.9rem;
       }
     }
 
-    h2 {
-      font-size: 1.5rem;
-      padding: 0.5rem;
+    .file-preview {
+      position: relative;
+      margin-top: 1rem;
+      display: inline-block;
+
+      .preview-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .remove-btn {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #f44336;
+        color: white;
+
+        &:hover {
+          background: #d32f2f;
+        }
+      }
+    }
+  }
+}
+
+// Bouton de soumission
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #991f23, #c82333);
+  color: white;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(153, 31, 35, 0.3);
+  }
+
+  &:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  .spinner {
+    margin: 0;
+  }
+
+  .btn-icon {
+    margin-right: 0.5rem;
+  }
+}
+
+// Section matchs
+.matchs-section {
+  @media (max-width: 1024px) {
+    order: -1;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .depot-page {
+    padding: 0.5rem;
+  }
+
+  .depot-header {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+
+  .depot-form-card {
+    .card-header {
+      padding: 1.25rem 1.5rem;
     }
   }
 
+  .depot-form {
+    padding: 1.5rem;
+  }
+
+  .payment-actions {
+    .ussd-action,
+    .app-action {
+      padding: 1.25rem;
+    }
+  }
+
+  .file-upload-zone {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .depot-form {
+    padding: 1rem;
+  }
+
+  .phone-group {
+    grid-template-columns: 1fr;
+  }
+
+  .file-preview .preview-image {
+    max-width: 150px;
+    max-height: 150px;
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.depot-form-card {
+  animation: fadeInUp 0.6s ease-out;
 }

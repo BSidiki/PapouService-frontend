@@ -1,62 +1,267 @@
-<mat-card>
-  <!-- <span class="logo" routerLink="/accueil">
-    <img src="assets/images/logo.png" alt="PapouService Logo" class="logo-img"/>
-  </span> -->
-  <h2>👤 Administrateurs</h2>
-
-  <form [formGroup]="form" (ngSubmit)="ajouterAdmin()" class="admin-form">
-    <mat-form-field appearance="outline">
-      <mat-label>Nom</mat-label>
-      <input matInput formControlName="nomUtilisateur" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Prénom</mat-label>
-      <input matInput formControlName="prenomUtilisateur" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Numéro</mat-label>
-      <input matInput formControlName="numeroUtilisateur" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Mot de passe</mat-label>
-      <input matInput type="password" formControlName="password" />
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" type="submit">Ajouter</button>
-  </form>
-</mat-card>
-
-<mat-card>
-  <h3>Liste des administrateurs</h3>
-  <table mat-table [dataSource]="admins" class="mat-elevation-z2">
-    <ng-container matColumnDef="nom">
-      <th mat-header-cell *matHeaderCellDef>Nom</th>
-      <td mat-cell *matCellDef="let admin">{{ admin.nomUtilisateur }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="prenom">
-      <th mat-header-cell *matHeaderCellDef>Prénom</th>
-      <td mat-cell *matCellDef="let admin">{{ admin.prenomUtilisateur }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="numero">
-      <th mat-header-cell *matHeaderCellDef>Numéro</th>
-      <td mat-cell *matCellDef="let admin">{{ admin.numeroUtilisateur }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Actions</th>
-      <td mat-cell *matCellDef="let admin">
-        <button mat-icon-button color="warn" (click)="supprimer(admin.idUtilisateur)">
-          <mat-icon>delete</mat-icon>
+<div class="admin-administrateurs">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-content">
+      <h2>👤 Gestion des Administrateurs</h2>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="loadAdmins()" [disabled]="loadingList" class="refresh-btn">
+          <mat-icon>refresh</mat-icon>
+          {{ loadingList ? 'Actualisation...' : 'Actualiser' }}
         </button>
-      </td>
-    </ng-container>
+      </div>
+    </div>
+    <p class="subtitle">Ajouter et gérer les comptes administrateurs</p>
+  </div>
 
-    <tr mat-header-row *matHeaderRowDef="['nom', 'prenom', 'numero', 'actions']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['nom', 'prenom', 'numero', 'actions'];"></tr>
-  </table>
-</mat-card>
+  <!-- Stats Cards -->
+  <div class="stats-cards" *ngIf="!loadingList">
+    <div class="stat-card primary">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ admins.data.length }}</div>
+        <div class="stat-label">Administrateurs</div>
+      </div>
+    </div>
+    <div class="stat-card accent">
+      <div class="stat-icon">🔄</div>
+      <div class="stat-content">
+        <div class="stat-value">{{ getActiveAdmins() }}</div>
+        <div class="stat-label">Actifs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Admin Form -->
+  <div class="form-section">
+    <mat-card class="form-card">
+      <div class="card-header">
+        <h3>➕ Ajouter un Administrateur</h3>
+        <span class="form-subtitle">Créez un nouveau compte administrateur</span>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="ajouterAdmin()" class="admin-form">
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Prénom</mat-label>
+            <input matInput formControlName="prenomUtilisateur" placeholder="Ex: Jean" />
+            <mat-icon matSuffix>person</mat-icon>
+            <mat-error *ngIf="f['prenomUtilisateur'].hasError('required')">
+              Le prénom est requis
+            </mat-error>
+            <mat-error *ngIf="f['prenomUtilisateur'].hasError('minlength')">
+              Minimum 2 caractères
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Nom</mat-label>
+            <input matInput formControlName="nomUtilisateur" placeholder="Ex: Dupont" />
+            <mat-icon matSuffix>badge</mat-icon>
+            <mat-error *ngIf="f['nomUtilisateur'].hasError('required')">
+              Le nom est requis
+            </mat-error>
+            <mat-error *ngIf="f['nomUtilisateur'].hasError('minlength')">
+              Minimum 2 caractères
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Numéro de téléphone</mat-label>
+            <input matInput formControlName="numeroUtilisateur" placeholder="Ex: +22670123456" />
+            <mat-icon matSuffix>phone</mat-icon>
+            <mat-error *ngIf="f['numeroUtilisateur'].hasError('required')">
+              Le numéro est requis
+            </mat-error>
+            <mat-error *ngIf="f['numeroUtilisateur'].hasError('pattern')">
+              Format: +226XXXXXXXX ou 7XXXXXXXX
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Mot de passe</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Minimum 6 caractères" />
+            <mat-icon matSuffix>lock</mat-icon>
+            <mat-error *ngIf="f['password'].hasError('required')">
+              Le mot de passe est requis
+            </mat-error>
+            <mat-error *ngIf="f['password'].hasError('minlength')">
+              Minimum 6 caractères
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="resetForm()" class="reset-btn">
+            <mat-icon>clear</mat-icon>
+            Réinitialiser
+          </button>
+          <button mat-raised-button
+                  color="primary"
+                  type="submit"
+                  [disabled]="loadingSubmit || form.invalid"
+                  class="submit-btn">
+            <div class="button-content">
+              <mat-progress-spinner
+                *ngIf="loadingSubmit"
+                diameter="20"
+                mode="indeterminate"
+                color="accent">
+              </mat-progress-spinner>
+              <mat-icon *ngIf="!loadingSubmit">person_add</mat-icon>
+              <span>{{ loadingSubmit ? 'Ajout en cours...' : 'Ajouter Administrateur' }}</span>
+            </div>
+          </button>
+        </div>
+      </form>
+    </mat-card>
+  </div>
+
+  <!-- Admins List -->
+  <div class="list-section">
+    <mat-card class="list-card">
+      <div class="list-header">
+        <div class="list-title">
+          <h3>📋 Liste des Administrateurs</h3>
+          <span class="list-subtitle">{{ admins.filteredData.length }} administrateur(s) trouvé(s)</span>
+        </div>
+
+        <div class="list-actions">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Rechercher un administrateur</mat-label>
+            <input matInput
+                   [(ngModel)]="search"
+                   (ngModelChange)="applySearch()"
+                   placeholder="Nom, prénom ou numéro" />
+            <mat-icon matSuffix>search</mat-icon>
+            <button *ngIf="search"
+                    mat-icon-button
+                    matSuffix
+                    aria-label="Effacer"
+                    (click)="search=''; applySearch()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" *ngIf="loadingList">
+        <div class="loading-content">
+          <mat-spinner diameter="40"></mat-spinner>
+          <span>Chargement des administrateurs...</span>
+        </div>
+      </div>
+
+      <!-- Desktop Table -->
+      <div class="table-section" *ngIf="!loadingList && admins.filteredData.length > 0">
+        <div class="desktop-view">
+          <div class="table-container">
+            <table mat-table [dataSource]="admins" matSort class="admins-table">
+
+              <!-- Prénom Column -->
+              <ng-container matColumnDef="prenom">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Prénom</th>
+                <td mat-cell *matCellDef="let admin">
+                  <div class="admin-info">
+                    <span class="admin-name">{{ admin.prenomUtilisateur }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Nom Column -->
+              <ng-container matColumnDef="nom">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Nom</th>
+                <td mat-cell *matCellDef="let admin">
+                  <span class="admin-name">{{ admin.nomUtilisateur }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Numéro Column -->
+              <ng-container matColumnDef="numero">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>Numéro</th>
+                <td mat-cell *matCellDef="let admin" class="phone-cell">
+                  <mat-icon class="phone-icon">phone</mat-icon>
+                  {{ admin.numeroUtilisateur }}
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let admin">
+                  <div class="action-buttons">
+                    <button mat-raised-button
+                            color="warn"
+                            (click)="supprimer(admin.idUtilisateur)"
+                            class="delete-btn"
+                            matTooltip="Supprimer l'administrateur">
+                      <mat-icon>delete</mat-icon>
+                      Supprimer
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="mobile-view">
+          <div *ngFor="let admin of admins.filteredData" class="admin-card">
+            <div class="card-header">
+              <div class="admin-info-mobile">
+                <h4>{{ admin.prenomUtilisateur }} {{ admin.nomUtilisateur }}</h4>
+                <div class="admin-meta">
+                  <span class="phone">
+                    <mat-icon>phone</mat-icon>
+                    {{ admin.numeroUtilisateur }}
+                  </span>
+                </div>
+              </div>
+              <div class="admin-badge">
+                <span class="role-badge">ADMIN</span>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <button mat-stroked-button
+                      color="warn"
+                      (click)="supprimer(admin.idUtilisateur)"
+                      class="delete-btn-mobile">
+                <mat-icon>delete</mat-icon>
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <mat-paginator [pageSize]="10"
+                       [pageSizeOptions]="[5, 10, 25, 50]"
+                       showFirstLastButtons
+                       [length]="admins.filteredData.length"
+                       class="custom-paginator">
+        </mat-paginator>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loadingList && admins.filteredData.length === 0">
+        <div class="empty-icon">👤</div>
+        <h4>Aucun administrateur trouvé</h4>
+        <p *ngIf="search">Aucun administrateur ne correspond à votre recherche</p>
+        <p *ngIf="!search">Aucun administrateur n'a été créé pour le moment</p>
+        <button *ngIf="search"
+                mat-raised-button
+                color="primary"
+                (click)="search=''; applySearch()"
+                class="retry-btn">
+          <mat-icon>refresh</mat-icon>
+          Réinitialiser la recherche
+        </button>
+      </div>
+    </mat-card>
+  </div>
+</div>

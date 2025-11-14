@@ -1,21 +1,144 @@
-<div class="pubs-carousel">
-  <div class="carousel-wrapper" #carousel>
-    <div class="carousel-slide" *ngFor="let pub of pubs; index as i" [title]="pub.titre">
-      <a *ngIf="pub.lien" [href]="pub.lien" target="_blank" rel="noopener noreferrer">
-        <img [src]="toBase64(pub.fichier)" [alt]="pub.titre" />
-      </a>
-      <ng-container *ngIf="!pub.lien">
-        <img [src]="toBase64(pub.fichier)" [alt]="pub.titre" />
-      </ng-container>
+<div class="pubs-carousel"
+     (mouseenter)="onMouseEnter()"
+     (mouseleave)="onMouseLeave()"
+     (touchstart)="onTouchStart($event)"
+     (touchmove)="onTouchMove($event)"
+     (touchend)="onTouchEnd()"
+     tabindex="0"
+     aria-label="Carousel de publicités">
+
+  <div class="carousel-status" *ngIf="pubs.length > 1">
+    <span class="status-text">{{ (currentIndex + 1) }} / {{ pubs.length }}</span>
+    <div class="pause-indicator" [class.active]="isPaused">
+      <span class="pause-icon">⏸</span>
     </div>
   </div>
 
-  <div class="dots" *ngIf="pubs.length > 1">
-    <span
-      class="dot"
-      *ngFor="let pub of pubs; index as i"
-      [class.active]="i === currentIndex"
-      (click)="scrollTo(i)">
-    </span>
+  <div class="carousel-controls" *ngIf="pubs.length > 1">
+    <button class="control-btn prev" (click)="previousSlide()" aria-label="Publicité précédente">
+      <span class="control-icon">‹</span>
+    </button>
+    <button class="control-btn next" (click)="nextSlide()" aria-label="Publicité suivante">
+      <span class="control-icon">›</span>
+    </button>
+  </div>
+
+  <div class="carousel-wrapper" #carousel>
+    <div class="carousel-track">
+      <div class="carousel-slide"
+           *ngFor="let pub of pubs; index as i"
+           [attr.data-index]="i"
+           [class.active]="i === currentIndex">
+
+        <a *ngIf="pub.lien"
+           [href]="pub.lien"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="pub-link"
+           [attr.aria-label]="'Publicité: ' + (pub.titre || 'Sans titre')"
+           (click)="openZoom(pub, $event)">
+          <img [src]="toBase64(pub.fichier)"
+               [alt]="pub.titre || 'Publicité'"
+               (error)="onImageError($event)"
+               loading="lazy" />
+          <div class="slide-overlay" *ngIf="pub.titre">
+            <h3 class="slide-title">{{ pub.titre }}</h3>
+            <div class="zoom-hint">
+              <mat-icon class="zoom-icon">zoom_in</mat-icon>
+              <span>Cliquer pour zoomer</span>
+            </div>
+          </div>
+        </a>
+
+        <div *ngIf="!pub.lien"
+             class="pub-static"
+             (click)="openZoom(pub, $event)"
+             tabindex="0"
+             role="button"
+             [attr.aria-label]="'Voir la publicité: ' + (pub.titre || 'Sans titre')">
+          <img [src]="toBase64(pub.fichier)"
+               [alt]="pub.titre || 'Publicité'"
+               (error)="onImageError($event)"
+               loading="lazy" />
+          <div class="slide-overlay" *ngIf="pub.titre">
+            <h3 class="slide-title">{{ pub.titre }}</h3>
+            <div class="zoom-hint">
+              <mat-icon class="zoom-icon">zoom_in</mat-icon>
+              <span>Cliquer pour zoomer</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="carousel-indicators" *ngIf="pubs.length > 1">
+    <button *ngFor="let _ of pubs; index as i"
+            class="indicator"
+            [class.active]="i === currentIndex"
+            (click)="scrollTo(i)"
+            [attr.aria-label]="'Aller à la publicité ' + (i + 1)"
+            [attr.aria-current]="i === currentIndex">
+      <span class="indicator-progress" *ngIf="i === currentIndex && !isPaused"></span>
+    </button>
+  </div>
+
+  <div class="empty-state" *ngIf="pubs.length === 0">
+    <div class="empty-icon">📺</div>
+    <p class="empty-text">Aucune publicité disponible</p>
+  </div>
+</div>
+
+<!-- Modal de zoom -->
+<div class="zoom-modal"
+     [class.visible]="zoomModalVisible"
+     (click)="closeZoom()"
+     role="dialog"
+     aria-label="Visualisation de la publicité"
+     aria-modal="true">
+
+  <div class="zoom-modal-content" (click)="$event.stopPropagation()">
+    <div class="zoom-header">
+      <h3 class="zoom-title">{{ zoomedPub?.titre || 'Publicité' }}</h3>
+      <div class="zoom-actions">
+        <button class="zoom-btn" (click)="zoomOut()" aria-label="Dézoomer"><mat-icon>zoom_out</mat-icon></button>
+        <span class="zoom-level">{{ (zoomLevel * 100).toFixed(0) }}%</span>
+        <button class="zoom-btn" (click)="zoomIn()" aria-label="Zoomer"><mat-icon>zoom_in</mat-icon></button>
+        <button class="zoom-btn" (click)="resetZoom()" aria-label="Réinitialiser le zoom"><mat-icon>refresh</mat-icon></button>
+        <button class="zoom-btn close-btn" (click)="closeZoom()" aria-label="Fermer"><mat-icon>close</mat-icon></button>
+      </div>
+    </div>
+
+    <div class="zoom-body">
+      <div class="zoom-navigation">
+        <button class="nav-btn prev" (click)="previousPub()" aria-label="Publicité précédente"><mat-icon>chevron_left</mat-icon></button>
+
+        <div class="zoom-image-container">
+          <img #zoomImage
+               [src]="toBase64(zoomedPub?.fichier)"
+               [alt]="zoomedPub?.titre || 'Publicité'"
+               class="zoom-image"
+               [style.transform]="'translate(' + zoomPosition.x + 'px,' + zoomPosition.y + 'px) scale(' + zoomLevel + ')'"
+               (mousedown)="onZoomImageMouseDown($event)"
+               (mousemove)="onZoomImageMouseMove($event)"
+               (mouseup)="onZoomImageMouseUp()"
+               (mouseleave)="onZoomImageMouseUp()"
+               (touchstart)="onZoomImageTouchStart($event)"
+               (touchmove)="onZoomImageTouchMove($event)"
+               (touchend)="onZoomImageTouchEnd()"
+               draggable="false" />
+        </div>
+
+        <button class="nav-btn next" (click)="nextPub()" aria-label="Publicité suivante"><mat-icon>chevron_right</mat-icon></button>
+      </div>
+    </div>
+
+    <div class="zoom-footer">
+      <div class="zoom-info">
+        <span class="pub-counter" *ngIf="pubs.length > 1">{{ getCurrentPubIndex() }} / {{ pubs.length }}</span>
+        <div class="zoom-help"><span class="help-text">🖱️ Glisser pour naviguer • 🔍 Molette pour zoomer • Esc pour fermer</span></div>
+      </div>
+    </div>
   </div>
 </div>
