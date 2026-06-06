@@ -34,11 +34,11 @@ body {
   height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  // Empêche le scroll horizontal
   overflow-x: hidden;
-  // Rendu plus net sur iOS
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  // Empêche l'effet élastique iOS de révéler le fond de l'écran
+  overscroll-behavior: none;
 }
 
 // ══════════════════════════════════════════════
@@ -79,7 +79,17 @@ input[type="submit"],
 input[type="button"] {
   min-height: 44px;
   touch-action: manipulation;
-  // Supprime le délai de 300ms sur mobile
+}
+
+// ══════════════════════════════════════════════
+// iOS : supprime le flash gris/bleu au toucher
+// ══════════════════════════════════════════════
+a, button, [role="button"],
+input, label, select, textarea,
+mat-button, mat-icon-button,
+.mat-mdc-button, .mat-mdc-icon-button,
+.mat-mdc-raised-button, .mat-mdc-stroked-button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 // Mat-icon-button : ne pas forcer 44px sur desktop
