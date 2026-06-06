@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { HttpParams, HttpHeaders } from '@angular/common/http';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeaderPublicComponent } from '../../layout/header-public/header-public.component';
+import { FooterComponent } from "../../layout/footer/footer.component";
+import { UtilisateurService } from '../../services/utilisateur.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -17,18 +20,20 @@ import { HeaderPublicComponent } from '../../layout/header-public/header-public.
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    HeaderPublicComponent
-  ],
+    HeaderPublicComponent,
+    FooterComponent
+],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   user = {
     nomUtilisateur: '',
     prenomUtilisateur: '',
@@ -37,17 +42,34 @@ export class RegisterComponent {
     id_1XBET: '',
     id_BETWINNER: '',
     id_MELBET: '',
-    id_1WIN: '',
     id_888STARZ: ''
   };
-
   confirmPassword = '';
+  codePromoParrain = '';
   hidePassword = true;
   loading = false;
   successMessage = '';
   errorMessage = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  alreadyLoggedIn = false;
+
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private utilisateurService: UtilisateurService,
+    private auth: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    if (this.auth.isLoggedIn()) {
+      this.alreadyLoggedIn = true;
+      return;
+    }
+    const ref = this.route.snapshot.queryParamMap.get('ref');
+    if (ref) {
+      this.codePromoParrain = ref;
+    }
+  }
 
   // Formatage automatique du numéro de téléphone - ASSOUPLI
   onPhoneBlur() {
@@ -133,7 +155,7 @@ export class RegisterComponent {
     // Préparer le numéro pour l'envoi (sans espaces)
     const numeroForBackend = this.user.numeroUtilisateur.replace(/\s+/g, '');
 
-    const body = new HttpParams()
+    let body = new HttpParams()
       .set('nomUtilisateur', this.user.nomUtilisateur.trim())
       .set('prenomUtilisateur', this.user.prenomUtilisateur.trim())
       .set('numeroUtilisateur', numeroForBackend)
@@ -141,12 +163,15 @@ export class RegisterComponent {
       .set('id_1XBET', this.user.id_1XBET.trim())
       .set('id_BETWINNER', this.user.id_BETWINNER.trim())
       .set('id_MELBET', this.user.id_MELBET.trim())
-      .set('id_1WIN', this.user.id_1WIN.trim())
       .set('id_888STARZ', this.user.id_888STARZ.trim());
+
+    if (this.codePromoParrain.trim()) {
+      body = body.set('codePromoParrain', this.codePromoParrain.trim());
+    }
 
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    this.http.post('http://192.168.11.124:8080/utilisateurs', body, { headers }).subscribe({
+    this.utilisateurService.create(body, headers).subscribe({
       next: () => {
         this.successMessage = 'Inscription réussie !';
         this.loading = false;
@@ -161,8 +186,8 @@ export class RegisterComponent {
         } else {
           this.errorMessage = 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.';
         }
-        console.error('Erreur d\'inscription:', err);
       }
     });
   }
 }
+

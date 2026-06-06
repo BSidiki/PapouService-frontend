@@ -9,7 +9,7 @@
         </button>
         <div class="header-title">
           <h2>💰 Historique des Dépôts</h2>
-          <p class="subtitle">Dépôts effectués par le client #{{ clientId }}</p>
+          <p class="subtitle">Dépôts effectués par le client PS-KONGO.DP000{{ clientId }}</p>
         </div>
       </div>
       <div class="header-actions">
@@ -134,7 +134,7 @@
             <th mat-header-cell *matHeaderCellDef>Montant</th>
             <td mat-cell *matCellDef="let depot">
               <div class="amount-cell">
-                <span class="amount">{{ depot.montant | number:'1.0-0' }}</span>
+                <span class="amount">{{ depot.montant | number:'1.0-0':'fr' }}</span>
                 <span class="currency">FCFA</span>
               </div>
             </td>
@@ -314,3 +314,4 @@
     </div>
   </div>
 </div>
+

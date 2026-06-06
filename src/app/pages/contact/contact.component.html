@@ -14,43 +14,43 @@
     <section class="quick-contact-section">
       <h2 class="section-title">Contact Rapide</h2>
       <div class="contact-options-grid">
-        <a href="tel:+22662054327" class="contact-option phone">
+        <a href="tel:04116262" class="contact-option phone">
           <div class="option-icon">
             <mat-icon>call</mat-icon>
           </div>
           <div class="option-content">
             <span class="option-title">Appeler</span>
-            <span class="option-detail">+226 62 05 43 27</span>
+            <span class="option-detail">04116262</span>
           </div>
         </a>
 
-        <a href="mailto:contact&#64;papouservice.com" class="contact-option email">
+        <a href="mailto:mohamedbelem233&#64;gmail.com" class="contact-option email">
           <div class="option-icon">
             <mat-icon>email</mat-icon>
           </div>
           <div class="option-content">
             <span class="option-title">Email</span>
-            <span class="option-detail">contact&#64;papouservice.com</span>
+            <span class="option-detail">mohamedbelem233&#64;gmail.com</span>
           </div>
         </a>
 
-        <a href="https://wa.me/22660417255" target="_blank" rel="noopener" class="contact-option whatsapp">
+        <a href="https://wa.me/22604116262" target="_blank" rel="noopener" class="contact-option whatsapp">
           <div class="option-icon">
             <mat-icon>chat</mat-icon>
           </div>
           <div class="option-content">
             <span class="option-title">WhatsApp</span>
-            <span class="option-detail">+226 60 41 72 55</span>
+            <span class="option-detail">04116262</span>
           </div>
         </a>
 
-        <a href="https://m.me/papouservice" target="_blank" rel="noopener" class="contact-option messenger">
+        <a href="https://www.facebook.com/share/1CUrFyPfAr/" target="_blank" rel="noopener" class="contact-option messenger">
           <div class="option-icon">
             <mat-icon>message</mat-icon>
           </div>
           <div class="option-content">
             <span class="option-title">Messenger</span>
-            <span class="option-detail">&#64;papouservice</span>
+            <span class="option-detail">PapouService</span>
           </div>
         </a>
       </div>
@@ -73,9 +73,9 @@
         <div class="form-row">
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Adresse email</mat-label>
-            <input matInput type="email" [(ngModel)]="contact.email" name="email" required />
+            <input matInput type="email" [(ngModel)]="contact.email" name="email" required email />
             <mat-icon matSuffix>email</mat-icon>
-            <mat-error>Veuillez saisir un email valide</mat-error>
+            <mat-error>Veuillez saisir un email valide (ex: nom&#64;domaine.com)</mat-error>
           </mat-form-field>
         </div>
 
@@ -90,9 +90,10 @@
         </div>
 
         <button mat-raised-button type="submit" class="submit-button"
-                [disabled]="!contact.nom || !contact.email || !contact.message">
-          <mat-icon>send</mat-icon>
-          Envoyer le message
+                [disabled]="loading || !isFormValid()">
+          <mat-progress-spinner *ngIf="loading" diameter="20" mode="indeterminate" color="accent" style="display:inline-block;margin-right:8px"></mat-progress-spinner>
+          <mat-icon *ngIf="!loading">send</mat-icon>
+          {{ loading ? 'Envoi en cours...' : 'Envoyer le message' }}
         </button>
       </form>
 
@@ -115,7 +116,7 @@
           <mat-icon>schedule</mat-icon>
           <div class="info-content">
             <h4>Horaires d'ouverture</h4>
-            <p>Lun - Dim: 8h00 - 22h00</p>
+            <p>24h/24 — 7j/7</p>
           </div>
         </div>
 
@@ -123,7 +124,7 @@
           <mat-icon>location_on</mat-icon>
           <div class="info-content">
             <h4>Réponse rapide</h4>
-            <p>Délai moyen: 2-4 heures</p>
+            <p>Délai moyen: 3 à 5 mn</p>
           </div>
         </div>
 

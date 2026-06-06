@@ -32,8 +32,33 @@
     &.depot   { border-left-color: #4caf50; }
     &.retrait { border-left-color: #e53935; }
 
+    &.priority-client {
+      background: linear-gradient(135deg, #fffbeb 0%, #fff 60%);
+      box-shadow: 0 2px 12px rgba(251, 191, 36, 0.25);
+    }
+
     .header {
       display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem;
+
+      .who {
+        display: flex; align-items: center; flex-wrap: wrap; gap: .4rem;
+      }
+
+      .invite-badge {
+        background: #e0e7ef; color: #374151;
+        padding: 1px 7px; border-radius: 999px; font-size: .7rem; font-weight: 600;
+      }
+
+      .fidelity-priority-badge {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .03em;
+        white-space: nowrap;
+      }
 
       .badge {
         padding: .2rem .6rem; border-radius: 999px; font-size: .75rem; font-weight: 700; color: #fff;

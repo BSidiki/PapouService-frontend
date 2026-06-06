@@ -59,6 +59,7 @@
         [expanded]="expandedAll || expandedId === faq.id"
         (opened)="setExpanded(faq.id)"
         (closed)="setExpanded(null)"
+        [hideToggle]="true"
         class="faq-panel"
       >
         <mat-expansion-panel-header class="faq-header-panel">

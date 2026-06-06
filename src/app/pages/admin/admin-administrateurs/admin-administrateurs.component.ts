@@ -1,5 +1,7 @@
+import { ErrorService } from '../../../services/error.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
+import { UtilisateurService } from '../../../services/utilisateur.service';
 import {
   FormBuilder,
   FormGroup,
@@ -16,17 +18,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
-
-type Utilisateur = {
-  idUtilisateur: number;
-  nomUtilisateur: string;
-  prenomUtilisateur: string;
-  numeroUtilisateur: string;
-  roles?: { name: string }[];
-};
+import { Utilisateur } from '../../../models';
 
 @Component({
   selector: 'app-admin-administrateurs',
@@ -35,7 +31,6 @@ type Utilisateur = {
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    // Material
     MatTableModule,
     MatFormFieldModule,
     MatInputModule,
@@ -44,34 +39,43 @@ type Utilisateur = {
     MatCardModule,
     MatPaginatorModule,
     MatSortModule,
-    MatSnackBarModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
+    MatDialogModule,
   ],
   templateUrl: './admin-administrateurs.component.html',
   styleUrls: ['./admin-administrateurs.component.scss'],
 })
 export class AdminAdministrateursComponent implements OnInit {
-  // TODO: déporter ceci vers environment.ts
-  private readonly API = 'http://192.168.11.124:8080';
-
   admins = new MatTableDataSource<Utilisateur>([]);
   displayedColumns = ['nom', 'prenom', 'numero', 'actions'];
 
-  // UI state
   loadingList = false;
   loadingSubmit = false;
   search = '';
 
   form: FormGroup;
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  // Edit mode
+  editingAdmin: Utilisateur | null = null;
+  editForm: FormGroup;
+
+  // Password change
+  passwordAdminId: number | null = null;
+  passwordForm: FormGroup;
+  savingPassword = false;
+
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginatorRef(p: MatPaginator) {
+    if (p) {
+      this.admins.paginator = p;
+      this.admins.sort = this.sort;
+    }
+  }
 
   constructor(
-    private http: HttpClient,
-    private fb: FormBuilder,
-    private snack: MatSnackBar
-  ) {
+    private utilisateurService: UtilisateurService,
+    private fb: FormBuilder, private errorService: ErrorService) {
     this.form = this.fb.group({
       nomUtilisateur: ['', [Validators.required, Validators.minLength(2)]],
       prenomUtilisateur: ['', [Validators.required, Validators.minLength(2)]],
@@ -79,11 +83,22 @@ export class AdminAdministrateursComponent implements OnInit {
         '',
         [
           Validators.required,
-          // formats Burkina (avec/ss +226), 8 chiffres
           Validators.pattern(/^(\+226|00226|226)?[0-9]{8}$/),
         ],
       ],
       password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+
+    this.editForm = this.fb.group({
+      nomUtilisateur: ['', [Validators.required, Validators.minLength(2)]],
+      prenomUtilisateur: ['', [Validators.required, Validators.minLength(2)]],
+      numeroUtilisateur: ['', [Validators.required, Validators.pattern(/^(\+226|00226|226)?[0-9]{8}$/)]],
+    });
+
+    this.passwordForm = this.fb.group({
+      ancienPassword: ['', [Validators.required]],
+      nouveauPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]],
     });
   }
 
@@ -92,22 +107,15 @@ export class AdminAdministrateursComponent implements OnInit {
     this.loadAdmins();
   }
 
-  // Ajoutez ces méthodes dans votre classe AdminAdministrateursComponent
+  getActiveAdmins(): number {
+    return this.admins.data.length;
+  }
 
-getActiveAdmins(): number {
-  return this.admins.data.length; // Pour l'instant, tous les admins sont considérés comme actifs
-}
-
-resetForm(): void {
-  this.form.reset();
-  this.form.markAsPristine();
-  this.form.markAsUntouched();
-}
-
-private async showConfirmationDialog(): Promise<boolean> {
-  // Vous pouvez remplacer cela par un dialog Material plus joli
-  return confirm('Êtes-vous sûr de vouloir supprimer cet administrateur ? Cette action est irréversible.');
-}
+  resetForm(): void {
+    this.form.reset();
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+  }
 
   private configureFilter() {
     this.admins.filterPredicate = (row, filter) => {
@@ -115,29 +123,92 @@ private async showConfirmationDialog(): Promise<boolean> {
       const fullName =
         `${row.prenomUtilisateur ?? ''} ${row.nomUtilisateur ?? ''}`.toLowerCase();
       const numero = (row.numeroUtilisateur ?? '').toLowerCase();
-      return (
-        fullName.includes(term) ||
-        numero.includes(term)
-      );
+      return fullName.includes(term) || numero.includes(term);
     };
   }
 
-  // ---------- API ----------
   loadAdmins() {
     this.loadingList = true;
-    this.http.get<Utilisateur[]>(`${this.API}/utilisateurs`).subscribe({
+    this.utilisateurService.getAll().subscribe({
       next: (data) => {
-        const onlyAdmins =
-          (data ?? []).filter((u) => u.roles?.some((r) => r.name === 'ADMIN')) ?? [];
-        this.admins.data = onlyAdmins;
-        this.admins.paginator = this.paginator;
-        this.admins.sort = this.sort;
+        this.admins.data = (data ?? []).filter(u => u.roles?.some(r => r.name === 'ADMIN'));
         this.loadingList = false;
       },
       error: (err) => {
         this.loadingList = false;
-        this.notify("Erreur lors du chargement des administrateurs.");
-        console.error(err);
+        this.notify('Erreur lors du chargement des administrateurs.');
+      },
+    });
+  }
+
+  startEdit(admin: Utilisateur): void {
+    this.editingAdmin = admin;
+    this.editForm.patchValue({
+      nomUtilisateur: admin.nomUtilisateur ?? '',
+      prenomUtilisateur: admin.prenomUtilisateur ?? '',
+      numeroUtilisateur: admin.numeroUtilisateur ?? '',
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelEdit(): void {
+    this.editingAdmin = null;
+    this.editForm.reset();
+  }
+
+  saveEdit(): void {
+    if (!this.editingAdmin?.idUtilisateur || this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+    this.loadingSubmit = true;
+    this.utilisateurService.update(this.editingAdmin.idUtilisateur, this.editForm.value).subscribe({
+      next: () => {
+        this.loadingSubmit = false;
+        this.editingAdmin = null;
+        this.editForm.reset();
+        this.notify('Administrateur modifié avec succès.', 'OK');
+        this.loadAdmins();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.loadingSubmit = false;
+        this.notify((err?.error?.message as string) || 'Erreur lors de la modification.');
+      },
+    });
+  }
+
+  startChangePassword(admin: Utilisateur): void {
+    this.passwordAdminId = admin.idUtilisateur ?? null;
+    this.passwordForm.reset();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelChangePassword(): void {
+    this.passwordAdminId = null;
+    this.passwordForm.reset();
+  }
+
+  savePassword(): void {
+    if (!this.passwordAdminId || this.passwordForm.invalid) {
+      this.passwordForm.markAllAsTouched();
+      return;
+    }
+    const v = this.passwordForm.value;
+    if (v.nouveauPassword !== v.confirmPassword) {
+      this.notify('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    this.savingPassword = true;
+    this.utilisateurService.changePassword(this.passwordAdminId, v).subscribe({
+      next: () => {
+        this.savingPassword = false;
+        this.passwordAdminId = null;
+        this.passwordForm.reset();
+        this.notify('Mot de passe modifié avec succès.', 'OK');
+      },
+      error: () => {
+        this.savingPassword = false;
+        this.notify('Erreur lors du changement de mot de passe.');
       },
     });
   }
@@ -158,51 +229,45 @@ private async showConfirmationDialog(): Promise<boolean> {
     formData.append('password', v.password);
     formData.append('role', 'ADMIN');
 
-    this.http.post(`${this.API}/utilisateurs`, formData).subscribe({
+    this.utilisateurService.create(formData).subscribe({
       next: () => {
         this.loadingSubmit = false;
         this.form.reset();
-        this.notify('Administrateur ajouté avec succès.', 'OK');
+        this.notify('Administrateur ajoute avec succes.', 'OK');
         this.loadAdmins();
       },
       error: (err: HttpErrorResponse) => {
         this.loadingSubmit = false;
-        const msg =
-          (err?.error?.message as string) ||
-          'Erreur lors de l’ajout de l’administrateur.';
+        const msg = (err?.error?.message as string) || "Erreur lors de l'ajout de l'administrateur.";
         this.notify(msg);
-        console.error(err);
       },
     });
   }
 
   supprimer(id: number) {
     if (!confirm('Voulez-vous vraiment supprimer cet administrateur ?')) return;
-    this.http.delete(`${this.API}/utilisateurs/${id}`).subscribe({
+    this.utilisateurService.delete(id).subscribe({
       next: () => {
-        this.notify('Administrateur supprimé.');
+        this.notify('Administrateur supprime.');
         this.loadAdmins();
       },
-      error: (err) => {
-        const msg =
-          (err?.error?.message as string) || 'Suppression impossible.';
+      error: (err: any) => {
+        const msg = (err?.error?.message as string) || 'Suppression impossible.';
         this.notify(msg);
-        console.error(err);
       },
     });
   }
 
-  // ---------- Helpers ----------
   applySearch() {
     this.admins.filter = this.search.trim().toLowerCase();
     if (this.admins.paginator) this.admins.paginator.firstPage();
   }
 
-  get f(): { [k: string]: AbstractControl } {
-    return this.form.controls;
-  }
+  get f(): { [k: string]: AbstractControl } { return this.form.controls; }
+  get ef(): { [k: string]: AbstractControl } { return this.editForm.controls; }
+  get pf(): { [k: string]: AbstractControl } { return this.passwordForm.controls; }
 
   private notify(message: string, action: string = 'Fermer') {
-    this.snack.open(message, action, { duration: 3000 });
+    this.errorService.info(message);
   }
 }

@@ -71,6 +71,14 @@
         </mat-error>
       </mat-form-field>
 
+      <!-- Indicateur de force du nouveau mot de passe -->
+      <div *ngIf="form.nouveauMotDePasse" class="password-strength">
+        <div class="strength-bar">
+          <div class="strength-fill" [class]="getPasswordStrengthClass()"></div>
+        </div>
+        <span class="strength-text" [class]="getPasswordStrengthClass()">Force : {{ getPasswordStrengthText() }}</span>
+      </div>
+
       <!-- Confirmation -->
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Confirmer le mot de passe</mat-label>
@@ -94,6 +102,9 @@
         </button>
         <mat-error *ngIf="passwordForm.submitted && passwordForm.controls['confirmation']?.errors?.['required']">
           La confirmation du mot de passe est obligatoire.
+        </mat-error>
+        <mat-error *ngIf="form.confirmation && !passwordsMatch">
+          Les mots de passe ne correspondent pas.
         </mat-error>
       </mat-form-field>
 

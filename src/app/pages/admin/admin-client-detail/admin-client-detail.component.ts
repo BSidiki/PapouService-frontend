@@ -1,3 +1,4 @@
+import { ErrorService } from '../../../services/error.service';
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -10,6 +11,7 @@ import { Location } from '@angular/common';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { environment } from '../../../../environments/environment';
 
 type Utilisateur = {
   idUtilisateur: number;
@@ -19,7 +21,6 @@ type Utilisateur = {
   id_1XBET?: string;
   id_BETWINNER?: string;
   id_MELBET?: string;
-  id_1WIN?: string;
   id_888STARZ?: string;
 };
 
@@ -50,15 +51,18 @@ export class AdminClientDetailComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   private location = inject(Location);
-
-  private readonly API = 'http://192.168.11.124:8080';
+  private errorService = inject(ErrorService);
+  private readonly API = environment.apiBaseUrl;
 
   client: Utilisateur | null = null;
   isLoading = true;
   hasError = false;
 
+  private readonly fidelityThresholds = [100_000, 1_000_000, 5_000_000, 10_000_000, 20_000_000];
+
   clientId: string | null = null;
   depotCount = 0;
+  montantCumule = 0;
   fidelityStars = '';
   isFidele = false;
 
@@ -106,7 +110,7 @@ export class AdminClientDetailComponent implements OnInit {
       d.utilisateur?.idUtilisateur === client.idUtilisateur
     );
 
-    // 2) fallback par numéro si l'id n'est pas présent dans les dépôts
+    // 2) Fallback par numéro si l'idUtilisateur est absent dans les dépôts
     if (valides.length === 0 && client.numeroUtilisateur) {
       valides = depots.filter(
         d => d.transactionState === 'VALIDATED' &&
@@ -115,9 +119,10 @@ export class AdminClientDetailComponent implements OnInit {
     }
 
     this.depotCount = valides.length;
+    this.montantCumule = valides.reduce((sum, d) => sum + (d.montant ?? 0), 0);
 
-    // ⭐️ 1 étoile / 5 dépôts – max 5
-    const stars = Math.min(5, Math.floor(this.depotCount / 5));
+    // ⭐ Fidélité basée sur le montant cumulé des dépôts validés (formule officielle Papou Service)
+    const stars = this.fidelityThresholds.filter(t => this.montantCumule >= t).length;
     this.fidelityStars = '★'.repeat(stars);
     this.isFidele = stars === 5;
   }
@@ -139,6 +144,18 @@ export class AdminClientDetailComponent implements OnInit {
     this.location.back();
   }
 
+  supprimerClient(): void {
+    if (!this.client) return;
+    if (!confirm(`Supprimer définitivement le client ${this.getFullName()} ? Cette action est irréversible.`)) return;
+    this.http.delete(`${this.API}/utilisateurs/delete/${this.client.idUtilisateur}`, { responseType: 'text' as 'json' }).subscribe({
+      next: () => {
+        this.errorService.info('Client supprimé avec succès.');
+        this.router.navigate(['/admin/clients']);
+      },
+      error: () => this.errorService.info('Erreur lors de la suppression du client.')
+    });
+  }
+
   // Helper methods for template
   getFullName(): string {
     if (!this.client) return 'Non renseigné';
@@ -148,18 +165,18 @@ export class AdminClientDetailComponent implements OnInit {
 
   getFidelityMessage(): string {
     const stars = this.fidelityStars.length;
-    if (stars === 0) return 'Aucun dépôt validé - Débutant';
-    if (stars === 1) return '1 dépôt validé - Novice';
-    if (stars === 2) return '2-4 dépôts validés - Intermédiaire';
-    if (stars === 3) return '5-9 dépôts validés - Avancé';
-    if (stars === 4) return '10-14 dépôts validés - Expert';
-    return '15+ dépôts validés - Maître';
+    if (stars === 0) return 'Moins de 100 000 FCFA cumulés — Débutant';
+    if (stars === 1) return '≥ 100 000 FCFA cumulés — Novice';
+    if (stars === 2) return '≥ 1 000 000 FCFA cumulés — Intermédiaire';
+    if (stars === 3) return '≥ 5 000 000 FCFA cumulés — Avancé';
+    if (stars === 4) return '≥ 10 000 000 FCFA cumulés — Expert';
+    return '≥ 20 000 000 FCFA cumulés — Maître';
   }
 
   hasPlatformIds(): boolean {
     if (!this.client) return false;
     return !!(this.client.id_1XBET || this.client.id_BETWINNER ||
-              this.client.id_MELBET || this.client.id_1WIN ||
-              this.client.id_888STARZ);
+              this.client.id_MELBET || this.client.id_888STARZ);
   }
 }
+

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalisation — Identité Visuelle</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --cream: #f5f0e8;
+    --gold: #c8a84b;
+    --gold-light: #e8d08a;
+    --rust: #b85c38;
+    --sage: #6b7c5e;
+    --paper: #ede8dc;
+    --shadow: rgba(26,18,8,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 40px 20px 80px;
+    background-image:
+      radial-gradient(ellipse at 10% 20%, rgba(200,168,75,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(184,92,56,0.06) 0%, transparent 50%);
+  }
+
+  header {
+    max-width: 720px;
+    margin: 0 auto 48px;
+    text-align: center;
+    animation: fadeDown 0.7s ease both;
+  }
+
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--sage);
+    letter-spacing: 0.08em;
+    line-height: 1.7;
+  }
+
+  /* Progress Bar */
+  .progress-wrap {
+    max-width: 720px;
+    margin: 0 auto 48px;
+    animation: fadeDown 0.8s 0.1s ease both;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--sage);
+  }
+
+  .progress-count {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--paper);
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(200,168,75,0.2);
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--rust));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* Sections */
+  .section {
+    max-width: 720px;
+    margin: 0 auto 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .section:nth-child(3) { animation-delay: 0.15s; }
+  .section:nth-child(4) { animation-delay: 0.25s; }
+  .section:nth-child(5) { animation-delay: 0.35s; }
+  .section:nth-child(6) { animation-delay: 0.45s; }
+  .section:nth-child(7) { animation-delay: 0.55s; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(200,168,75,0.25);
+  }
+
+  .section-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid rgba(200,168,75,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .section-count {
+    margin-left: auto;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--sage);
+  }
+
+  /* Items */
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 16px;
+    margin-bottom: 6px;
+    background: var(--paper);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .item::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.25s;
+  }
+
+  .item:hover {
+    border-color: rgba(200,168,75,0.3);
+    transform: translateX(3px);
+  }
+
+  .item.done {
+    opacity: 0.65;
+  }
+
+  .item.done::before {
+    background: var(--sage);
+  }
+
+  .item.done .item-text {
+    text-decoration: line-through;
+    color: var(--sage);
+  }
+
+  .item.priority::before {
+    background: var(--rust);
+  }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--gold);
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .item.done .checkbox {
+    background: var(--sage);
+    border-color: var(--sage);
+  }
+
+  .checkbox-tick {
+    opacity: 0;
+    color: white;
+    font-size: 11px;
+    transition: opacity 0.2s;
+  }
+
+  .item.done .checkbox-tick { opacity: 1; }
+
+  .item-content { flex: 1; min-width: 0; }
+
+  .item-text {
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+  }
+
+  .item-note {
+    font-size: 10px;
+    color: var(--sage);
+    margin-top: 3px;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+    font-weight: 500;
+  }
+
+  .tag-priority {
+    background: rgba(184,92,56,0.12);
+    color: var(--rust);
+    border: 1px solid rgba(184,92,56,0.25);
+  }
+
+  .tag-legal {
+    background: rgba(26,18,8,0.07);
+    color: var(--ink);
+    border: 1px solid rgba(26,18,8,0.15);
+  }
+
+  /* Completion banner */
+  .completion {
+    max-width: 720px;
+    margin: 40px auto 0;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, var(--ink) 0%, #2d2010 100%);
+    border-radius: 8px;
+    text-align: center;
+    display: none;
+    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  .completion.visible { display: block; }
+
+  .completion-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+
+  .completion-sub {
+    font-size: 11px;
+    color: rgba(245,240,232,0.5);
+    letter-spacing: 0.1em;
+  }
+
+  /* Reset button */
+  .reset-btn {
+    display: block;
+    margin: 24px auto 0;
+    padding: 10px 24px;
+    background: transparent;
+    border: 1px solid rgba(200,168,75,0.4);
+    color: var(--gold);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover {
+    background: rgba(200,168,75,0.1);
+    border-color: var(--gold);
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="eyebrow">Phase finale</span>
+  <h1>Identité <em>Visuelle</em><br>Checklist de finalisation</h1>
+  <p class="subtitle">Cochez chaque étape au fur et à mesure — votre progression est sauvegardée.</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-meta">
+    <span class="progress-label">Progression globale</span>
+    <span class="progress-count" id="progressCount">0 / 0</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+</div>
+
+<div id="checklist"></div>
+<div class="completion" id="completion">
+  <div class="completion-title">✦ Projet finalisé</div>
+  <p class="completion-sub">Votre identité visuelle est prête à être livrée.</p>
+</div>
+<button class="reset-btn" onclick="resetAll()">↺ Tout réinitialiser</button>
+
+<script>
+const data = [
+  {
+    icon: "🎨",
+    title: "Cohérence des éléments",
+    items: [
+      { text: "Vérifier l'harmonie globale logo + couleurs + typographies", note: "Regardez l'ensemble de loin, puis en détail.", priority: true },
+      { text: "S'assurer que les variantes du logo sont toutes cohérentes", note: "Version principale, secondaire, monochrome, favicon." },
+      { text: "Confirmer les espacements et marges autour du logo (zone de protection)", note: "Définir une règle claire (ex : x = hauteur du symbole)." },
+    ]
+  },
+  {
+    icon: "🖨️",
+    title: "Vérifications techniques",
+    items: [
+      { text: "Exports vectoriels livrés en SVG et PDF", note: "Tester l'ouverture dans Illustrator et Acrobat.", priority: true },
+      { text: "Exports raster en PNG fond transparent (72 dpi web, 300 dpi print)" },
+      { text: "Vérifier que les polices sont bien intégrées ou converties en tracés" },
+      { text: "Tester les couleurs : codes HEX, RVB, CMJN et Pantone définis", note: "Le Pantone est crucial pour l'impression.", priority: true },
+    ]
+  },
+  {
+    icon: "📐",
+    title: "Charte graphique",
+    items: [
+      { text: "Rédiger ou finaliser la charte graphique (brand guidelines)" },
+      { text: "Inclure les règles d'utilisation : ce qu'il ne faut PAS faire", note: "Exemples visuels d'erreurs à éviter (distorsion, mauvaises couleurs…)." },
+      { text: "Documenter les typographies avec les graisses et usages" },
+      { text: "Définir les applications types (carte de visite, signature email, réseaux)" },
+    ]
+  },
+  {
+    icon: "📱",
+    title: "Tests en situation réelle",
+    items: [
+      { text: "Tester le logo sur fond blanc, noir, et couleur de marque", priority: true },
+      { text: "Vérifier la lisibilité en très petit format (app icon, favicon)" },
+      { text: "Simuler un print : imprimer une maquette sur papier" },
+      { text: "Tester l'affichage sur écran mobile et desktop" },
+    ]
+  },
+  {
+    icon: "⚖️",
+    title: "Légal & Propriété",
+    items: [
+      { text: "Vérifier la disponibilité du logo (similarité avec des marques existantes)", note: "Recherche sur l'INPI ou équivalent.", legal: true },
+      { text: "S'assurer que les polices utilisées ont une licence commerciale", legal: true },
+      { text: "Faire signer un bon à tirer / contrat de cession des droits", legal: true, priority: true },
+    ]
+  },
+  {
+    icon: "📦",
+    title: "Livraison client",
+    items: [
+      { text: "Organiser les fichiers dans une structure de dossiers claire", note: "Ex : /Logo, /Couleurs, /Typos, /Applications, /Charte" },
+      { text: "Préparer un fichier ZIP propre et nommé correctement" },
+      { text: "Rédiger un email ou brief de livraison expliquant le contenu" },
+      { text: "Prévoir un temps de révision avec le client (1 à 2 allers-retours)", priority: true },
+    ]
+  }
+];
+
+const listEl = document.getElementById('checklist');
+let state = JSON.parse(localStorage.getItem('vi-checklist') || '{}');
+
+function buildList() {
+  listEl.innerHTML = '';
+  data.forEach((section, si) => {
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = `
+      <div class="section-header">
+        <div class="section-icon">${section.icon}</div>
+        <div class="section-title">${section.title}</div>
+        <div class="section-count" id="sc-${si}"></div>
+      </div>
+    `;
+    section.items.forEach((item, ii) => {
+      const id = `${si}-${ii}`;
+      const done = !!state[id];
+      const div = document.createElement('div');
+      div.className = `item${done ? ' done' : ''}${item.priority ? ' priority' : ''}`;
+      div.onclick = () => toggle(id, div, si);
+      div.innerHTML = `
+        <div class="checkbox"><span class="checkbox-tick">✓</span></div>
+        <div class="item-content">
+          <div class="item-text">
+            ${item.text}
+            ${item.priority ? '<span class="tag tag-priority">Priorité</span>' : ''}
+            ${item.legal ? '<span class="tag tag-legal">Légal</span>' : ''}
+          </div>
+          ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
+        </div>
+      `;
+      sec.appendChild(div);
+    });
+    listEl.appendChild(sec);
+    updateSectionCount(si);
+  });
+  updateProgress();
+}
+
+function toggle(id, el, si) {
+  state[id] = !state[id];
+  localStorage.setItem('vi-checklist', JSON.stringify(state));
+  el.classList.toggle('done', state[id]);
+  updateProgress();
+  updateSectionCount(si);
+}
+
+function updateSectionCount(si) {
+  const total = data[si].items.length;
+  const done = data[si].items.filter((_, ii) => state[`${si}-${ii}`]).length;
+  document.getElementById(`sc-${si}`).textContent = `${done}/${total}`;
+}
+
+function updateProgress() {
+  const total = data.reduce((a, s) => a + s.items.length, 0);
+  const done = Object.values(state).filter(Boolean).length;
+  document.getElementById('progressCount').textContent = `${done} / ${total}`;
+  document.getElementById('progressFill').style.width = `${(done/total)*100}%`;
+  document.getElementById('completion').classList.toggle('visible', done === total);
+}
+
+function resetAll() {
+  if (confirm('Réinitialiser toute la checklist ?')) {
+    state = {};
+    localStorage.setItem('vi-checklist', '{}');
+    buildList();
+  }
+}
+
+buildList();
+</script>
+</body>
+</html>

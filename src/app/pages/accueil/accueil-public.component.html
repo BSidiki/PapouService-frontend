@@ -14,16 +14,22 @@
 
     <!-- À propos + pubs -->
     <section class="welcome-section">
+      <div class="deco-circle-1" aria-hidden="true"></div>
+      <div class="deco-circle-2" aria-hidden="true"></div>
       <div class="container">
         <div class="welcome-card">
           <div class="welcome-grid">
 
             <!-- Texte de bienvenue -->
             <div class="welcome-text">
-              <h1>✨ Bienvenue sur <strong class="brand">Papou Service</strong></h1>
+              <div class="hero-badge">
+                <span class="dot"></span>
+                Plateforme de confiance
+              </div>
+              <h1>✨ Bienvenue chez <strong class="brand">Papou Service</strong></h1>
               <p class="lead">
-                La solution <strong>rapide</strong>, <strong>simple</strong> et <strong>sécurisée</strong>
-                pour vos dépôts et retraits sur vos plateformes de jeu préférées.
+                <strong>Rapide</strong>- <strong>Fiable</strong>- <strong>Sécurisé</strong>
+                — la solution idéale pour vos dépôts et retraits sur vos plateformes de jeu préférées.
               </p>
 
               <div class="benefits-list">
@@ -42,18 +48,14 @@
               </div>
 
               <p class="cta-text">
-                Inscrivez-vous pour bénéficier de nos services de façon fiable et efficace.
+                Faites vos dépôts ou Inscrivez-vous pour bénéficier de nos services de façon fiable et efficace.
               </p>
 
               <div class="action-buttons">
-                <a mat-raised-button color="primary" routerLink="/register" class="btn-primary">
-                  <mat-icon>person_add</mat-icon>
-                  Créer un compte
-                </a>
-                <a mat-stroked-button color="primary" routerLink="/login" class="btn-secondary">
-                  <mat-icon>login</mat-icon>
-                  Se connecter
-                </a>
+                <a routerLink="/depot"    class="button-action btn-primary"><mat-icon>payments</mat-icon>Faire un Dépôt</a>
+                <a routerLink="/retrait"  class="button-action btn-secondary"><mat-icon>savings</mat-icon>Faire un Retrait</a>
+                <a routerLink="/register" class="button-action btn-outline-blue"><mat-icon>person_add</mat-icon>Créer un compte</a>
+                <a routerLink="/login"    class="button-action btn-ghost"><mat-icon>login</mat-icon>Se connecter</a>
               </div>
             </div>
 
@@ -69,10 +71,83 @@
       </div>
     </section>
 
+    <!-- Comment ça marche -->
+    <section class="how-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">Simple & Rapide</span>
+          <h2>⚡ Comment ça marche ?</h2>
+          <p>Effectuez vos transactions en 3 étapes simples</p>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-icon-wrap">
+              <mat-icon>person_add</mat-icon>
+              <span class="step-num">1</span>
+            </div>
+            <h3>Créez votre compte</h3>
+            <p>Inscrivez-vous gratuitement et configurez vos plateformes de jeu préférées depuis votre profil.</p>
+          </div>
+          <div class="step-arrow"><mat-icon>arrow_forward</mat-icon></div>
+          <div class="step-card">
+            <div class="step-icon-wrap">
+              <mat-icon>edit_note</mat-icon>
+              <span class="step-num">2</span>
+            </div>
+            <h3>Soumettez votre demande</h3>
+            <p>Remplissez le formulaire de dépôt ou retrait, choisissez votre moyen de paiement et envoyez.</p>
+          </div>
+          <div class="step-arrow"><mat-icon>arrow_forward</mat-icon></div>
+          <div class="step-card">
+            <div class="step-icon-wrap">
+              <mat-icon>check_circle</mat-icon>
+              <span class="step-num">3</span>
+            </div>
+            <h3>Transaction validée</h3>
+            <p>Notre équipe traite votre demande rapidement. Suivez l'état en temps réel dans votre historique.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Moyens de paiement -->
+    <section class="payments-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="eyebrow">Flexibilité de paiement</span>
+          <h2>💳 Moyens de paiement acceptés</h2>
+          <p>Payez avec votre moyen préféré, disponible dans votre pays</p>
+        </div>
+        <div class="payments-grid">
+          <div class="payment-item">
+            <img src="assets/images/OrangeMoney.png" alt="Orange Money" loading="lazy" />
+            <span>Orange Money</span>
+          </div>
+          <div class="payment-item">
+            <img src="assets/images/MoovMoney.png" alt="Moov Money" loading="lazy" />
+            <span>Moov Money</span>
+          </div>
+          <div class="payment-item">
+            <img src="assets/images/WaveMoney.png" alt="Wave" loading="lazy" />
+            <span>Wave</span>
+          </div>
+          <div class="payment-item">
+            <img src="assets/images/SankMoney.png" alt="Sank Money" loading="lazy" />
+            <span>Sank Money</span>
+          </div>
+          <div class="payment-item">
+            <img src="assets/images/CarteBancaire.png" alt="Carte Bancaire" loading="lazy" />
+            <span>Carte Bancaire</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Plateformes partenaires -->
     <section class="partners-section">
       <div class="container">
         <div class="section-header">
+          <span class="eyebrow">Plateformes partenaires</span>
           <h2>🎯 Nos plateformes partenaires</h2>
           <p>Rejoignez les meilleures plateformes de gaming avec Papou Service</p>
         </div>
@@ -86,20 +161,15 @@
             </div>
             <h3>1XBET</h3>
             <div class="partner-actions">
-              <a mat-raised-button color="primary"
-                href="https://bit.ly/inscription-1xbet"
-                target="_blank"
-                rel="noopener"
-                class="partner-btn">
+              <a href="https://refpa14435.com/L?tag=d_1651403m_1573c_&site=1651403&ad=1573"
+                target="_blank" rel="noopener" class="partner-btn">
                 <mat-icon>open_in_new</mat-icon>
                 Créer un compte
               </a>
-              <a mat-stroked-button
-                href="assets/apk/1xbet.apk"
-                download
-                class="partner-btn download">
+              <a href="https://download.1xbet.com/1xbet.apk"
+                target="_blank" rel="noopener" class="partner-btn download">
                 <mat-icon>download</mat-icon>
-                Télécharger
+                Télécharger APK
               </a>
             </div>
           </div>
@@ -111,20 +181,15 @@
             </div>
             <h3>BetWinner</h3>
             <div class="partner-actions">
-              <a mat-raised-button color="primary"
-                href="https://bit.ly/inscription-betwinner"
-                target="_blank"
-                rel="noopener"
-                class="partner-btn">
+              <a href="https://betwinner.com/fr/registration"
+                target="_blank" rel="noopener" class="partner-btn">
                 <mat-icon>open_in_new</mat-icon>
                 Créer un compte
               </a>
-              <a mat-stroked-button
-                href="assets/apk/betwinner.apk"
-                download
-                class="partner-btn download">
+              <a href="https://betwinner.com/apk/betwinner.apk"
+                target="_blank" rel="noopener" class="partner-btn download">
                 <mat-icon>download</mat-icon>
-                Télécharger
+                Télécharger APK
               </a>
             </div>
           </div>
@@ -136,20 +201,15 @@
             </div>
             <h3>MelBet</h3>
             <div class="partner-actions">
-              <a mat-raised-button color="primary"
-                href="https://bit.ly/inscription-melbet"
-                target="_blank"
-                rel="noopener"
-                class="partner-btn">
+              <a href="https://refpa3665.com/L?tag=d_2303333m_45415c_&site=2303333&ad=45415"
+                target="_blank" rel="noopener" class="partner-btn">
                 <mat-icon>open_in_new</mat-icon>
                 Créer un compte
               </a>
-              <a mat-stroked-button
-                href="assets/apk/melbet.apk"
-                download
-                class="partner-btn download">
+              <a href="https://melbet.com/apk/melbet.apk"
+                target="_blank" rel="noopener" class="partner-btn download">
                 <mat-icon>download</mat-icon>
-                Télécharger
+                Télécharger APK
               </a>
             </div>
           </div>
@@ -161,20 +221,20 @@
             </div>
             <h3>888starz</h3>
             <div class="partner-actions">
-              <a mat-raised-button color="primary"
-                href="https://888starz.bet/fr/registration"
-                target="_blank"
-                rel="noopener"
-                class="partner-btn">
+              <a href="https://888ghta.com/33mafF"
+                target="_blank" rel="noopener" class="partner-btn">
                 <mat-icon>open_in_new</mat-icon>
                 Créer un compte
               </a>
-              <a mat-stroked-button
-                href="org.starz888.client-28-23370.apk"
-                download
-                class="partner-btn download">
-                <mat-icon>download</mat-icon>
-                Télécharger
+              <a href="https://888ghta.com/jlaloC"
+                target="_blank" rel="noopener" class="partner-btn download">
+                <mat-icon>android</mat-icon>
+                Télécharger Android
+              </a>
+              <a href="https://888ghta.com/SJWIa7"
+                target="_blank" rel="noopener" class="partner-btn download">
+                <mat-icon>apple</mat-icon>
+                Télécharger iOS
               </a>
             </div>
           </div>

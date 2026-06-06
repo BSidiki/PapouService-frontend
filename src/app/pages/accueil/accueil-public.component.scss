@@ -1,40 +1,97 @@
 @use "sass:color";
-// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500&family=Roboto:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
 
-// === Palette PapouService ===
-$rouge: #991f23;
-$bleu: #00adef;
-$blanc: #ffffff;
-$texte-fonce: #333333;
-$texte-gris: #666666;
-$fond-clair: #f8f9fa;
-$bordure: #e0e0e0;
+// ═══════════════════════════════════════════
+// TOKENS OFFICIELS CLIENT
+// ═══════════════════════════════════════════
+$rouge:       #991f23;
+$rouge-dark:  color.adjust($rouge, $lightness: -8%);
+$rouge-light: color.adjust($rouge, $lightness: 48%); // rose très pâle
+$rouge-pale:  color.adjust($rouge, $lightness: 58%); // quasi blanc teinté
+$bleu:        #00adef;
+$bleu-dark:   color.adjust($bleu, $lightness: -8%);
+$bleu-pale:   color.adjust($bleu, $lightness: 52%);
+$blanc:       #ffffff;
+$texte-fonce: #1a1d2e;
+$texte-gris:  #6b7280;
+$texte-moyen: #4b5563;
+$fond-clair:  #f6f7fb;
+$bordure:     rgba(0, 0, 0, 0.08);
+$bordure-rouge: rgba($rouge, 0.15);
 
+$font-titre:       'Montserrat', sans-serif;
+$font-sous-titre:  'Poppins', sans-serif;
+$font-corps:       'Roboto', sans-serif;
+
+$radius-sm:   10px;
+$radius-md:   18px;
+$radius-lg:   26px;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
+
+// ═══════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1;    transform: scale(1);   }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%;  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0);    }
+  50%       { transform: translateY(-6px); }
+}
+
+// ═══════════════════════════════════════════
+// BASE
+// ═══════════════════════════════════════════
 .public-accueil {
   min-height: 100vh;
   background: $blanc;
-  font-family: 'Roboto', sans-serif;
+  font-family: $font-corps;
 }
 
-/* =============== Container =============== */
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1.5rem;
 
-  @media (max-width: 767px) {
-    padding: 0 0.75rem;
-  }
+  @media (max-width: 767px) { padding: 0 1rem; }
 }
 
-/* =============== HERO / annonces =============== */
+// ═══════════════════════════════════════════
+// HERO — annonces (bandeau rouge compact)
+// ═══════════════════════════════════════════
 .hero {
-  background: linear-gradient(135deg, $rouge 0%, color.adjust($rouge, $lightness: -8%) 100%);
+  background: linear-gradient(135deg, $rouge 0%, $rouge-dark 100%);
+  position: relative;
+  overflow: hidden;
   padding: 0;
 
+  // Motif de points décoratif
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba($blanc, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+  }
+
   .hero-content {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    /* Le composant annonces occupe la pleine largeur */
+
     ::ng-deep app-annonces-public {
       display: block;
       width: 100%;
@@ -42,223 +99,377 @@ $bordure: #e0e0e0;
   }
 }
 
-/* =============== MAIN WRAPPER =============== */
+// ═══════════════════════════════════════════
+// MAIN WRAPPER
+// ═══════════════════════════════════════════
 .main-content {
-  padding: 2rem 0 3rem;
-  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 60%, #f1f3f5 100%);
-
-  @media (min-width: 768px) {
-    padding: 3rem 0 4rem;
-  }
+  background: $blanc;
+  padding: 0;
 }
 
-/* =============== SECTION BIENVENUE =============== */
+// ═══════════════════════════════════════════
+// SECTION BIENVENUE — dégradé rouge clair → blanc
+// ═══════════════════════════════════════════
 .welcome-section {
-  padding: 2rem 0;
+  position: relative;
+  overflow: hidden;
+  padding: 72px 0 88px;
 
-  @media (min-width: 768px) {
-    padding: 3rem 0;
+  // Dégradé principal : rouge très pâle en haut → blanc en bas
+  background: linear-gradient(
+    160deg,
+    $rouge-pale  0%,
+    color.adjust($rouge, $lightness: 54%) 35%,
+    #f9f4f4      65%,
+    $blanc       100%
+  );
+
+  // Cercles décoratifs flottants
+  &::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba($rouge, 0.08) 0%, transparent 70%);
+    pointer-events: none;
   }
 
-  .container {
-    display: flex;
-    justify-content: center;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -60px;
+    left: -60px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba($bleu, 0.07) 0%, transparent 70%);
+    pointer-events: none;
   }
+
+  .container { position: relative; z-index: 1; }
+
+  @media (min-width: 768px) { padding: 88px 0 104px; }
+}
+
+// Éléments décoratifs SVG flottants
+.welcome-section .deco-circle-1 {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba($rouge, 0.12);
+  animation: float 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.welcome-section .deco-circle-2 {
+  position: absolute;
+  bottom: 20%;
+  right: 8%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba($bleu, 0.08);
+  border: 1px solid rgba($bleu, 0.15);
+  animation: float 7s ease-in-out infinite 1s;
+  pointer-events: none;
 }
 
 .welcome-card {
+  background: transparent;
+  padding: 0;
   width: 100%;
-  max-width: 1200px;
-  background: $blanc;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
-  padding: 2rem;
-
-  @media (min-width: 992px) {
-    padding: 2.5rem 2.75rem;
-  }
-
-  @media (max-width: 600px) {
-    border-radius: 16px;
-    padding: 1.5rem 1.25rem;
-  }
 }
 
 .welcome-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 3rem;
   align-items: center;
 
   @media (min-width: 992px) {
     grid-template-columns: 1.1fr 1fr;
-    gap: 2.5rem;
+    gap: 4rem;
   }
 }
 
+// ─── Texte bienvenue ─────────────────────
 .welcome-text {
+
+  // Badge statut
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba($rouge, 0.08);
+    border: 1px solid rgba($rouge, 0.22);
+    color: $rouge;
+    font-family: $font-sous-titre;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 22px;
+    animation: fadeUp 0.6s $ease both;
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: $rouge;
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+  }
+
   h1 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: $font-titre;         // Montserrat Bold
     font-weight: 700;
-    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    font-size: clamp(2rem, 4.5vw, 3.4rem);
     color: $texte-fonce;
-    margin: 0 0 1rem;
-    line-height: 1.2;
+    margin: 0 0 1.25rem;
+    line-height: 1.1;
+    animation: fadeUp 0.7s 0.1s $ease both;
 
     .brand {
       color: $rouge;
       position: relative;
 
+      // Soulignement décoratif rouge→bleu
       &::after {
         content: '';
         position: absolute;
         left: 0;
-        bottom: -0.25rem;
+        bottom: -3px;
         width: 100%;
-        height: 4px;
+        height: 3px;
         border-radius: 999px;
         background: linear-gradient(90deg, $rouge, $bleu);
-        opacity: 0.35;
+        opacity: 0.5;
       }
     }
   }
 
   .lead {
+    font-family: $font-corps;          // Roboto
     font-size: 1.05rem;
-    color: $texte-gris;
-    line-height: 1.7;
-    margin: 0 0 1.5rem;
+    color: $texte-moyen;
+    line-height: 1.80;
+    margin: 0 0 2rem;
+    max-width: 500px;
+    animation: fadeUp 0.7s 0.2s $ease both;
 
     strong {
       color: $rouge;
-      font-weight: 600;
+      font-weight: 500;
     }
   }
 }
 
-/* Points forts */
+// ─── Bénéfices ───────────────────────────
 .benefits-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin: 1.5rem 0;
+  gap: 10px;
+  margin: 0 0 2rem;
+  animation: fadeUp 0.7s 0.3s $ease both;
 
   .benefit-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0.75rem;
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.015);
+    gap: 14px;
+    padding: 11px 16px;
+    background: $blanc;
+    border: 1px solid $bordure-rouge;
+    border-radius: $radius-sm;
+    box-shadow: 0 2px 8px rgba($rouge, 0.05);
+    transition: all 0.22s $ease;
+    cursor: default;
+
+    &:hover {
+      background: rgba($rouge, 0.03);
+      border-color: rgba($rouge, 0.28);
+      transform: translateX(5px);
+      box-shadow: 0 4px 14px rgba($rouge, 0.10);
+
+      .benefit-icon { color: $rouge; }
+    }
 
     .benefit-icon {
       color: $bleu;
-      font-size: 1.5rem;
-      width: 1.5rem;
-      height: 1.5rem;
+      font-size: 1.3rem;
+      width: 1.3rem;
+      height: 1.3rem;
       flex-shrink: 0;
+      transition: color 0.2s;
     }
 
     span {
-      font-family: 'Poppins', sans-serif;
+      font-family: $font-sous-titre;  // Poppins Medium
       font-weight: 500;
       color: $texte-fonce;
-      font-size: 0.98rem;
+      font-size: 0.92rem;
     }
   }
 }
 
 .cta-text {
-  font-size: 0.98rem;
+  font-family: $font-corps;
+  font-size: 0.92rem;
   color: $texte-gris;
-  margin: 1.25rem 0 0.5rem;
-  line-height: 1.5;
+  margin: 0 0 0.5rem;
+  line-height: 1.6;
+  animation: fadeUp 0.7s 0.35s $ease both;
 }
 
-/* Boutons actions */
+// ─── Boutons d'action ─────────────────────
 .action-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 12px;
   margin-top: 1.5rem;
+  animation: fadeUp 0.7s 0.4s $ease both;
 
-  .btn-primary,
-  .btn-secondary {
+  .button-action {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.6rem;
-    border-radius: 999px;
-    font-family: 'Poppins', sans-serif;
+    gap: 8px;
+    padding: 13px 22px;
+    border-radius: $radius-sm;
+    font-family: $font-sous-titre;   // Poppins
     font-weight: 600;
+    font-size: 0.9rem;
     text-decoration: none;
-    transition: all .25s ease;
-    outline: none;
-    font-size: 0.95rem;
+    transition: all 0.25s $ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
 
     &:focus-visible {
       outline: 2px solid $bleu;
       outline-offset: 3px;
     }
 
-    mat-icon {
-      font-size: 1.2rem;
-      width: 1.2rem;
-      height: 1.2rem;
+    // Shimmer au hover
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba($blanc, 0.15), transparent);
+      transition: left 0.5s ease;
     }
-  }
+    &:hover::before { left: 100%; }
 
-  .btn-primary {
-    background: linear-gradient(135deg, $rouge, color.adjust($rouge, $lightness: -8%));
-    color: $blanc;
-    border: 0;
+    // Primaire — Dépôt
+    &.btn-primary {
+      background: linear-gradient(135deg, $rouge, $rouge-dark);
+      color: $blanc;
+      box-shadow: 0 4px 18px rgba($rouge, 0.35);
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(153, 31, 35, 0.35);
-      background: linear-gradient(135deg, color.adjust($rouge, $lightness: -4%), color.adjust($rouge, $lightness: -12%));
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 24px rgba($rouge, 0.48);
+      }
+      &:active { transform: translateY(0); }
     }
-  }
 
-  .btn-secondary {
-    background: transparent;
-    color: $rouge;
-    border: 1px solid rgba($rouge, 0.5);
+    // Secondaire — Retrait
+    &.btn-secondary {
+      background: linear-gradient(135deg, #2e7d32, #1b5e20);
+      color: $blanc;
+      border-color: #2e7d32;
+      box-shadow: 0 4px 14px rgba(46, 125, 50, 0.35);
 
-    &:hover {
-      background: rgba($rouge, 0.06);
-      border-color: $rouge;
-      transform: translateY(-2px);
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 7px 24px rgba(46, 125, 50, 0.48);
+      }
+      &:active { transform: translateY(0); }
+    }
+
+    // Outline bleu — Inscription
+    &.btn-outline-blue {
+      background: $blanc;
+      color: $bleu;
+      border-color: rgba($bleu, 0.45);
+      box-shadow: 0 2px 8px rgba($bleu, 0.08);
+
+      &:hover {
+        background: $bleu;
+        color: $blanc;
+        border-color: $bleu;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba($bleu, 0.30);
+      }
+    }
+
+    // Ghost — Connexion
+    &.btn-ghost {
+      background: $blanc;
+      color: $texte-moyen;
+      border-color: $bordure;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+      &:hover {
+        background: $fond-clair;
+        color: $texte-fonce;
+        border-color: rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+      }
     }
   }
 
   @media (max-width: 767px) {
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
 
-    .btn-primary,
-    .btn-secondary {
-      flex: 1;
-      min-width: 200px;
+    .button-action {
+      width: 100%;
       justify-content: center;
+      padding: 14px 20px;
+      font-size: 0.92rem;
     }
   }
 }
 
-/* Média (carousel pubs) */
+// ─── Média carousel ───────────────────────
 .welcome-media {
-  border-radius: 18px;
+  border-radius: $radius-lg;
   overflow: hidden;
   background: $blanc;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba($rouge, 0.12);
+  box-shadow:
+    0 20px 48px rgba($rouge, 0.10),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: fadeUp 0.8s 0.2s $ease both;
+  position: relative;
+
+  // Liseré rouge en haut
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    z-index: 1;
+  }
 
   .media-ratio {
-    // aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
 
-    @supports not (aspect-ratio: 16 / 9) {
+    @supports not (aspect-ratio: 4 / 3) {
       height: 0;
-      padding-bottom: 56.25%;
+      padding-bottom: 75%;
       position: relative;
 
       ::ng-deep app-carousel-pubs {
@@ -275,172 +486,396 @@ $bordure: #e0e0e0;
   }
 }
 
-/* =============== SECTION PARTENAIRES =============== */
-.partners-section {
-  background: $fond-clair;
-  padding: 2.5rem 0 3rem;
-  margin-top: 2rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.03);
+// ═══════════════════════════════════════════
+// SECTION COMMENT ÇA MARCHE
+// ═══════════════════════════════════════════
+.how-section {
+  background: $blanc;
+  padding: 80px 0 88px;
+}
 
-  @media (min-width: 768px) {
-    padding: 3rem 0 3.5rem;
-    margin-top: 2.5rem;
+.steps-grid {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  justify-content: center;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    gap: 24px;
+
+    .step-arrow { transform: rotate(90deg); }
   }
 }
 
-.section-header {
+.step-card {
+  flex: 1;
+  max-width: 280px;
   text-align: center;
-  margin-bottom: 2rem;
+  padding: 32px 24px;
+  background: $fond-clair;
+  border: 1px solid rgba($rouge, 0.08);
+  border-radius: $radius-md;
+  transition: transform 0.3s $ease, box-shadow 0.3s $ease;
 
-  h2 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    font-size: clamp(1.5rem, 3vw, 2rem);
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px rgba($rouge, 0.10);
+    border-color: rgba($rouge, 0.20);
+  }
+
+  .step-icon-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba($rouge, 0.10), rgba($bleu, 0.10));
+    margin: 0 auto 20px;
+
+    mat-icon {
+      font-size: 28px; width: 28px; height: 28px;
+      color: $rouge;
+    }
+
+    .step-num {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $rouge, $rouge-dark);
+      color: $blanc;
+      font-family: $font-titre;
+      font-weight: 700;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba($rouge, 0.40);
+    }
+  }
+
+  h3 {
+    font-family: $font-sous-titre;
+    font-weight: 600;
+    font-size: 1rem;
     color: $texte-fonce;
-    margin: 0 0 0.5rem;
+    margin: 0 0 10px;
   }
 
   p {
-    font-size: 1rem;
+    font-family: $font-corps;
+    font-size: 0.85rem;
     color: $texte-gris;
+    line-height: 1.6;
     margin: 0;
   }
 }
 
+.step-arrow {
+  padding: 0 16px;
+  color: rgba($rouge, 0.35);
+  flex-shrink: 0;
+
+  mat-icon { font-size: 28px; width: 28px; height: 28px; }
+}
+
+// ═══════════════════════════════════════════
+// SECTION MOYENS DE PAIEMENT
+// ═══════════════════════════════════════════
+.payments-section {
+  background: linear-gradient(135deg, rgba($rouge, 0.03), rgba($bleu, 0.03));
+  padding: 72px 0 80px;
+  border-top: 1px solid rgba($rouge, 0.06);
+  border-bottom: 1px solid rgba($rouge, 0.06);
+}
+
+.payments-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+.payment-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px;
+  background: $blanc;
+  border: 1px solid rgba(0,0,0,0.07);
+  border-radius: $radius-md;
+  transition: all 0.25s $ease;
+  min-width: 110px;
+
+  img {
+    width: 52px; height: 52px;
+    object-fit: contain;
+    border-radius: 10px;
+  }
+
+  span {
+    font-family: $font-sous-titre;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: $texte-moyen;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    border-color: rgba($rouge, 0.20);
+  }
+}
+
+// ═══════════════════════════════════════════
+// SECTION PARTENAIRES
+// ═══════════════════════════════════════════
+.partners-section {
+  background: $fond-clair;
+  padding: 80px 0 88px;
+  position: relative;
+
+  // Séparateur ondulé depuis le blanc
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40px;
+    background: $blanc;
+    clip-path: ellipse(55% 100% at 50% 0%);
+  }
+
+  @media (min-width: 768px) { padding: 88px 0 100px; }
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 52px;
+
+  .eyebrow {
+    display: inline-block;
+    font-family: $font-sous-titre;   // Poppins
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: $bleu;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: $font-titre;        // Montserrat Bold
+    font-weight: 700;
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+    color: $texte-fonce;
+    margin: 0 0 10px;
+    line-height: 1.15;
+  }
+
+  p {
+    font-family: $font-corps;        // Roboto
+    font-size: 1rem;
+    color: $texte-gris;
+    margin: 0 auto;
+    max-width: 460px;
+  }
+}
+
+// ─── Grille partenaires ───────────────────
 .partners-grid {
   display: grid;
-  gap: 1.5rem;
+  gap: 20px;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 
-  @media (min-width: 768px) {
-    gap: 2rem;
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  @media (min-width: 1024px) { grid-template-columns: repeat(5, 1fr); }
+  @media (max-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 640px)  { grid-template-columns: repeat(2, 1fr); gap: 14px; }
 }
 
 .partner-card {
   background: $blanc;
   border: 1px solid $bordure;
-  border-radius: 14px;
-  padding: 1.4rem 1.2rem;
+  border-radius: $radius-md;
+  padding: 28px 20px 22px;
   text-align: center;
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  min-height: 230px;
+  align-items: center;
+  gap: 14px;
+  min-height: 240px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s $ease, box-shadow 0.3s $ease, border-color 0.3s $ease;
+
+  // Barre gradient animée
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s $ease;
+  }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
-    border-color: $bleu;
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.10);
+    border-color: rgba($rouge, 0.22);
+
+    &::before { transform: scaleX(1); }
+    .partner-image { background: rgba($rouge, 0.04); }
   }
 
   .partner-image {
-    width: 80px;
-    height: 80px;
+    width: 76px; height: 76px;
     margin: 0 auto;
     background: $fond-clair;
-    border-radius: 10px;
+    border-radius: $radius-sm;
     display: grid;
     place-items: center;
-    padding: 0.5rem;
+    padding: 8px;
+    border: 1px solid $bordure;
+    transition: background 0.2s $ease;
 
-    img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
+    img { max-width: 100%; max-height: 100%; object-fit: contain; }
   }
 
   h3 {
-    font-family: 'Poppins', sans-serif;
+    font-family: $font-sous-titre;   // Poppins Medium
     font-weight: 600;
     font-size: 1.05rem;
     color: $texte-fonce;
     margin: 0;
   }
+
+  @media (max-width: 640px) { padding: 20px 14px 18px; min-height: 210px; }
 }
 
 .partner-actions {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
+  width: 100%;
   margin-top: auto;
 
   .partner-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    padding: 0.55rem 1rem;
-    border-radius: 999px;
-    font-family: 'Poppins', sans-serif;
+    gap: 6px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: $font-sous-titre;
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     text-decoration: none;
-    transition: all .2s ease;
-    border: 1px solid transparent;
+    transition: all 0.2s $ease;
+    cursor: pointer;
 
-    &:focus-visible {
-      outline: 2px solid $bleu;
-      outline-offset: 3px;
-    }
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
 
-    mat-icon {
-      font-size: 1.1rem;
-      width: 1.1rem;
-      height: 1.1rem;
-    }
+    &:focus-visible { outline: 2px solid $bleu; outline-offset: 2px; }
 
     &:not(.download) {
       background: $bleu;
       color: $blanc;
-      border-color: $bleu;
+      border: none;
 
       &:hover {
-        background: color.adjust($bleu, $lightness: -8%);
-        border-color: color.adjust($bleu, $lightness: -8%);
+        background: $bleu-dark;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba($bleu, 0.30);
       }
     }
 
     &.download {
       background: transparent;
       color: $texte-gris;
-      border-color: $bordure;
+      border: 1px solid $bordure;
 
       &:hover {
-        background: $fond-clair;
-        border-color: $bleu;
-        color: $bleu;
+        border-color: $rouge;
+        color: $rouge;
+        background: rgba($rouge, 0.04);
       }
     }
   }
 }
 
-/* =============== Mobile tweaks =============== */
-@media (max-width: 480px) {
-  .welcome-text h1 { font-size: 1.5rem; }
-  .benefits-list .benefit-item { font-size: .92rem; }
+// ═══════════════════════════════════════════
+// RESPONSIVE MOBILE
+// ═══════════════════════════════════════════
+@media (max-width: 767px) {
+  .welcome-section  { padding: 48px 0 56px; }
+  .how-section      { padding: 56px 0 60px; }
+  .payments-section { padding: 48px 0 56px; }
+  .partners-section { padding: 48px 0 56px; }
 
-  .partner-card { padding: 1rem; }
-  .partner-actions { flex-direction: column; }
-}
-
-/* =============== Animations & Reduced motion =============== */
-.partner-card,
-.action-buttons .btn-primary,
-.action-buttons .btn-secondary {
-  transition: all .25s cubic-bezier(.4,0,.2,1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .partner-card,
-  .action-buttons .btn-primary,
-  .action-buttons .btn-secondary {
-    transition: none;
+  .section-header {
+    margin-bottom: 32px;
+    h2 { font-size: 1.5rem; }
+    p  { font-size: 0.88rem; }
   }
+
+  .partner-btn {
+    font-size: 0.78rem;
+    padding: 9px 10px;
+    gap: 4px;
+    mat-icon { font-size: 14px; width: 14px; height: 14px; }
+  }
+
+  .step-card {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-text h1 { font-size: 1.75rem; }
+  .welcome-section  { padding: 40px 0 48px; }
+  .action-buttons   { gap: 8px; }
+
+  .partner-card {
+    padding: 16px 12px 14px;
+    min-height: 190px;
+    gap: 10px;
+  }
+
+  .partner-btn {
+    font-size: 0.73rem;
+    padding: 8px 8px;
+  }
+}
+
+// ═══════════════════════════════════════════
+// REDUCED MOTION
+// ═══════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+  .partner-card, .button-action,
+  .benefit-item, .partner-btn {
+    transition: none;
+    animation: none;
+  }
+  .partner-card::before { transition: none; }
+  .hero-badge .dot,
+  .deco-circle-1,
+  .deco-circle-2 { animation: none; }
+}
+
+// ═══════════════════════════════════════════
+// FOCUS ACCESSIBLE
+// ═══════════════════════════════════════════
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid $bleu;
+  outline-offset: 2px;
+  border-radius: 6px;
 }

@@ -42,59 +42,107 @@
       </div>
 
       <form (ngSubmit)="onSubmit()" [formGroup]="pubForm" enctype="multipart/form-data" class="pub-form">
-        <div class="upload-section">
+
+        <!-- Sélecteur de type -->
+        <div class="type-selector">
+          <label class="type-label">Type de publicité</label>
+          <div class="type-options">
+            <button type="button" class="type-btn" [class.active]="typePub === 'IMAGE'"
+                    (click)="typePub = 'IMAGE'; onTypeChange()">
+              <mat-icon>image</mat-icon> Image
+            </button>
+            <button type="button" class="type-btn" [class.active]="typePub === 'VIDEO_FICHIER'"
+                    (click)="typePub = 'VIDEO_FICHIER'; onTypeChange()">
+              <mat-icon>videocam</mat-icon> Vidéo (fichier)
+            </button>
+            <button type="button" class="type-btn" [class.active]="typePub === 'VIDEO_LIEN'"
+                    (click)="typePub = 'VIDEO_LIEN'; onTypeChange()">
+              <mat-icon>link</mat-icon> Vidéo (lien)
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload image ou vidéo -->
+        <div class="upload-section" *ngIf="typePub === 'IMAGE' || typePub === 'VIDEO_FICHIER'">
           <div class="upload-container">
             <input type="file"
                    id="pubUpload"
-                   accept="image/*"
+                   [accept]="typePub === 'VIDEO_FICHIER' ? 'video/mp4,video/webm,video/ogg' : 'image/*'"
                    (change)="onFileSelected($event)"
                    class="file-input" />
 
             <div class="upload-area" [class.has-file]="previewUrl || selectedFile">
               <label for="pubUpload" class="upload-label">
                 <div class="upload-icon">
-                  <mat-icon>cloud_upload</mat-icon>
+                  <mat-icon>{{ typePub === 'VIDEO_FICHIER' ? 'video_library' : 'cloud_upload' }}</mat-icon>
                 </div>
                 <div class="upload-text">
                   <span class="upload-title">{{ getUploadTitle() }}</span>
-                  <span class="upload-subtitle">Cliquez ou glissez-déposez une image</span>
+                  <span class="upload-subtitle">
+                    {{ typePub === 'VIDEO_FICHIER' ? 'Cliquez pour choisir une vidéo (MP4, WebM)' : 'Cliquez ou glissez-déposez une image' }}
+                  </span>
                 </div>
               </label>
 
-              <!-- File Preview -->
-              <div class="file-preview" *ngIf="previewUrl">
-                <img [src]="previewUrl"
-                     (click)="openImageZoom(previewUrl)"
-                     class="preview-image"
-                     alt="Aperçu de la publicité" />
+              <!-- Aperçu image -->
+              <div class="file-preview" *ngIf="previewUrl && typePub === 'IMAGE'">
+                <img [src]="previewUrl" (click)="openImageZoom(previewUrl)"
+                     class="preview-image" alt="Aperçu" />
                 <div class="preview-overlay">
-                  <button type="button"
-                          mat-icon-button
-                          color="warn"
-                          class="remove-image"
-                          (click)="removeImage()"
-                          matTooltip="Supprimer l'image">
+                  <button type="button" mat-icon-button color="warn" class="remove-image"
+                          (click)="removeImage()" matTooltip="Supprimer">
                     <mat-icon>close</mat-icon>
                   </button>
-                  <span class="zoom-hint">👆 Cliquer pour zoomer</span>
                 </div>
               </div>
 
-              <!-- Editing Preview -->
-              <div class="file-preview" *ngIf="previewUrl" (click)="openImageZoom(previewUrl)" role="button" tabindex="0">
-                <img [src]="previewUrl" class="preview-image" alt="Aperçu de la publicité" />
+              <!-- Aperçu vidéo -->
+              <div class="file-preview" *ngIf="previewUrl && typePub === 'VIDEO_FICHIER'">
+                <video [src]="previewUrl" class="preview-image" controls style="object-fit:contain"></video>
                 <div class="preview-overlay">
-                  <button type="button" mat-icon-button color="warn" class="remove-image" (click)="removeImage(); $event.stopPropagation()">
+                  <button type="button" mat-icon-button color="warn" class="remove-image"
+                          (click)="removeImage()">
                     <mat-icon>close</mat-icon>
                   </button>
-                  <span class="zoom-hint">👆 Cliquer pour zoomer</span>
                 </div>
               </div>
             </div>
 
             <div class="upload-info">
               <mat-icon>info</mat-icon>
-              <span>Formats supportés: JPG, PNG, WebP, GIF • Taille max: 5MB • Ratio recommandé: 16:9</span>
+              <span *ngIf="typePub === 'IMAGE'">Formats supportés: JPG, PNG, WebP, GIF • Taille max: 5 Mo</span>
+              <span *ngIf="typePub === 'VIDEO_FICHIER'">Formats supportés: MP4, WebM, OGG • Taille max: 50 Mo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- URL vidéo -->
+        <div class="url-section" *ngIf="typePub === 'VIDEO_LIEN'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>URL de la vidéo (YouTube, direct, etc.)</mat-label>
+            <input matInput [(ngModel)]="lienVideo" [ngModelOptions]="{standalone: true}"
+                   placeholder="https://www.youtube.com/watch?v=..." />
+            <mat-icon matPrefix>link</mat-icon>
+            <mat-hint>Collez le lien YouTube ou l'URL directe de la vidéo</mat-hint>
+          </mat-form-field>
+
+          <!-- Aperçu vidéo lien -->
+          <div class="video-link-preview" *ngIf="lienVideo.trim()">
+            <p class="preview-label"><mat-icon>preview</mat-icon> Aperçu</p>
+            <div class="video-preview-container">
+              <iframe *ngIf="lienVideo.includes('youtube.com') || lienVideo.includes('youtu.be')"
+                      [src]="getYoutubeEmbedUrl(lienVideo)"
+                      frameborder="0"
+                      allowfullscreen
+                      class="video-preview-iframe"
+                      title="Aperçu YouTube">
+              </iframe>
+              <video *ngIf="!lienVideo.includes('youtube.com') && !lienVideo.includes('youtu.be')"
+                     [src]="lienVideo"
+                     controls
+                     class="video-preview-el"
+                     preload="metadata">
+              </video>
             </div>
           </div>
         </div>
@@ -111,7 +159,7 @@
           <button mat-raised-button
                   color="primary"
                   type="submit"
-                  [disabled]="(!selectedFile && !isEditing) || loading"
+                  [disabled]="loading"
                   class="submit-btn">
             <div class="button-content">
               <mat-progress-spinner
@@ -171,21 +219,36 @@
           <div class="pubs-grid">
             <div *ngFor="let pub of dataSource.filteredData" class="pub-card">
               <div class="pub-image-container">
-                <ng-container *ngIf="toBase64(pub.fichier) as src">
-                  <div class="pub-image-container" (click)="openImageZoom(src)" role="button" tabindex="0">
-                    <img *ngIf="src" [src]="src" class="pub-image" alt="Publicité" />
-                    <div class="image-overlay"><span class="zoom-indicator">🔍</span></div>
-                  </div>
+                <!-- Lien YouTube / externe -->
+                <ng-container *ngIf="pub.typePub === 'VIDEO_LIEN'">
+                  <iframe *ngIf="pub.lien && (pub.lien.includes('youtube.com') || pub.lien.includes('youtu.be'))"
+                          [src]="getYoutubeEmbedUrl(pub.lien)"
+                          frameborder="0" allowfullscreen
+                          class="pub-image" style="border:none;">
+                  </iframe>
+                  <video *ngIf="pub.lien && !pub.lien.includes('youtube.com') && !pub.lien.includes('youtu.be')"
+                         [src]="pub.lien" controls class="pub-image" preload="metadata">
+                  </video>
                 </ng-container>
-                <div class="image-overlay">
-                  <span class="zoom-indicator">🔍</span>
-                </div>
+                <!-- Vidéo fichier -->
+                <ng-container *ngIf="pub.typePub === 'VIDEO_FICHIER'">
+                  <video [src]="toVideoBase64(pub.fichier)" controls class="pub-image" preload="metadata"></video>
+                </ng-container>
+                <!-- Image -->
+                <ng-container *ngIf="pub.typePub === 'IMAGE' || !pub.typePub">
+                  <ng-container *ngIf="toBase64(pub.fichier) as src">
+                    <div class="pub-image-container" (click)="openImageZoom(src)" role="button" tabindex="0">
+                      <img [src]="src" class="pub-image" alt="Publicité" />
+                      <div class="image-overlay"><span class="zoom-indicator">🔍</span></div>
+                    </div>
+                  </ng-container>
+                </ng-container>
               </div>
 
               <div class="pub-info">
                 <div class="pub-id">ID: {{ getId(pub) }}</div>
-                <div class="pub-size" *ngIf="getImageSize(pub)">
-                  {{ getImageSize(pub) }}
+                <div class="pub-type-badge" [class]="'type-' + (pub.typePub ?? 'IMAGE').toLowerCase()">
+                  {{ pub.typePub === 'VIDEO_FICHIER' ? '🎬 Vidéo' : pub.typePub === 'VIDEO_LIEN' ? '🔗 Lien' : '🖼️ Image' }}
                 </div>
               </div>
 
@@ -238,12 +301,27 @@
             </div>
 
             <div class="card-content">
-              <ng-container *ngIf="toBase64(pub.fichier) as src">
-                <div class="pub-image-mobile-wrapper" (click)="openImageZoom(src)" role="button" tabindex="0">
-                  <img *ngIf="src" [src]="src" class="pub-image-mobile" alt="Publicité" />
-                </div>
+              <ng-container *ngIf="pub.typePub === 'VIDEO_LIEN'">
+                <iframe *ngIf="pub.lien && (pub.lien.includes('youtube.com') || pub.lien.includes('youtu.be'))"
+                        [src]="getYoutubeEmbedUrl(pub.lien)"
+                        frameborder="0" allowfullscreen
+                        class="pub-image-mobile" style="border:none;">
+                </iframe>
+                <video *ngIf="pub.lien && !pub.lien.includes('youtube.com') && !pub.lien.includes('youtu.be')"
+                       [src]="pub.lien" controls class="pub-image-mobile" preload="metadata">
+                </video>
               </ng-container>
-              <span class="zoom-hint-mobile">👆 Cliquer pour zoomer</span>
+              <ng-container *ngIf="pub.typePub === 'VIDEO_FICHIER'">
+                <video [src]="toVideoBase64(pub.fichier)" controls class="pub-image-mobile" preload="metadata"></video>
+              </ng-container>
+              <ng-container *ngIf="pub.typePub === 'IMAGE' || !pub.typePub">
+                <ng-container *ngIf="toBase64(pub.fichier) as src">
+                  <div class="pub-image-mobile-wrapper" (click)="openImageZoom(src)" role="button" tabindex="0">
+                    <img [src]="src" class="pub-image-mobile" alt="Publicité" />
+                  </div>
+                </ng-container>
+                <span class="zoom-hint-mobile">👆 Cliquer pour zoomer</span>
+              </ng-container>
             </div>
           </div>
         </div>

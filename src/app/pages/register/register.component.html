@@ -1,6 +1,28 @@
 <app-header-public></app-header-public>
 
-<div class="register-container">
+<!-- Vue "déjà connecté" : s'affiche quand l'utilisateur clique sur un lien de parrainage tout en étant connecté -->
+<div *ngIf="alreadyLoggedIn" class="already-logged-in-container">
+  <div class="already-logged-in-card">
+    <mat-icon class="already-icon">info</mat-icon>
+    <h2>Vous êtes déjà connecté</h2>
+    <p>
+      Ce lien d'inscription est réservé aux personnes qui n'ont pas encore de compte.<br>
+      Si vous souhaitez parrainer un ami, partagez-lui ce lien directement.
+    </p>
+    <div class="already-actions">
+      <button mat-raised-button color="primary" routerLink="/user/parrainage">
+        <mat-icon>group_add</mat-icon>
+        Mon espace parrainage
+      </button>
+      <button mat-stroked-button routerLink="/user">
+        <mat-icon>home</mat-icon>
+        Mon espace
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="register-container" *ngIf="!alreadyLoggedIn">
   <div class="register-background">
     <div class="register-card-wrapper">
       <mat-card class="register-card">
@@ -138,6 +160,30 @@
             </div>
           </section>
 
+          <!-- Code de parrainage -->
+          <section class="form-section optional-section">
+            <h2 class="section-title">
+              <mat-icon>group_add</mat-icon>
+              Code de parrainage <span class="optional-badge">(facultatif)</span>
+            </h2>
+            <p class="section-description">
+              Si un ami vous a invité, entrez son code pour bénéficier du programme de parrainage
+            </p>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Code de parrainage</mat-label>
+              <input
+                matInput
+                [(ngModel)]="codePromoParrain"
+                name="codePromoParrain"
+                placeholder="Ex: PS-0001"
+                autocomplete="off"
+              />
+              <mat-icon matPrefix>loyalty</mat-icon>
+              <mat-hint>Format: PS-XXXX</mat-hint>
+            </mat-form-field>
+          </section>
+
           <!-- Identifiants de plateforme -->
           <section class="form-section optional-section">
             <h2 class="section-title">
@@ -176,13 +222,6 @@
                 <mat-icon matPrefix>sports_esports</mat-icon>
               </mat-form-field>
 
-              <mat-form-field appearance="outline" class="platform-field">
-                <mat-label>
-                  <span class="platform-text">1WIN</span>
-                </mat-label>
-                <input matInput [(ngModel)]="user.id_1WIN" name="id_1WIN" />
-                <mat-icon matPrefix>sports_esports</mat-icon>
-              </mat-form-field>
 
               <mat-form-field appearance="outline" class="platform-field">
                 <mat-label>
@@ -254,3 +293,5 @@
     </div>
   </div>
 </div>
+<app-footer></app-footer>
+

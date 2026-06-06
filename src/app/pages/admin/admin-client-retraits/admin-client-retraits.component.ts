@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
+import { environment } from '../../../../environments/environment';
 
 type TransactionState = 'PENDING' | 'VALIDATED' | 'REJECTED';
 
@@ -53,7 +54,7 @@ interface Retrait {
   styleUrls: ['./admin-client-retraits.component.scss']
 })
 export class AdminClientRetraitsComponent implements OnInit {
-  private readonly API = 'http://192.168.11.124:8080';
+  private readonly API = environment.apiBaseUrl;
 
   clientId!: string;
   loading = false;
@@ -105,7 +106,6 @@ export class AdminClientRetraitsComponent implements OnInit {
           this.loading = false;
         },
         error: (err) => {
-          console.error(err);
           this.errorMsg = 'Erreur lors du chargement des retraits.';
           this.loading = false;
         }
@@ -195,3 +195,4 @@ export class AdminClientRetraitsComponent implements OnInit {
     this.applyFilterAndPaginate(true);
   }
 }
+

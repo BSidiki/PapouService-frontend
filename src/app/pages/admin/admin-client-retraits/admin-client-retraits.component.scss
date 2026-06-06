@@ -11,6 +11,7 @@
     padding: 1.5rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e6edf5;
 
     .header-content {
       display: flex;
@@ -26,6 +27,16 @@
         .back-button {
           border-radius: 12px;
           margin-top: 0.25rem;
+          border: 1px solid rgba(153, 31, 35, 0.25);
+          color: #991f23;
+          background: rgba(153, 31, 35, 0.05);
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba(153, 31, 35, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(153, 31, 35, 0.15);
+          }
 
           mat-icon {
             margin-right: 0.5rem;
@@ -53,6 +64,16 @@
       .header-actions {
         .refresh-btn {
           border-radius: 12px;
+          border: 1px solid rgba(0, 173, 239, 0.3);
+          color: #00adef;
+          background: rgba(0, 173, 239, 0.05);
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba(0, 173, 239, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 173, 239, 0.2);
+          }
 
           mat-icon {
             margin-right: 0.5rem;
@@ -78,6 +99,14 @@
       gap: 1rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       border-left: 4px solid transparent;
+      border: 1px solid #e6edf5;
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        background: #fbfdff;
+      }
 
       &.primary {
         border-left-color: #991f23; // Rouge officiel
@@ -98,6 +127,7 @@
       .stat-icon {
         font-size: 2rem;
         opacity: 0.8;
+        color: #991f23;
       }
 
       .stat-content {
@@ -125,10 +155,20 @@
     padding: 1.5rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e6edf5;
 
     .filter-group {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      align-items: center;
+
       .status-field {
         min-width: 250px;
+
+        @media (max-width: 768px) {
+          min-width: 100%;
+        }
       }
 
       .status-option {
@@ -159,6 +199,22 @@
           }
         }
       }
+
+      .reset-btn {
+        border-radius: 12px;
+        white-space: nowrap;
+        border: 1px solid #00adef;
+        color: #00adef;
+        background: rgba(0, 173, 239, 0.05);
+
+        &:hover {
+          background: rgba(0, 173, 239, 0.1);
+        }
+
+        @media (max-width: 768px) {
+          width: 100%;
+        }
+      }
     }
 
     .results-info {
@@ -186,6 +242,7 @@
     background: white;
     border-radius: 16px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e6edf5;
 
     .loading-content {
       display: flex;
@@ -193,11 +250,25 @@
       align-items: center;
       gap: 1rem;
 
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e2e8f0;
+        border-top: 4px solid #00adef;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
       span {
         color: #64748b;
         font-weight: 500;
       }
     }
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 
   // Error State
@@ -207,6 +278,7 @@
     background: white;
     border-radius: 16px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e6edf5;
 
     .error-content {
       .error-icon {
@@ -231,6 +303,13 @@
 
       .retry-btn {
         border-radius: 12px;
+        border: 1px solid #00adef;
+        color: #00adef;
+        background: rgba(0, 173, 239, 0.05);
+
+        &:hover {
+          background: rgba(0, 173, 239, 0.1);
+        }
 
         mat-icon {
           margin-right: 0.5rem;
@@ -254,6 +333,7 @@
         overflow: hidden;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         margin-bottom: 1.5rem;
+        border: 1px solid #e6edf5;
       }
 
       .retraits-table {
@@ -272,6 +352,7 @@
           padding: 1rem;
           border-bottom: 1px solid #f1f5f9;
           vertical-align: top;
+          color: #1e293b;
         }
 
         .amount-cell {
@@ -365,12 +446,47 @@
           border-radius: 8px;
           padding: 0.375rem 0.75rem;
           font-size: 0.75rem;
+          border: 1px solid transparent;
+          transition: all 0.2s ease;
 
           mat-icon {
             font-size: 1rem;
             width: 16px;
             height: 16px;
             margin-right: 0.25rem;
+          }
+
+          &.view {
+            background: rgba(0, 173, 239, 0.1);
+            color: #00adef;
+            border-color: rgba(0, 173, 239, 0.25);
+
+            &:hover {
+              background: #00adef;
+              color: white;
+            }
+          }
+
+          &.validate {
+            background: rgba(22, 163, 74, 0.1);
+            color: #16a34a;
+            border-color: rgba(22, 163, 74, 0.25);
+
+            &:hover {
+              background: #16a34a;
+              color: white;
+            }
+          }
+
+          &.reject {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            border-color: rgba(220, 38, 38, 0.25);
+
+            &:hover {
+              background: #dc2626;
+              color: white;
+            }
           }
         }
       }
@@ -391,6 +507,12 @@
         padding: 1.25rem;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
 
         .card-header {
           display: flex;
@@ -479,6 +601,15 @@
                     color: #94a3b8;
                     font-style: italic;
                   }
+
+                  &.platform {
+                    background: #e0f2fe;
+                    color: #0369a1;
+                    padding: 0.25rem 0.5rem;
+                    border-radius: 6px;
+                    width: fit-content;
+                    font-size: 0.75rem;
+                  }
                 }
               }
             }
@@ -494,9 +625,44 @@
             width: 100%;
             border-radius: 8px;
             padding: 0.5rem;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
 
             mat-icon {
               margin-right: 0.5rem;
+            }
+
+            &.view-mobile {
+              background: rgba(0, 173, 239, 0.1);
+              color: #00adef;
+              border-color: rgba(0, 173, 239, 0.25);
+
+              &:hover {
+                background: #00adef;
+                color: white;
+              }
+            }
+
+            &.validate-mobile {
+              background: rgba(22, 163, 74, 0.1);
+              color: #16a34a;
+              border-color: rgba(22, 163, 74, 0.25);
+
+              &:hover {
+                background: #16a34a;
+                color: white;
+              }
+            }
+
+            &.reject-mobile {
+              background: rgba(220, 38, 38, 0.1);
+              color: #dc2626;
+              border-color: rgba(220, 38, 38, 0.25);
+
+              &:hover {
+                background: #dc2626;
+                color: white;
+              }
             }
           }
         }
@@ -509,6 +675,15 @@
       border-radius: 12px;
       margin-top: 1rem;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e6edf5;
+
+      ::ng-deep .mat-paginator-container {
+        justify-content: center;
+
+        @media (min-width: 768px) {
+          justify-content: space-between;
+        }
+      }
     }
   }
 
@@ -519,6 +694,7 @@
     background: white;
     border-radius: 16px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e6edf5;
 
     .empty-content {
       .empty-icon {
@@ -544,6 +720,13 @@
 
       .reset-btn {
         border-radius: 12px;
+        border: 1px solid #00adef;
+        color: #00adef;
+        background: rgba(0, 173, 239, 0.05);
+
+        &:hover {
+          background: rgba(0, 173, 239, 0.1);
+        }
 
         mat-icon {
           margin-right: 0.5rem;
@@ -570,43 +753,5 @@
       background-color: #94a3b8 !important;
     }
   }
-
-  // Dark Mode Support
-  @media (prefers-color-scheme: dark) {
-    background: #0f172a;
-    color: #e2e8f0;
-
-    .header-section,
-    .stats-cards .stat-card,
-    .filters-section,
-    .loading-state,
-    .error-state,
-    .table-section .desktop-view .table-container,
-    .table-section .mobile-view .retrait-card,
-    .custom-paginator,
-    .empty-state {
-      background: #1e293b;
-      color: #e2e8f0;
-      border-color: #334155;
-    }
-
-    .stats-cards .stat-card .stat-content .stat-value,
-    .header-title h2,
-    .results-info .results-count,
-    .error-content h3,
-    .amount-cell .amount,
-    .mobile-view .retrait-amount .amount {
-      color: #e2e8f0;
-    }
-
-    .retraits-table {
-      td.mat-cell {
-        border-bottom-color: #334155;
-      }
-    }
-
-    .mobile-view .retrait-card {
-      border-color: #475569;
-    }
-  }
 }
+

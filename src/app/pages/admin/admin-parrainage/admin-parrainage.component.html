@@ -1,0 +1,294 @@
+<div class="admin-parrainage">
+
+  <!-- Header -->
+  <div class="header-row">
+    <div class="header-content">
+      <div class="header-title">
+        <mat-icon class="header-icon">diversity_3</mat-icon>
+        <h2>Programme de Parrainage</h2>
+      </div>
+      <button mat-stroked-button (click)="loadData()" [disabled]="loading" class="refresh-btn">
+        <mat-icon>refresh</mat-icon>
+        {{ loading ? 'Actualisation...' : 'Actualiser' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="state" *ngIf="loading">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <span>Chargement des données de parrainage...</span>
+    </div>
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- Stats globales -->
+    <div class="stat-cards">
+      <mat-card class="stat-card c-bleu">
+        <div class="stat-icon-wrap blue">
+          <mat-icon>handshake</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Parrains actifs</div>
+          <div class="stat-value">{{ totalParrainsActifs }}</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card c-vert">
+        <div class="stat-icon-wrap green">
+          <mat-icon>group</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Total filleuls</div>
+          <div class="stat-value">{{ totalFilleuls }}</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card c-or">
+        <div class="stat-icon-wrap gold">
+          <mat-icon>military_tech</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Palier 1 atteint</div>
+          <div class="stat-value">{{ totalPalier1 }}</div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card c-rouge">
+        <div class="stat-icon-wrap red">
+          <mat-icon>workspace_premium</mat-icon>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">Palier Premium atteint</div>
+          <div class="stat-value">{{ totalPalier2 }}</div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Taux de commission -->
+    <mat-card class="taux-card" style="margin-bottom: 16px; padding: 16px;">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <mat-icon>percent</mat-icon>
+        <span style="font-weight:600;">Taux de commission :</span>
+        <ng-container *ngIf="!editingTaux">
+          <span style="font-size:1.1em;">{{ tauxCommission !== null ? (tauxCommission * 100 | number:'1.0-2') + ' %' : '—' }}</span>
+          <button mat-stroked-button (click)="startEditTaux()">
+            <mat-icon>edit</mat-icon> Modifier
+          </button>
+        </ng-container>
+        <ng-container *ngIf="editingTaux">
+          <input type="number" step="0.01" min="0" max="1" [(ngModel)]="tauxEdit"
+                 style="width:80px; padding:4px 8px; border:1px solid #ccc; border-radius:4px;"
+                 placeholder="ex: 0.05" />
+          <span style="color:#888; font-size:0.85em;">(ex: 0.05 = 5 %)</span>
+          <button mat-raised-button color="primary" (click)="saveTauxCommission()">
+            <mat-icon>save</mat-icon> Enregistrer
+          </button>
+          <button mat-stroked-button (click)="editingTaux = false">Annuler</button>
+        </ng-container>
+      </div>
+    </mat-card>
+
+    <!-- Filtre / Recherche -->
+    <div class="filters-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Rechercher un client ou un code</mat-label>
+        <input matInput [(ngModel)]="search" (ngModelChange)="applyFilter()"
+               placeholder="Nom, téléphone, code PS-XXXX...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper" *ngIf="dataSource.data.length > 0">
+      <table mat-table [dataSource]="dataSource" matSort class="parrainage-table">
+
+        <!-- Parrain -->
+        <ng-container matColumnDef="parrain">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Client (Parrain)</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="client-cell">
+              <span class="client-name">{{ row.nomComplet }}</span>
+              <span class="client-phone">{{ row.numeroUtilisateur }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Son code -->
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef>Son code</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="code-cell">
+              <span class="referral-badge">{{ row.codeParrainage }}</span>
+              <button mat-icon-button class="copy-btn" (click)="copierCode(row.codeParrainage)"
+                      matTooltip="Copier le code">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Code utilisé -->
+        <ng-container matColumnDef="codeUtilise">
+          <th mat-header-cell *matHeaderCellDef>Code utilisé à l'inscription</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="parrain-badge" *ngIf="row.codeUtilise">{{ row.codeUtilise }}</span>
+            <span class="no-code" *ngIf="!row.codeUtilise">—</span>
+          </td>
+        </ng-container>
+
+        <!-- Filleuls -->
+        <ng-container matColumnDef="filleuls">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Filleuls</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="filleuls-cell">
+              <span class="filleul-count" [class.has-filleuls]="row.nbFilleuls > 0">
+                {{ row.nbFilleuls }}
+                <span class="filleul-valides" *ngIf="row.nbFilleulsValides > 0"
+                      matTooltip="Filleuls ayant au moins 1 dépôt validé">
+                  ({{ row.nbFilleulsValides }} validés)
+                </span>
+              </span>
+              <div class="mini-progress" *ngIf="row.nbFilleuls > 0">
+                <div class="mini-bar">
+                  <div class="mini-fill" [style.width.%]="getProgress1(row.nbFilleuls)"></div>
+                </div>
+                <span class="mini-label">{{ row.nbFilleuls }}/{{ milestone1 }}</span>
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Commissions -->
+        <ng-container matColumnDef="commissions">
+          <th mat-header-cell *matHeaderCellDef>Commissions</th>
+          <td mat-cell *matCellDef="let row">
+            <div class="commissions-cell" *ngIf="row.commissionEnAttente > 0 || row.commissionTotaleVersee > 0; else noComm">
+              <span class="comm-attente" *ngIf="row.commissionEnAttente > 0"
+                    matTooltip="En attente de versement">
+                <mat-icon>schedule</mat-icon> {{ row.commissionEnAttente | number:'1.0-0' }} F
+              </span>
+              <span class="comm-versee" *ngIf="row.commissionTotaleVersee > 0"
+                    matTooltip="Total versé">
+                <mat-icon>check_circle</mat-icon> {{ row.commissionTotaleVersee | number:'1.0-0' }} F
+              </span>
+            </div>
+            <ng-template #noComm><span class="no-code">—</span></ng-template>
+          </td>
+        </ng-container>
+
+        <!-- Palier -->
+        <ng-container matColumnDef="palier">
+          <th mat-header-cell *matHeaderCellDef>Palier</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="palier-chip palier-{{ row.palier }}">
+              <mat-icon *ngIf="row.palier === 2">workspace_premium</mat-icon>
+              <mat-icon *ngIf="row.palier === 1">star</mat-icon>
+              <mat-icon *ngIf="row.palier === 0">remove</mat-icon>
+              {{ getPalierLabel(row.palier) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Détail</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-stroked-button class="detail-btn"
+                    *ngIf="row.nbFilleuls > 0"
+                    (click)="selectParrain(row)">
+              <mat-icon>{{ selectedParrain?.idUtilisateur === row.idUtilisateur ? 'expand_less' : 'expand_more' }}</mat-icon>
+              Voir ({{ row.nbFilleuls }})
+            </button>
+            <span *ngIf="row.nbFilleuls === 0" class="no-code">—</span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            [class.selected-row]="selectedParrain?.idUtilisateur === row.idUtilisateur"
+            (click)="row.nbFilleuls > 0 && selectParrain(row)">
+        </tr>
+      </table>
+
+      <!-- Panneau filleuls -->
+      <div class="filleuls-panel" *ngIf="selectedParrain">
+        <div class="filleuls-header">
+          <div class="panel-title">
+            <mat-icon>group</mat-icon>
+            <h4>Filleuls de <strong>{{ selectedParrain.nomComplet }}</strong></h4>
+            <span class="panel-code">{{ selectedParrain.codeParrainage }}</span>
+          </div>
+          <button mat-icon-button (click)="selectedParrain = null" matTooltip="Fermer">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <!-- Commissions résumé -->
+        <div class="parrain-commissions" *ngIf="selectedParrain.commissionEnAttente > 0 || selectedParrain.commissionTotaleVersee > 0">
+          <div class="comm-badge attente" *ngIf="selectedParrain.commissionEnAttente > 0">
+            <mat-icon>schedule</mat-icon>
+            <span>En attente : <strong>{{ selectedParrain.commissionEnAttente | number:'1.0-0' }} FCFA</strong></span>
+          </div>
+          <div class="comm-badge versee" *ngIf="selectedParrain.commissionTotaleVersee > 0">
+            <mat-icon>check_circle</mat-icon>
+            <span>Versées : <strong>{{ selectedParrain.commissionTotaleVersee | number:'1.0-0' }} FCFA</strong></span>
+          </div>
+        </div>
+
+        <!-- Progression des jalons -->
+        <div class="jalons">
+          <div class="jalon">
+            <div class="jalon-label">
+              <span>Palier 1 — {{ selectedParrain.nbFilleuls }}/{{ milestone1 }} filleuls</span>
+              <span class="jalon-pct">{{ getProgress1(selectedParrain.nbFilleuls).toFixed(0) }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getProgress1(selectedParrain.nbFilleuls)"></div>
+            </div>
+          </div>
+          <div class="jalon jalon-gold" *ngIf="selectedParrain.nbFilleuls >= milestone1">
+            <div class="jalon-label">
+              <span>Palier Premium — {{ selectedParrain.nbFilleuls - milestone1 }}/{{ milestone2 - milestone1 }} supplémentaires</span>
+              <span class="jalon-pct">{{ getProgress2(selectedParrain.nbFilleuls).toFixed(0) }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill gold" [style.width.%]="getProgress2(selectedParrain.nbFilleuls)"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des filleuls -->
+        <div class="filleuls-list">
+          <div *ngFor="let f of selectedParrain.filleuls" class="filleul-item">
+            <div class="filleul-avatar" [class.validated]="f.nbDepotsValides > 0">
+              <mat-icon>{{ f.nbDepotsValides > 0 ? 'verified_user' : 'person' }}</mat-icon>
+            </div>
+            <div class="filleul-info">
+              <span class="filleul-name">{{ f.nomComplet }}</span>
+              <span class="filleul-phone">{{ f.numeroUtilisateur }}</span>
+            </div>
+            <span class="filleul-depots" [class.has-depots]="f.nbDepotsValides > 0">
+              <mat-icon>{{ f.nbDepotsValides > 0 ? 'receipt_long' : 'block' }}</mat-icon>
+              {{ f.nbDepotsValides > 0 ? f.nbDepotsValides + ' dépôt(s) validé(s)' : 'Aucun dépôt' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]" [pageSize]="10"
+                     showFirstLastButtons aria-label="Pagination">
+      </mat-paginator>
+    </div>
+
+    <!-- État vide -->
+    <div class="empty-state" *ngIf="dataSource.data.length === 0">
+      <mat-icon>group_off</mat-icon>
+      <h4>Aucun résultat</h4>
+      <p>Aucun client ne correspond à votre recherche.</p>
+    </div>
+
+  </ng-container>
+</div>

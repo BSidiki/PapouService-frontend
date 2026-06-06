@@ -1,15 +1,231 @@
+/* Polices bundlées localement pour Android natif (pas de Google CDN) */
+@import 'material-icons/iconfont/material-icons.css';
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import '@fontsource/montserrat/700.css';
+@import '@fontsource/poppins/500.css';
+@import '@fontsource/poppins/600.css';
+@import '@fontsource/open-sans/400.css';
+@import '@fontsource/open-sans/500.css';
+
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-
-/* @mixin spacer {
-  flex: 1 1 auto;
+// ══════════════════════════════════════════════
+// BOX MODEL UNIVERSEL — corrige les débordements
+// ══════════════════════════════════════════════
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-span.spacer {
-  @include spacer;
+// ══════════════════════════════════════════════
+// BASE HTML / BODY
+// ══════════════════════════════════════════════
+html {
+  height: 100%;
+  // Empêche le scroll horizontal sur tout le site
+  overflow-x: hidden;
+  // Texte plus net sur iOS/macOS
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
+
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  // Empêche le scroll horizontal
+  overflow-x: hidden;
+  // Rendu plus net sur iOS
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ══════════════════════════════════════════════
+// IMAGES RESPONSIVES
+// ══════════════════════════════════════════════
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// ══════════════════════════════════════════════
+// INPUTS — empêche le zoom auto sur iOS (≥16px)
+// ══════════════════════════════════════════════
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="tel"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+textarea,
+select {
+  font-size: 16px;
+  // Supprime le style natif iOS sur les inputs
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+}
+
+// ══════════════════════════════════════════════
+// CIBLES TACTILES — minimum 44×44px (Apple HIG)
+// ══════════════════════════════════════════════
+button,
+[role="button"],
+a,
+input[type="submit"],
+input[type="button"] {
+  min-height: 44px;
+  touch-action: manipulation;
+  // Supprime le délai de 300ms sur mobile
+}
+
+// Mat-icon-button : ne pas forcer 44px sur desktop
+.mat-mdc-icon-button {
+  min-height: unset !important;
+}
+
+// ══════════════════════════════════════════════
+// iOS : scroll lock correct quand sidenav ouverte
+// ══════════════════════════════════════════════
+body.sidenav-open {
+  overflow: hidden;
+  // Position fixed nécessaire sur iOS Safari pour
+  // vraiment bloquer le scroll en arrière-plan
+  @supports (-webkit-touch-callout: none) {
+    position: fixed;
+    width: 100%;
+    // Conserve la position de scroll
+    top: var(--scroll-y, 0);
+  }
+}
+
+// ══════════════════════════════════════════════
+// SAFE AREA INSETS — iPhone avec encoche / Dynamic Island
+// ══════════════════════════════════════════════
+.safe-area-top    { padding-top:    env(safe-area-inset-top); }
+.safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+// Appliqué au toolbar pour éviter que l'encoche le cache
+mat-toolbar, .public-toolbar {
+  padding-left:  max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+}
+
+// Footer : tenir compte de la barre du bas (iPhone home bar)
+app-footer, .footer {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+// ══════════════════════════════════════════════
+// RESPONSIVE GLOBAL — conteneurs & typographie
+// ══════════════════════════════════════════════
+
+// Empêche les tables de dépasser sur mobile
+table {
+  width: 100%;
+  table-layout: auto;
+}
+
+// Empêche les mots longs de casser le layout
+p, span, h1, h2, h3, h4, h5, h6, li, td, th {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+// Tous les conteneurs avec max-width s'adaptent au mobile
+[class*="-container"],
+[class*="-wrapper"],
+[class*="-content"] {
+  max-width: 100%;
+}
+
+// ── Petits Android (360px) & iPhone SE (375px) ───────────────────
+@media (max-width: 390px) {
+  html { font-size: 15px; }
+
+  // Réduire les padding trop larges sur très petits écrans
+  .parrainage-page,
+  .retrait-page,
+  .depot-page,
+  .profil-page,
+  .historique-page,
+  .depot-detail-page,
+  .retrait-detail-page,
+  .admin-dashboard,
+  .admin-clients { padding-left: 10px !important; padding-right: 10px !important; }
+
+  mat-card, .mat-mdc-card { border-radius: 12px !important; }
+
+  // Stat cards en colonne sur très petit écran
+  .stat-cards { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+}
+
+// ── Paysage mobile (landscape) ───────────────────────────────────
+@media (max-height: 500px) and (orientation: landscape) {
+  .sidenav-container,
+  .login-container,
+  .register-container {
+    // Scroll vertical activé en paysage
+    overflow-y: auto;
+  }
+}
+
+// ── Mat-snackbar : toujours visible sur mobile ────────────────────
+.mat-mdc-snack-bar-container {
+  max-width: calc(100vw - 32px) !important;
+  margin: 0 16px 16px !important;
+}
+
+// ── Mat-dialog : plein écran sur mobile ──────────────────────────
+@media (max-width: 600px) {
+  .mat-mdc-dialog-container {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    border-radius: 16px 16px 0 0 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+  }
+  .cdk-overlay-pane {
+    max-width: 100vw !important;
+    width: 100% !important;
+    align-items: flex-end !important;
+  }
+}
+
+// ── Mat-select panel sur mobile ───────────────────────────────────
+@media (max-width: 600px) {
+  .mat-mdc-select-panel {
+    max-width: calc(100vw - 32px) !important;
+  }
+}
+
+/* ── Snackbar notifications ─────────────────────────────────────── */
+.notif-snackbar .mdc-snackbar__surface {
+  background: #1a2f1a !important;
+  border-left: 4px solid #16a34a;
+  border-radius: 8px !important;
+}
+.notif-snackbar .mdc-snackbar__label {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+.success-snackbar .mdc-snackbar__surface {
+  background: #14532d !important;
+  border-left: 4px solid #22c55e;
+  border-radius: 8px !important;
+}
+.error-snackbar .mdc-snackbar__surface {
+  background: #450a0a !important;
+  border-left: 4px solid #ef4444;
+  border-radius: 8px !important;
+}
+
+@mixin spacer { flex: 1 1 auto; }
+span.spacer { @include spacer; }
 
 mat-toolbar {
   display: flex;
@@ -18,61 +234,562 @@ mat-toolbar {
   justify-content: space-between;
   padding: 0 1rem;
 
-  .brand {
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-
-  .menu {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-
-    button {
-      font-size: 0.9rem;
-    }
-  }
-
-  .spacer {
-    flex: 1 1 auto;
-  }
-
-  .mobile-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
+  .brand { font-weight: bold; font-size: 1.2rem; }
+  .menu  { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; button { font-size: 0.9rem; } }
+  .spacer { flex: 1 1 auto; }
+  .mobile-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
 }
 
-// Mobile menu (toggle)
 @media screen and (max-width: 768px) {
   mat-toolbar {
     flex-direction: column;
     align-items: flex-start;
     padding: 0.5rem 1rem;
-
-    .menu {
-      display: none;
-      flex-direction: column;
-      width: 100%;
-      margin-top: 0.5rem;
-    }
-
-    &.menu-open .menu {
-      display: flex;
-    }
-
-    .mobile-toggle {
-      display: block;
-      align-self: flex-end;
-    }
-
-    .spacer {
-      display: none;
-    }
+    .menu { display: none; flex-direction: column; width: 100%; margin-top: 0.5rem; }
+    &.menu-open .menu { display: flex; }
+    .mobile-toggle { display: block; align-self: flex-end; }
+    .spacer { display: none; }
   }
 }
-  */
+
+.notif-badge {
+  background: #dc2626;
+  color: white;
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DARK MODE — OVERRIDES COMPLETS
+// ══════════════════════════════════════════════════════════════════
+
+// Palette dark
+$dm-bg:         #0f172a;
+$dm-surface:    #1e293b;
+$dm-surface-2:  #162032;
+$dm-surface-3:  #243447;
+$dm-border:     #334155;
+$dm-border-2:   #2d3f55;
+$dm-text:       #f1f5f9;
+$dm-text-2:     #94a3b8;
+$dm-text-3:     #64748b;
+$dm-rouge:      #e05260;
+$dm-bleu:       #38bdf8;
+
+body.dark-theme {
+  // ── Variables CSS ────────────────────────────────────────────────
+  --bg-color:        #{$dm-bg};
+  --card-color:      #{$dm-surface};
+  --border-color:    #{$dm-border};
+  --text-primary:    #{$dm-text};
+  --text-secondary:  #{$dm-text-2};
+
+  background: $dm-bg;
+  color: $dm-text;
+
+  // ── Material : Toolbar ───────────────────────────────────────────
+  mat-toolbar {
+    background: $dm-surface !important;
+    color: $dm-text !important;
+    border-bottom: 1px solid $dm-border !important;
+  }
+
+  // ── Material : Sidenav ───────────────────────────────────────────
+  mat-sidenav,
+  .mat-drawer,
+  .mat-sidenav {
+    background: $dm-surface !important;
+    color: $dm-text !important;
+  }
+
+  // ── Material : Cards ─────────────────────────────────────────────
+  mat-card,
+  .mat-mdc-card {
+    background: $dm-surface !important;
+    color: $dm-text !important;
+    border: 1px solid $dm-border !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+  }
+
+  // ── Material : Form fields ───────────────────────────────────────
+  mat-form-field {
+    .mat-mdc-text-field-wrapper { background: $dm-surface-2 !important; }
+    .mdc-text-field--outlined .mdc-notched-outline__leading,
+    .mdc-text-field--outlined .mdc-notched-outline__notch,
+    .mdc-text-field--outlined .mdc-notched-outline__trailing {
+      border-color: $dm-border !important;
+    }
+    &.mat-focused .mdc-notched-outline__leading,
+    &.mat-focused .mdc-notched-outline__notch,
+    &.mat-focused .mdc-notched-outline__trailing {
+      border-color: $dm-bleu !important;
+    }
+    input, textarea, mat-select { color: $dm-text !important; }
+    .mat-mdc-form-field-label,
+    .mdc-floating-label,
+    .mat-mdc-select-placeholder { color: $dm-text-2 !important; }
+    .mat-mdc-select-arrow { color: $dm-text-2 !important; }
+  }
+
+  // ── Material : Select panel ──────────────────────────────────────
+  .mat-mdc-select-panel,
+  .mat-mdc-autocomplete-panel {
+    background: $dm-surface !important;
+    border: 1px solid $dm-border;
+    mat-option { color: $dm-text !important; }
+    mat-option:hover,
+    mat-option.mat-mdc-option-active { background: $dm-surface-3 !important; }
+  }
+
+  // ── Material : Table ─────────────────────────────────────────────
+  mat-table,
+  .mat-mdc-table {
+    background: $dm-surface !important;
+    color: $dm-text !important;
+  }
+  th.mat-mdc-header-cell {
+    background: $dm-surface-2 !important;
+    color: $dm-text-2 !important;
+    border-bottom-color: $dm-border !important;
+  }
+  td.mat-mdc-cell {
+    color: $dm-text !important;
+    border-bottom-color: $dm-border !important;
+  }
+  tr.mat-mdc-row:hover { background: rgba(255,255,255,0.04) !important; }
+
+  // ── Material : Paginator ─────────────────────────────────────────
+  mat-paginator,
+  .mat-mdc-paginator {
+    background: $dm-surface !important;
+    color: $dm-text-2 !important;
+    border-top: 1px solid $dm-border;
+    .mat-mdc-icon-button { color: $dm-text-2 !important; }
+    .mat-mdc-select-value { color: $dm-text !important; }
+  }
+
+  // ── Material : Buttons ───────────────────────────────────────────
+  .mat-mdc-outlined-button:not([color]) {
+    border-color: $dm-border !important;
+    color: $dm-text !important;
+  }
+  .mat-mdc-button:not([color]) { color: $dm-text-2 !important; }
+  .mat-mdc-icon-button:not([color]) { color: $dm-text-2 !important; }
+
+  // ── Material : Tabs ──────────────────────────────────────────────
+  .mat-mdc-tab-header { border-bottom: 1px solid $dm-border; }
+  .mat-mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label { color: $dm-text-2 !important; }
+  .mat-mdc-tab-body { background: $dm-bg; }
+
+  // ── Material : Dialog ────────────────────────────────────────────
+  .mat-mdc-dialog-container,
+  .mdc-dialog__surface {
+    background: $dm-surface !important;
+    color: $dm-text !important;
+  }
+
+  // ── Material : Chip ──────────────────────────────────────────────
+  .mat-mdc-chip { background: $dm-surface-3 !important; color: $dm-text !important; }
+
+  // ── Material : Tooltip ───────────────────────────────────────────
+  .mdc-tooltip__surface { background: #374151 !important; color: $dm-text !important; }
+
+  // ── Material : Divider ───────────────────────────────────────────
+  mat-divider, .mat-divider { border-top-color: $dm-border !important; }
+
+  // ── Material : Progress bar ──────────────────────────────────────
+  mat-progress-bar { --mdc-linear-progress-track-color: #{$dm-border} !important; }
+
+  // ── Layout ───────────────────────────────────────────────────────
+  .sidenav-container,
+  .mat-drawer-container,
+  .mat-sidenav-container { background: $dm-bg !important; }
+
+  // ── Liens ────────────────────────────────────────────────────────
+  a:not(.mat-mdc-button):not(.mat-mdc-raised-button):not(.platform-link) {
+    color: $dm-bleu;
+    &:visited { color: #a78bfa; }
+  }
+
+  // ════════════════════════════════════════════
+  // PAGE WRAPPERS (tous les composants)
+  // ════════════════════════════════════════════
+  .retrait-page,
+  .depot-page,
+  .parrainage-page,
+  .profil-page,
+  .depot-detail-page,
+  .retrait-detail-page,
+  .historique-page,
+  .admin-dashboard,
+  .admin-clients,
+  .admin-annonces,
+  .admin-pubs,
+  .admin-validations,
+  .admin-transactions,
+  .admin-parrainage,
+  .admin-admin,
+  .contact-page,
+  .faq-page,
+  .a-propos-page,
+  .not-found-page {
+    background: $dm-bg !important;
+    background-image: none !important;
+  }
+
+  :host { background: $dm-bg !important; }
+
+  // ════════════════════════════════════════════
+  // SECTIONS BLANCHES → surface
+  // ════════════════════════════════════════════
+  .page-header,
+  .header-row,
+  .section-header,
+  .filter-bar,
+  .info-section,
+  .info-card,
+  .detail-card,
+  .form-section,
+  .summary-section,
+  .confirm-card,
+  .upload-zone,
+  .platforms-section,
+  .chart-card,
+  .no-data,
+  .empty-state,
+  .table-container,
+  .transactions-section,
+  .stat-block,
+  .detail-section,
+  .contact-card,
+  .faq-card {
+    background: $dm-surface !important;
+    border-color: $dm-border !important;
+    color: $dm-text !important;
+  }
+
+  // ════════════════════════════════════════════
+  // SECTIONS $fond-clair → surface-2
+  // ════════════════════════════════════════════
+  .stat-item,
+  .milestone,
+  .gold-milestone,
+  .option-card,
+  .amount-btn,
+  .platform-btn,
+  .payment-btn,
+  .retrait-form,
+  .filter-group,
+  .active-filters,
+  .code-retrait,
+  .transaction-card,
+  .filleul-item,
+  .commission-item,
+  .quick-amounts,
+  .summary-row,
+  .info-row,
+  .platform-select-grid,
+  .historique-item,
+  .detail-row,
+  .profil-section,
+  .password-section,
+  .ids-section,
+  .stat-cards .stat-card,
+  .countdown-box {
+    background: $dm-surface-2 !important;
+    border-color: $dm-border !important;
+  }
+
+  // ════════════════════════════════════════════
+  // TEXTES
+  // ════════════════════════════════════════════
+
+  // Titres principaux
+  h1, h2, h3, h4, h5, h6 { color: $dm-text !important; }
+
+  // Classes texte spécifiques du projet
+  .main-title,
+  .page-title,
+  .section-title,
+  .card-title,
+  .stat-label,
+  .platform-name,
+  .filleul-nom,
+  .client-name,
+  .label,
+  .retrait-label,
+  .comm-montant,
+  .amount,
+  .stat-value,
+  .milestone-title { color: $dm-text !important; }
+
+  .subtitle,
+  .stat-label,
+  .milestone-reward,
+  .milestone-count,
+  .referral-hint,
+  .filleul-numero,
+  .comm-date,
+  .comm-filleul,
+  .info-label,
+  .platform-action,
+  .date,
+  .date-mobile,
+  .proof-label,
+  .value,
+  .retrait-hint { color: $dm-text-2 !important; }
+
+  // ════════════════════════════════════════════
+  // TABLEAUX
+  // ════════════════════════════════════════════
+  table {
+    background: $dm-surface !important;
+    color: $dm-text !important;
+  }
+  thead tr { background: $dm-surface-2 !important; }
+  tbody tr { border-bottom-color: $dm-border !important; }
+  tbody tr:hover { background: rgba(255,255,255,0.03) !important; }
+  th { color: $dm-text-2 !important; border-bottom-color: $dm-border !important; }
+  td { color: $dm-text !important; border-bottom-color: $dm-border !important; }
+
+  // ════════════════════════════════════════════
+  // INPUTS NATIFS
+  // ════════════════════════════════════════════
+  input:not([type="range"]),
+  textarea,
+  select {
+    background: $dm-surface-2 !important;
+    color: $dm-text !important;
+    border-color: $dm-border !important;
+    &::placeholder { color: $dm-text-3 !important; }
+  }
+
+  // ════════════════════════════════════════════
+  // HEADER UTILISATEUR (sidenav)
+  // ════════════════════════════════════════════
+  .sidenav {
+    background: $dm-surface !important;
+    color: $dm-text !important;
+    border-right-color: $dm-border !important;
+  }
+  .nav-item {
+    color: $dm-text-2 !important;
+    &:hover, &.active {
+      background: rgba(255,255,255,0.06) !important;
+      color: $dm-text !important;
+    }
+  }
+  .nav-icon { color: $dm-text-3 !important; }
+  .user-info-section {
+    background: $dm-surface-2 !important;
+    border-bottom-color: $dm-border !important;
+  }
+  .user-name  { color: $dm-text !important; }
+  .user-phone { color: $dm-text-2 !important; }
+
+  // ════════════════════════════════════════════
+  // DASHBOARD ADMIN
+  // ════════════════════════════════════════════
+  .stat-card {
+    &.primary, &.accent, &.warn, &.warning-depot, &.warning-retrait {
+      color: $dm-text !important;
+      .stat-label { color: rgba(255,255,255,0.75) !important; }
+      .stat-value { color: #ffffff !important; }
+    }
+  }
+
+  .platform-link {
+    background: $dm-surface-2 !important;
+    border-color: $dm-border !important;
+    color: $dm-text !important;
+    &:hover { background: $dm-surface-3 !important; }
+    .platform-name { color: $dm-text !important; }
+    .platform-action { color: $dm-text-2 !important; }
+  }
+
+  .filter-field .mat-mdc-text-field-wrapper { background: $dm-surface-2 !important; }
+
+  .row-new { background: rgba(56,189,248,0.07) !important; }
+
+  .client-cell {
+    .client-name  { color: $dm-text !important; }
+    .client-phone { color: $dm-text-2 !important; }
+  }
+
+  .platform-info {
+    .platform-name { color: $dm-text !important; }
+    .platform-id   { color: $dm-text-2 !important; }
+  }
+
+  .no-image { color: $dm-text-3 !important; }
+  .code-label { color: $dm-text-2 !important; }
+  .code-value { color: $dm-text !important; }
+
+  // ════════════════════════════════════════════
+  // RETRAIT / DÉPÔT — pages utilisateur
+  // ════════════════════════════════════════════
+  .retrait-header,
+  .depot-header { color: #fff !important; /* gradients — on laisse le fond rouge */ }
+
+  .form-card,
+  .step-card,
+  .upload-card { background: $dm-surface !important; border-color: $dm-border !important; }
+
+  .upload-zone {
+    border-color: $dm-border !important;
+    background: $dm-surface-2 !important;
+    &:hover, &.dragover { border-color: $dm-bleu !important; background: rgba(56,189,248,0.05) !important; }
+    .upload-hint { color: $dm-text-2 !important; }
+  }
+
+  .quick-amount-btn,
+  .amount-btn {
+    background: $dm-surface-2 !important;
+    border-color: $dm-border !important;
+    color: $dm-text !important;
+    &:hover, &.selected { background: $dm-surface-3 !important; border-color: $dm-bleu !important; }
+  }
+
+  .platform-option,
+  .payment-option {
+    background: $dm-surface-2 !important;
+    border-color: $dm-border !important;
+    color: $dm-text !important;
+    &.selected, &:hover { border-color: $dm-bleu !important; background: $dm-surface-3 !important; }
+  }
+
+  .confirm-overlay {
+    background: rgba(0,0,0,0.65) !important;
+    .confirm-card {
+      background: $dm-surface !important;
+      border-color: $dm-border !important;
+      color: $dm-text !important;
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // PARRAINAGE
+  // ════════════════════════════════════════════
+  .referral-code-section {
+    background: rgba(56,189,248,0.05) !important;
+    border-color: $dm-border !important;
+  }
+  .registration-link-section {
+    background: rgba(56,189,248,0.05) !important;
+    border-color: $dm-border !important;
+    .link-text { color: $dm-bleu !important; }
+  }
+  .progress-bar { background: #2d3f55 !important; }
+  .filleuls-card .filleuls-list,
+  .commissions-card .commissions-list { background: transparent !important; }
+
+  // ════════════════════════════════════════════
+  // PROFIL
+  // ════════════════════════════════════════════
+  .profil-header {
+    background: $dm-surface !important;
+    border-color: $dm-border !important;
+  }
+  .avatar-circle { background: $dm-surface-3 !important; border-color: $dm-border !important; }
+  .profil-nom    { color: $dm-text !important; }
+  .profil-numero { color: $dm-text-2 !important; }
+
+  .ids-grid .id-card {
+    background: $dm-surface-2 !important;
+    border-color: $dm-border !important;
+    .id-platform { color: $dm-text-2 !important; }
+    .id-value     { color: $dm-text !important; }
+  }
+
+  // ════════════════════════════════════════════
+  // HISTORIQUE
+  // ════════════════════════════════════════════
+  .historique-item {
+    background: $dm-surface-2 !important;
+    border-color: $dm-border !important;
+    &:hover { background: $dm-surface-3 !important; }
+    .historique-date { color: $dm-text-2 !important; }
+    .historique-type { color: $dm-text !important; }
+  }
+
+  // ════════════════════════════════════════════
+  // HEADER PUBLIC / LOGIN / REGISTER
+  // ════════════════════════════════════════════
+  .login-card,
+  .register-card {
+    background: $dm-surface !important;
+    border: 1px solid $dm-border !important;
+    color: $dm-text !important;
+    backdrop-filter: none !important;
+  }
+  .login-container,
+  .register-container {
+    /* On garde le gradient de fond — lisible en dark */
+  }
+
+  // ════════════════════════════════════════════
+  // FOOTER
+  // ════════════════════════════════════════════
+  .footer { background: #060a14 !important; }
+
+  // ════════════════════════════════════════════
+  // ACCUEIL PUBLIC
+  // ════════════════════════════════════════════
+  .public-accueil { background: $dm-bg !important; }
+  .main-content   { background: $dm-bg !important; color: $dm-text !important; }
+  .welcome-section { background: $dm-surface !important; }
+  .service-card {
+    background: $dm-surface !important;
+    border-color: $dm-border !important;
+    color: $dm-text !important;
+  }
+
+  // ════════════════════════════════════════════
+  // ANNONCES / CAROUSEL
+  // ════════════════════════════════════════════
+  .annonce-card,
+  .carousel-item {
+    background: $dm-surface !important;
+    border-color: $dm-border !important;
+    color: $dm-text !important;
+  }
+
+  // ════════════════════════════════════════════
+  // ADMIN — pages communes
+  // ════════════════════════════════════════════
+  .admin-container,
+  .clients-container {
+    background: $dm-bg !important;
+  }
+
+  .search-field .mat-mdc-text-field-wrapper { background: $dm-surface-2 !important; }
+
+  .filter-toggle,
+  .clear-filters,
+  .refresh-btn {
+    border-color: $dm-border !important;
+    color: $dm-text-2 !important;
+  }
+
+  .filter-badge {
+    background: $dm-rouge !important;
+    color: #fff !important;
+  }
+
+  .last { color: $dm-text-3 !important; }
+
+  // ════════════════════════════════════════════
+  // SCROLLBAR (optionnel, Webkit)
+  // ════════════════════════════════════════════
+  * {
+    scrollbar-color: $dm-border $dm-surface-2;
+    &::-webkit-scrollbar { width: 8px; height: 8px; }
+    &::-webkit-scrollbar-track { background: $dm-surface-2; }
+    &::-webkit-scrollbar-thumb { background: $dm-border; border-radius: 4px; }
+    &::-webkit-scrollbar-thumb:hover { background: #475569; }
+  }
+}

@@ -1,0 +1,296 @@
+<section class="hero-carousel">
+  <app-annonces-public></app-annonces-public>
+</section>
+
+<div class="parrainage-page">
+  <div class="parrainage-container">
+
+    <!-- En-tête -->
+    <div class="page-header">
+      <mat-icon class="header-icon">diversity_3</mat-icon>
+      <div class="header-content">
+        <h1 class="main-title">Programme de Parrainage</h1>
+        <p class="subtitle">Invitez vos amis et gagnez des récompenses exclusives</p>
+      </div>
+    </div>
+
+    <!-- Carte principale -->
+    <mat-card class="parrainage-card">
+      <div class="card-header">
+        <mat-icon class="card-icon">group_add</mat-icon>
+        <h3>Mon Code & Lien de Parrainage</h3>
+      </div>
+
+      <div class="card-content">
+
+        <!-- Code + Lien côte à côte -->
+        <div class="code-link-row">
+
+          <!-- Code de parrainage -->
+          <div class="referral-code-section">
+            <p class="referral-label">Votre code de parrainage</p>
+            <div class="referral-code-box">
+              <span class="referral-code">{{ referralCode || '—' }}</span>
+              <button mat-icon-button (click)="copyReferralCode()" class="copy-btn" title="Copier le code" [disabled]="!referralCode">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            </div>
+            <button *ngIf="!referralCode" mat-stroked-button class="generate-btn" (click)="genererCode()" [disabled]="generatingCode">
+              <mat-progress-spinner *ngIf="generatingCode" diameter="16" mode="indeterminate"></mat-progress-spinner>
+              <mat-icon *ngIf="!generatingCode">add_circle</mat-icon>
+              {{ generatingCode ? 'Génération...' : 'Générer mon code' }}
+            </button>
+          </div>
+
+          <!-- Lien d'inscription -->
+          <div class="registration-link-section">
+            <p class="referral-label">Lien d'inscription avec votre code</p>
+            <div class="link-box">
+              <span class="link-text">{{ getRegistrationLink() }}</span>
+              <button mat-icon-button (click)="copyRegistrationLink()" class="copy-btn" title="Copier le lien">
+                <mat-icon>link</mat-icon>
+              </button>
+            </div>
+            <p class="referral-hint">Vos amis n'auront pas besoin de saisir le code manuellement</p>
+          </div>
+
+        </div>
+
+        <!-- Statistiques -->
+        <div class="parrainage-stats">
+          <div class="stat-item">
+            <div class="stat-icon-wrap blue">
+              <mat-icon>people</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ parrainageCount }}</span>
+              <span class="stat-label">Filleuls inscrits</span>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon-wrap green">
+              <mat-icon>payments</mat-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value-row">
+                <span class="stat-value">{{ showTotalCommissions ? (getTotalCommissions() | number:'1.0-0') : '••••••' }}</span>
+                <button mat-icon-button class="eye-btn" (click)="showTotalCommissions = !showTotalCommissions"
+                        [title]="showTotalCommissions ? 'Masquer' : 'Afficher'">
+                  <mat-icon>{{ showTotalCommissions ? 'visibility' : 'visibility_off' }}</mat-icon>
+                </button>
+              </div>
+              <span class="stat-label">Commissions totales (FCFA)</span>
+            </div>
+          </div>
+          <div class="stat-item highlight">
+            <div class="stat-icon-wrap red">
+              <mat-icon>account_balance_wallet</mat-icon>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value-row">
+                <span class="stat-value">{{ showCommissionEnAttente ? (commissionEnAttente | number:'1.0-0') : '••••••' }}</span>
+                <button mat-icon-button class="eye-btn" (click)="showCommissionEnAttente = !showCommissionEnAttente"
+                        [title]="showCommissionEnAttente ? 'Masquer' : 'Afficher'">
+                  <mat-icon>{{ showCommissionEnAttente ? 'visibility' : 'visibility_off' }}</mat-icon>
+                </button>
+              </div>
+              <span class="stat-label">En attente de retrait (FCFA)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Jalons -->
+        <div class="milestones-row">
+
+          <!-- Jalon 1 : 30 filleuls -->
+          <div class="milestone" [class.achieved]="parrainageCount >= milestone1">
+            <div class="milestone-header">
+              <mat-icon>{{ parrainageCount >= milestone1 ? 'verified' : 'emoji_events' }}</mat-icon>
+              <span class="milestone-title">Palier {{ milestone1 }} filleuls</span>
+              <span class="milestone-count">{{ parrainageCount }}/{{ milestone1 }}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="getParrainageProgress1()"></div>
+            </div>
+            <p class="milestone-reward">Accédez à des faveurs exclusives chez Papou Service</p>
+            <div *ngIf="parrainageCount >= milestone1" class="milestone-badge">
+              <mat-icon>star</mat-icon> Palier atteint !
+            </div>
+          </div>
+
+          <!-- Jalon 2 : 40 filleuls -->
+          <div class="milestone gold-milestone" [class.achieved]="parrainageCount >= milestone2">
+            <div class="milestone-header">
+              <mat-icon>{{ parrainageCount >= milestone2 ? 'workspace_premium' : 'military_tech' }}</mat-icon>
+              <span class="milestone-title">Palier premium {{ milestone2 }}</span>
+              <span class="milestone-count">{{ getParrainageCountForMilestone2() }}/{{ milestone2 - milestone1 }}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill gold" [style.width.%]="getParrainageProgress2()"></div>
+            </div>
+            <p class="milestone-reward">Récompense premium et avantages exclusifs supplémentaires</p>
+            <div *ngIf="parrainageCount >= milestone2" class="milestone-badge gold-badge">
+              <mat-icon>workspace_premium</mat-icon> Palier premium atteint !
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Boutons de partage -->
+        <div class="share-section">
+          <div class="share-brand">
+            <img src="assets/images/logo.png" alt="Papou Service" class="share-logo" />
+            <h4 class="share-title">Inviter via</h4>
+          </div>
+          <div class="share-buttons">
+            <button mat-raised-button class="share-btn whatsapp-btn" (click)="shareViaWhatsApp()">
+              <mat-icon>chat</mat-icon>
+              WhatsApp
+            </button>
+            <button mat-raised-button class="share-btn facebook-btn" (click)="shareViaFacebook()">
+              <mat-icon>thumb_up</mat-icon>
+              Facebook
+            </button>
+            <button mat-raised-button class="share-btn messenger-btn" (click)="shareViaMessenger()">
+              <mat-icon>message</mat-icon>
+              Messenger
+            </button>
+            <button mat-raised-button class="share-btn instagram-btn" (click)="shareViaInstagram()">
+              <mat-icon>photo_camera</mat-icon>
+              Instagram
+            </button>
+          </div>
+        </div>
+
+        <!-- Retrait de commission -->
+        <div class="retrait-commission-section">
+          <mat-divider></mat-divider>
+          <div class="retrait-header-row">
+            <div class="retrait-info">
+              <mat-icon>account_balance</mat-icon>
+              <div>
+                <p class="retrait-label">Commission disponible :
+                  <strong>{{ showCommissionEnAttente ? (commissionEnAttente | number:'1.0-0') : '••••••' }} FCFA</strong>
+                </p>
+                <p class="retrait-hint">Chaque dépôt confirmé de vos filleuls génère 1 % de commission, versé en fin de mois.</p>
+              </div>
+            </div>
+            <button mat-raised-button color="primary" (click)="showRetraitForm = !showRetraitForm" [disabled]="commissionEnAttente <= 0">
+              <mat-icon>account_balance_wallet</mat-icon>
+              Demander un retrait
+            </button>
+          </div>
+
+          <div class="retrait-form" *ngIf="showRetraitForm">
+            <h4>Retrait de commission</h4>
+            <div class="retrait-fields">
+              <mat-form-field appearance="outline">
+                <mat-label>Numéro mobile</mat-label>
+                <input matInput [(ngModel)]="retraitData.numeroMobile" placeholder="Ex: 75000000" />
+                <mat-icon matPrefix>smartphone</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Pays</mat-label>
+                <mat-select [(ngModel)]="retraitData.pays">
+                  <mat-option value="BF">Burkina Faso</mat-option>
+                  <mat-option value="CI">Côte d'Ivoire</mat-option>
+                  <mat-option value="ML">Mali</mat-option>
+                  <mat-option value="SN">Sénégal</mat-option>
+                  <mat-option value="TG">Togo</mat-option>
+                  <mat-option value="BJ">Bénin</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Mode de paiement</mat-label>
+                <mat-select [(ngModel)]="retraitData.modePaiement">
+                  <mat-option value="O">Orange Money</mat-option>
+                  <mat-option value="M">Moov Money</mat-option>
+                  <mat-option value="W">Wave</mat-option>
+                  <mat-option value="C">Carte Bancaire</mat-option>
+                  <mat-option value="S">SankMoney</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="retrait-actions">
+              <button mat-raised-button color="primary" (click)="demanderRetrait()" [disabled]="retraitLoading">
+                <mat-progress-spinner *ngIf="retraitLoading" diameter="18" mode="indeterminate"></mat-progress-spinner>
+                <mat-icon *ngIf="!retraitLoading">send</mat-icon>
+                {{ retraitLoading ? 'Envoi...' : 'Envoyer la demande' }}
+              </button>
+              <button mat-stroked-button (click)="showRetraitForm = false">Annuler</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </mat-card>
+
+    <!-- Commissions -->
+    <mat-card class="commissions-card" *ngIf="commissions.length > 0">
+      <div class="card-header">
+        <mat-icon class="card-icon">payments</mat-icon>
+        <h3>Mes Commissions</h3>
+        <button mat-icon-button class="eye-btn" (click)="showCommissionsCard = !showCommissionsCard"
+                [title]="showCommissionsCard ? 'Masquer la liste' : 'Afficher la liste'">
+          <mat-icon>{{ showCommissionsCard ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
+      </div>
+      <div class="commissions-list" *ngIf="showCommissionsCard">
+        <div class="commission-item" *ngFor="let c of commissions">
+          <mat-icon class="comm-icon">monetization_on</mat-icon>
+          <div class="comm-details">
+            <span class="comm-montant">{{ c.montant | number:'1.0-0' }} FCFA</span>
+            <span class="comm-filleul" *ngIf="c.nomFilleul">Filleul : {{ c.nomFilleul }}</span>
+            <span class="comm-date" *ngIf="c.datePeriode">{{ c.datePeriode | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <span class="comm-statut" [class]="c.versee ? 'statut-versee' : 'statut-pending'">
+            {{ c.versee ? 'Versée' : 'En attente' }}
+          </span>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Liste des filleuls -->
+    <mat-card class="filleuls-card" *ngIf="filleulsStats.length > 0">
+      <div class="card-header">
+        <mat-icon class="card-icon">people</mat-icon>
+        <h3>Mes Filleuls ({{ parrainageCount }})</h3>
+      </div>
+      <div class="filleuls-list">
+        <div class="filleul-item" *ngFor="let f of filleulsStats">
+          <div class="filleul-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="filleul-info">
+            <span class="filleul-nom">{{ f.prenomUtilisateur }} {{ f.nomUtilisateur }}</span>
+            <span class="filleul-numero">{{ f.numeroUtilisateur }}</span>
+            <div class="filleul-stats">
+              <span class="stat-badge depots">
+                <mat-icon>receipt_long</mat-icon>
+                {{ f.nbDepots }} dépôt{{ f.nbDepots > 1 ? 's' : '' }}
+              </span>
+              <span class="stat-badge montant" *ngIf="f.totalDepots > 0">
+                <mat-icon>payments</mat-icon>
+                {{ f.totalDepots | number:'1.0-0' }} FCFA
+              </span>
+              <span class="stat-badge commission" *ngIf="f.commissionGeneree > 0">
+                <mat-icon>savings</mat-icon>
+                {{ f.commissionGeneree | number:'1.0-0' }} FCFA générés
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Aucun filleul -->
+    <div class="empty-state" *ngIf="!loading && filleuls.length === 0">
+      <mat-icon>group_add</mat-icon>
+      <p>Vous n'avez pas encore de filleuls. Partagez votre code pour commencer !</p>
+    </div>
+
+  </div>
+</div>
+<app-footer></app-footer>

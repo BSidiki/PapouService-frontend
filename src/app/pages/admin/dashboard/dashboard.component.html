@@ -4,6 +4,22 @@
     <div class="header-content">
       <h2>📊 Dashboard Administrateur</h2>
       <div class="tools">
+        <!-- Indicateur notifications -->
+        <div class="notif-status"
+             [class.has-unread]="unreadCount > 0"
+             [class.granted]="notifPermission === 'granted' && unreadCount === 0"
+             [class.denied]="notifPermission === 'denied'"
+             [matTooltip]="unreadCount > 0 ? unreadCount + ' nouvelle(s) transaction(s) non lue(s) — Cliquer pour marquer comme lues' : notifPermission === 'granted' ? 'Notifications activées' : notifPermission === 'denied' ? 'Notifications bloquées' : 'Cliquer pour activer les notifications'"
+             (click)="unreadCount > 0 ? clearUnread() : requestNotifPermission()">
+          <mat-icon>{{ unreadCount > 0 ? 'notifications_active' : notifPermission === 'denied' ? 'notifications_off' : 'notifications' }}</mat-icon>
+          <span *ngIf="unreadCount > 0" class="notif-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+        </div>
+        <!-- Bouton son -->
+        <button mat-icon-button class="sound-btn"
+                [matTooltip]="soundEnabled ? 'Son activé' : 'Son désactivé'"
+                (click)="soundEnabled = !soundEnabled">
+          <mat-icon>{{ soundEnabled ? 'volume_up' : 'volume_off' }}</mat-icon>
+        </button>
         <button mat-stroked-button (click)="refresh()" [disabled]="loading" class="refresh-btn">
           <span class="btn-content">
             <mat-icon>refresh</mat-icon>
@@ -41,7 +57,14 @@
         <div class="stat-icon">💰</div>
         <div class="stat-content">
           <div class="stat-label">Dépôts validés</div>
-          <div class="stat-value">{{ totalDepotsValides | number }} FCFA</div>
+          <div class="stat-value masked-row">
+            <span *ngIf="showDepotsTotal; else depotMasked">{{ totalDepotsValides | number }} FCFA</span>
+            <ng-template #depotMasked><span class="masked-value">••••••• FCFA</span></ng-template>
+            <button mat-icon-button class="eye-btn" (click)="showDepotsTotal = !showDepotsTotal"
+                    [matTooltip]="showDepotsTotal ? 'Masquer' : 'Afficher'">
+              <mat-icon>{{ showDepotsTotal ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
         </div>
       </mat-card>
 
@@ -49,25 +72,71 @@
         <div class="stat-icon">💸</div>
         <div class="stat-content">
           <div class="stat-label">Retraits validés</div>
-          <div class="stat-value">{{ totalRetraitsValides | number }} FCFA</div>
+          <div class="stat-value masked-row">
+            <span *ngIf="showRetraitsTotal; else retraitMasked">{{ totalRetraitsValides | number }} FCFA</span>
+            <ng-template #retraitMasked><span class="masked-value">••••••• FCFA</span></ng-template>
+            <button mat-icon-button class="eye-btn" (click)="showRetraitsTotal = !showRetraitsTotal"
+                    [matTooltip]="showRetraitsTotal ? 'Masquer' : 'Afficher'">
+              <mat-icon>{{ showRetraitsTotal ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
         </div>
       </mat-card>
 
-      <mat-card class="stat-card warning">
-        <div class="stat-icon">⏳</div>
+      <mat-card class="stat-card warning-depot">
+        <div class="stat-icon">📥</div>
         <div class="stat-content">
           <div class="stat-label">Dépôts en attente</div>
           <div class="stat-value">{{ depotsPendingCount }}</div>
         </div>
       </mat-card>
 
-      <mat-card class="stat-card warning">
-        <div class="stat-icon">⏳</div>
+      <mat-card class="stat-card warning-retrait">
+        <div class="stat-icon">📤</div>
         <div class="stat-content">
           <div class="stat-label">Retraits en attente</div>
           <div class="stat-value">{{ retraitsPendingCount }}</div>
         </div>
       </mat-card>
+    </div>
+
+    <!-- Accès rapide plateformes -->
+    <div class="platforms-section">
+      <h3>🎯 Accès rapide plateformes</h3>
+      <div class="platforms-grid">
+        <a href="https://1xbet.com/fr" target="_blank" rel="noopener" class="platform-link">
+          <img src="assets/images/1XBET.png" alt="1XBET" class="platform-logo" />
+          <div class="platform-info">
+            <span class="platform-name">1XBET</span>
+            <span class="platform-action">Faire un dépôt</span>
+          </div>
+          <mat-icon class="platform-arrow">open_in_new</mat-icon>
+        </a>
+        <a href="https://betwinner.com/fr" target="_blank" rel="noopener" class="platform-link">
+          <img src="assets/images/BETWINNER.png" alt="BetWinner" class="platform-logo" />
+          <div class="platform-info">
+            <span class="platform-name">BetWinner</span>
+            <span class="platform-action">Faire un dépôt</span>
+          </div>
+          <mat-icon class="platform-arrow">open_in_new</mat-icon>
+        </a>
+        <a href="https://melbet.com/fr" target="_blank" rel="noopener" class="platform-link">
+          <img src="assets/images/MELBET.png" alt="MelBet" class="platform-logo" />
+          <div class="platform-info">
+            <span class="platform-name">MelBet</span>
+            <span class="platform-action">Faire un dépôt</span>
+          </div>
+          <mat-icon class="platform-arrow">open_in_new</mat-icon>
+        </a>
+        <a href="https://888starz.bet/fr" target="_blank" rel="noopener" class="platform-link">
+          <img src="assets/images/888STARZ.png" alt="888Starz" class="platform-logo" />
+          <div class="platform-info">
+            <span class="platform-name">888Starz</span>
+            <span class="platform-action">Faire un dépôt</span>
+          </div>
+          <mat-icon class="platform-arrow">open_in_new</mat-icon>
+        </a>
+      </div>
     </div>
 
     <!-- Charts Section -->
@@ -98,7 +167,7 @@
         </div>
 
         <div class="chart-card">
-          <h4>Volumes par jour</h4>
+          <h4>Transactions en attente par jour</h4>
           <div class="chart-container">
             <canvas baseChart
                     [type]="'line'"
@@ -179,7 +248,6 @@
               <mat-option value="IXBET">1XBET</mat-option>
               <mat-option value="BETWINNER">BETWINNER</mat-option>
               <mat-option value="MELBET">MELBET</mat-option>
-              <mat-option value="IWIN">1WIN</mat-option>
               <mat-option value="STARZ">888STARZ</mat-option>
             </mat-select>
           </mat-form-field>
@@ -189,8 +257,6 @@
             <mat-select [(value)]="filters.statut" (selectionChange)="onFilterChange()">
               <mat-option value="ALL">Tous les statuts</mat-option>
               <mat-option value="PENDING">En attente</mat-option>
-              <mat-option value="VALIDATED">Validé</mat-option>
-              <mat-option value="REJECTED">Rejeté</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -230,7 +296,7 @@
 
       <!-- Desktop Table -->
       <div class="table-container desktop-view" *ngIf="dataSource.data.length > 0">
-        <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)" class="mat-elevation-z2">
+        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
 
           <!-- Type Column -->
           <ng-container matColumnDef="type">
@@ -240,6 +306,9 @@
                     [class.badge-retrait]="element.type === 'Retrait'">
                 {{ element.type }}
               </span>
+              <span *ngIf="element.isCommission" class="badge badge-commission">
+                <mat-icon>savings</mat-icon> Commission
+              </span>
             </td>
           </ng-container>
 
@@ -248,18 +317,24 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Client</th>
             <td mat-cell *matCellDef="let element">
               <div class="client-cell">
-                <div class="client-name">{{ element.nom || '—' }}</div>
+                <div class="client-name">
+                  {{ element.nom || '—' }}
+                  <span *ngIf="element.isInvite" class="invite-badge" title="Transaction sans compte">Invité</span>
+                  <span *ngIf="element.fidelityLevel > 0" class="fidelity-priority-badge"
+                        [title]="'Client fidèle niveau ' + element.fidelityLevel + '/5 — Prioritaire'">
+                    {{ element.fidelityStars }}
+                  </span>
+                </div>
                 <div class="client-phone" *ngIf="element.numero && element.numero !== '—'">
                   {{ element.numero }}
+                  <button mat-icon-button class="copy-btn"
+                          (click)="copyToClipboard(element.numero); $event.stopPropagation()"
+                          matTooltip="Copier le numéro">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
                 </div>
               </div>
             </td>
-          </ng-container>
-
-          <!-- Numéro Column -->
-          <ng-container matColumnDef="numero">
-            <th mat-header-cell *matHeaderCellDef>Numéro</th>
-            <td mat-cell *matCellDef="let element"> {{ element.numero || '—' }} </td>
           </ng-container>
 
           <!-- Plateforme Column -->
@@ -270,22 +345,22 @@
                 <span class="platform-name">{{ element.plateforme }}</span>
                 <span class="platform-id" *ngIf="element.idPlateforme && element.idPlateforme !== '—'">
                   ID: {{ element.idPlateforme }}
+                  <button mat-icon-button class="copy-btn"
+                          (click)="copyToClipboard(element.idPlateforme); $event.stopPropagation()"
+                          matTooltip="Copier l'ID plateforme">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
                 </span>
               </div>
             </td>
           </ng-container>
 
-          <!-- ID Plateforme Column -->
-          <ng-container matColumnDef="idPlateforme">
-            <th mat-header-cell *matHeaderCellDef>ID Plateforme</th>
-            <td mat-cell *matCellDef="let element"> {{ element.idPlateforme }} </td>
-          </ng-container>
-
-          <!-- Montant Column -->
+          <!-- Montant Column (dépôts uniquement) -->
           <ng-container matColumnDef="montant">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Montant</th>
             <td mat-cell *matCellDef="let element">
-              <strong class="amount">{{ element.montant | number }} FCFA</strong>
+              <strong *ngIf="element.type === 'Dépôt'" class="amount">{{ element.montant | number:'1.0-0':'fr' }} FCFA</strong>
+              <span *ngIf="element.type === 'Retrait'" class="no-image">—</span>
             </td>
           </ng-container>
 
@@ -301,12 +376,30 @@
           <ng-container matColumnDef="capture">
             <th mat-header-cell *matHeaderCellDef>Preuve</th>
             <td mat-cell *matCellDef="let element">
-              <img *ngIf="element.capture"
-                   [src]="'data:image/jpeg;base64,' + element.capture"
-                   (click)="showImageZoom(element.capture); $event.stopPropagation()"
-                   class="thumb"
-                   alt="Preuve"/>
-              <span *ngIf="!element.capture" class="no-image">—</span>
+              <div class="preuve-cell">
+                <!-- Capture image -->
+                <img *ngIf="element.capture"
+                     [src]="'data:image/jpeg;base64,' + element.capture"
+                     (click)="showImageZoom(element.capture); $event.stopPropagation()"
+                     class="thumb"
+                     alt="Preuve"/>
+                <!-- Code de retrait (si pas de capture) -->
+                <div *ngIf="!element.capture && element.codeRetrait" class="code-retrait">
+                  <span class="code-label">Code:</span>
+                  <span class="code-value">{{ element.codeRetrait }}</span>
+                  <button mat-icon-button class="copy-btn"
+                          (click)="copyToClipboard(element.codeRetrait); $event.stopPropagation()"
+                          matTooltip="Copier le code">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                </div>
+                <span *ngIf="!element.capture && !element.codeRetrait && element.type !== 'Retrait'" class="no-image">—</span>
+                <!-- Caisse choisie (retraits uniquement) -->
+                <div *ngIf="element.type === 'Retrait'" class="caisse-badge">
+                  <mat-icon class="ref-icon">place</mat-icon>
+                  <span>{{ element.caisseChoisie || '—' }}</span>
+                </div>
+              </div>
             </td>
           </ng-container>
 
@@ -317,14 +410,16 @@
               <div class="action-buttons">
                 <button mat-raised-button color="primary" class="action-btn validate"
                         (click)="traiter(element, 'VALIDATED'); $event.stopPropagation()"
+                        [disabled]="processingIds.has(element.type + ':' + element.id)"
                         matTooltip="Valider cette transaction">
                   <span class="btn-content">
                     <mat-icon>check_circle</mat-icon>
-                    <span>Valider</span>
+                    <span>{{ processingIds.has(element.type + ':' + element.id) ? 'En cours...' : 'Valider' }}</span>
                   </span>
                 </button>
                 <button mat-raised-button color="warn" class="action-btn reject"
                         (click)="traiter(element, 'REJECTED'); $event.stopPropagation()"
+                        [disabled]="processingIds.has(element.type + ':' + element.id)"
                         matTooltip="Rejeter cette transaction">
                   <span class="btn-content">
                     <mat-icon>cancel</mat-icon>
@@ -336,7 +431,8 @@
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              [class.row-new]="newRowIds.has(row.type + ':' + row.id)"></tr>
         </table>
       </div>
 
@@ -350,7 +446,10 @@
                     [class.badge-retrait]="transaction.type === 'Retrait'">
                 {{ transaction.type }}
               </span>
-              <span class="amount">{{ transaction.montant | number }} FCFA</span>
+              <span *ngIf="transaction.isCommission" class="badge badge-commission">
+                <mat-icon>savings</mat-icon> Commission
+              </span>
+              <span *ngIf="transaction.type === 'Dépôt'" class="amount">{{ transaction.montant | number }} FCFA</span>
             </div>
             <div class="date-mobile">{{ formatDate(transaction.date) }}</div>
           </div>
@@ -358,11 +457,24 @@
           <div class="card-content">
             <div class="info-row">
               <span class="label">Client:</span>
-              <span class="value">{{ transaction.nom || '—' }}</span>
+              <span class="value">
+                {{ transaction.nom || '—' }}
+                <span *ngIf="transaction.fidelityLevel > 0" class="fidelity-priority-badge"
+                      [title]="'Niveau ' + transaction.fidelityLevel + '/5'">
+                  {{ transaction.fidelityStars }}
+                </span>
+              </span>
             </div>
             <div class="info-row" *ngIf="transaction.numero && transaction.numero !== '—'">
               <span class="label">Téléphone:</span>
-              <span class="value">{{ transaction.numero }}</span>
+              <span class="value copy-row">
+                {{ transaction.numero }}
+                <button mat-icon-button class="copy-btn"
+                        (click)="copyToClipboard(transaction.numero)"
+                        matTooltip="Copier le numéro">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </span>
             </div>
             <div class="info-row">
               <span class="label">Plateforme:</span>
@@ -370,7 +482,14 @@
             </div>
             <div class="info-row" *ngIf="transaction.idPlateforme && transaction.idPlateforme !== '—'">
               <span class="label">ID Plateforme:</span>
-              <span class="value">{{ transaction.idPlateforme }}</span>
+              <span class="value copy-row">
+                {{ transaction.idPlateforme }}
+                <button mat-icon-button class="copy-btn"
+                        (click)="copyToClipboard(transaction.idPlateforme)"
+                        matTooltip="Copier l'ID plateforme">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </span>
             </div>
           </div>
 
@@ -382,16 +501,34 @@
                   class="thumb-mobile"
                   alt="Preuve"/>
             </div>
+            <div class="proof-section" *ngIf="!transaction.capture && transaction.codeRetrait">
+              <span class="proof-label">Code retrait:</span>
+              <span class="value copy-row">
+                {{ transaction.codeRetrait }}
+                <button mat-icon-button class="copy-btn"
+                        (click)="copyToClipboard(transaction.codeRetrait)"
+                        matTooltip="Copier le code">
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+              </span>
+            </div>
+            <!-- Caisse choisie (retraits uniquement) -->
+            <div class="proof-section caisse-mobile" *ngIf="transaction.type === 'Retrait'">
+              <span class="proof-label">Caisse:</span>
+              <span class="value">{{ transaction.caisseChoisie || '—' }}</span>
+            </div>
             <div class="action-buttons-mobile">
               <button mat-raised-button color="primary" class="action-btn validate"
-                      (click)="traiter(transaction, 'VALIDATED')">
+                      (click)="traiter(transaction, 'VALIDATED')"
+                      [disabled]="processingIds.has(transaction.type + ':' + transaction.id)">
                 <span class="btn-content">
                   <mat-icon>check_circle</mat-icon>
-                  <span class="btn-text">Valider</span>
+                  <span class="btn-text">{{ processingIds.has(transaction.type + ':' + transaction.id) ? 'En cours...' : 'Valider' }}</span>
                 </span>
               </button>
               <button mat-raised-button color="warn" class="action-btn reject"
-                      (click)="traiter(transaction, 'REJECTED')">
+                      (click)="traiter(transaction, 'REJECTED')"
+                      [disabled]="processingIds.has(transaction.type + ':' + transaction.id)">
                 <span class="btn-content">
                   <mat-icon>cancel</mat-icon>
                   <span class="btn-text">Rejeter</span>
@@ -413,3 +550,4 @@
     </div>
   </ng-container>
 </div>
+

@@ -13,12 +13,22 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     margin: 2rem auto;
     max-width: 500px;
+    border: 1px solid #e6edf5;
 
     .loading-content {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1.5rem;
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #e2e8f0;
+        border-top: 5px solid #00adef;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
 
       h3 {
         color: #1e293b;
@@ -34,6 +44,11 @@
     }
   }
 
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   // Error State
   .error-state {
     text-align: center;
@@ -43,6 +58,7 @@
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     margin: 2rem auto;
     max-width: 500px;
+    border: 1px solid #e6edf5;
 
     .error-content {
       .error-icon {
@@ -68,6 +84,16 @@
 
       .back-btn {
         border-radius: 12px;
+        border: 1px solid #00adef;
+        color: #00adef;
+        background: rgba(0, 173, 239, 0.05);
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: rgba(0, 173, 239, 0.1);
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(0, 173, 239, 0.2);
+        }
 
         mat-icon {
           margin-right: 0.5rem;
@@ -88,6 +114,7 @@
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e6edf5;
 
       .header-content {
         display: flex;
@@ -97,6 +124,16 @@
         .back-button {
           border-radius: 12px;
           margin-top: 0.25rem;
+          border: 1px solid rgba(153, 31, 35, 0.25);
+          color: #991f23;
+          background: rgba(153, 31, 35, 0.05);
+          transition: all 0.2s ease;
+
+          &:hover {
+            background: rgba(153, 31, 35, 0.1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(153, 31, 35, 0.15);
+          }
 
           mat-icon {
             margin-right: 0.5rem;
@@ -144,10 +181,12 @@
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
           border-left: 4px solid #e2e8f0;
           transition: all 0.3s ease;
+          border: 1px solid #e6edf5;
 
           &:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            background: #fbfdff;
           }
 
           &.primary {
@@ -166,6 +205,7 @@
           .stat-icon {
             font-size: 2rem;
             opacity: 0.8;
+            color: #991f23;
           }
 
           .stat-content {
@@ -194,6 +234,7 @@
           padding: 1.5rem;
           box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
           text-align: center;
+          border: 1px solid #e6edf5;
 
           .fidelity-header {
             display: flex;
@@ -254,6 +295,7 @@
               font-size: 0.875rem;
               font-weight: 600;
               font-family: 'Poppins', sans-serif;
+              display: inline-block;
             }
           }
         }
@@ -275,7 +317,8 @@
         background: white;
         border-radius: 16px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e2e8f0;
+        border: 1px solid #e6edf5;
+        overflow: hidden;
 
         .card-header {
           display: flex;
@@ -346,6 +389,7 @@
                 border-radius: 8px;
                 font-family: 'Monaco', 'Consolas', monospace;
                 color: #991f23; // Rouge officiel
+                display: inline-block;
               }
             }
           }
@@ -372,6 +416,7 @@
             &:hover {
               background: #f0f9ff;
               border-color: #00adef; // Bleu officiel
+              transform: translateX(3px);
             }
 
             .platform-icon {
@@ -380,6 +425,9 @@
               object-fit: contain;
               border-radius: 8px;
               flex-shrink: 0;
+              background: white;
+              padding: 0.25rem;
+              border: 1px solid #e2e8f0;
             }
 
             .platform-info {
@@ -433,6 +481,7 @@
       border-radius: 16px;
       padding: 1.5rem;
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e6edf5;
 
       .action-buttons {
         display: flex;
@@ -444,9 +493,44 @@
           border-radius: 12px;
           padding: 0.75rem 1.5rem;
           min-width: 160px;
+          border: 1px solid transparent;
+          transition: all 0.2s ease;
 
           mat-icon {
             margin-right: 0.5rem;
+          }
+
+          &.primary {
+            background: #991f23;
+            color: white;
+
+            &:hover {
+              background: #7a191c;
+              transform: translateY(-2px);
+              box-shadow: 0 8px 16px rgba(153, 31, 35, 0.25);
+            }
+          }
+
+          &.accent {
+            background: #00adef;
+            color: white;
+
+            &:hover {
+              background: #0089c7;
+              transform: translateY(-2px);
+              box-shadow: 0 8px 16px rgba(0, 173, 239, 0.25);
+            }
+          }
+
+          &.warn {
+            background: #f59e0b;
+            color: white;
+
+            &:hover {
+              background: #d97706;
+              transform: translateY(-2px);
+              box-shadow: 0 8px 16px rgba(245, 158, 11, 0.25);
+            }
           }
         }
       }
@@ -455,49 +539,21 @@
 
   // Material Overrides
   ::ng-deep {
+    .mat-form-field-appearance-outline {
+      .mat-form-field-outline {
+        color: #e2e8f0;
+      }
+
+      &.mat-focused {
+        .mat-form-field-outline-thick {
+          color: #00adef;
+        }
+      }
+    }
+
     .mat-raised-button[disabled] {
       background-color: #94a3b8 !important;
     }
   }
-
-  // Dark Mode Support
-  @media (prefers-color-scheme: dark) {
-    background: #0f172a;
-
-    .header-section,
-    .stats-cards .stat-card,
-    .fidelity-card,
-    .info-card,
-    .platforms-card,
-    .actions-section,
-    .loading-state,
-    .error-state {
-      background: #1e293b;
-      color: #e2e8f0;
-      border-color: #334155;
-    }
-
-    .header-title h1,
-    .stat-content .stat-value,
-    .fidelity-header h3,
-    .card-header h3,
-    .info-item .value,
-    .platform-id {
-      color: #e2e8f0;
-    }
-
-    .info-item .value.id {
-      background: #334155;
-      color: #e2e8f0;
-    }
-
-    .platform-item {
-      background: #334155 !important;
-      border-color: #475569 !important;
-
-      &:hover {
-        background: #3f4a5f !important;
-      }
-    }
-  }
 }
+

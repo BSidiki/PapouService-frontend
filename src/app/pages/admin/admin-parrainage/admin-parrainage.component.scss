@@ -1,0 +1,633 @@
+@use "sass:color";
+
+$rouge:       #991f23;
+$bleu:        #00adef;
+$blanc:       #ffffff;
+$bg:          #f6f9fc;
+$texte-fonce: #1f2937;
+$texte-moyen: #4b5563;
+$texte-gris:  #6b7280;
+$fond-clair:  #f6f7fb;
+$gris-border: #e6edf5;
+$vert:        #16a34a;
+$or:          #f59e0b;
+
+$font-titre:      'Montserrat', sans-serif;
+$font-sous-titre: 'Poppins', sans-serif;
+$font-corps:      'Roboto', sans-serif;
+
+$radius-sm:  10px;
+$radius-md:  16px;
+$radius-lg:  22px;
+$ease:       cubic-bezier(0.4, 0, 0.2, 1);
+$shadow-sm:  0 4px 14px rgba(17, 24, 39, 0.06);
+$shadow:     0 8px 24px rgba(17, 24, 39, 0.09);
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── Page wrapper ──────────────────────────────
+.admin-parrainage {
+  padding: 24px 24px 64px;
+  background: $bg;
+  background-image:
+    radial-gradient(700px 200px at 10% 0%, rgba($rouge, 0.04), transparent 60%),
+    radial-gradient(700px 200px at 90% 0%, rgba($bleu, 0.04), transparent 60%);
+  min-height: 100vh;
+  font-family: $font-corps;
+  color: $texte-fonce;
+
+  @media (max-width: 768px) { padding: 16px 16px 48px; }
+}
+
+// ── Header ────────────────────────────────────
+.header-row {
+  margin-bottom: 24px;
+  animation: fadeUp 0.4s $ease both;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .header-icon {
+        font-size: 2rem;
+        width: auto; height: auto;
+        color: $rouge;
+        opacity: 0.85;
+      }
+
+      h2 {
+        font-family: $font-titre;
+        font-weight: 800;
+        font-size: clamp(1.3rem, 3vw, 1.8rem);
+        color: $texte-fonce;
+        margin: 0;
+      }
+    }
+
+    .refresh-btn {
+      border-radius: $radius-sm;
+      font-family: $font-sous-titre;
+      font-weight: 500;
+      border-color: rgba($rouge, 0.3);
+      color: $rouge;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      &:hover { background: rgba($rouge, 0.05); }
+    }
+  }
+}
+
+// ── Loading ───────────────────────────────────
+.state {
+  text-align: center;
+  padding: 48px;
+
+  .loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: $texte-gris;
+    font-family: $font-sous-titre;
+    font-size: 0.9rem;
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid rgba($rouge, 0.15);
+      border-top-color: $rouge;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+  }
+}
+
+// ── Stats cards ───────────────────────────────
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  animation: fadeUp 0.4s 0.05s $ease both;
+
+  .stat-card {
+    border-radius: $radius-md !important;
+    border: 1px solid $gris-border !important;
+    box-shadow: $shadow-sm !important;
+    padding: 18px 20px !important;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: default;
+    transition: transform 0.2s $ease, box-shadow 0.2s $ease;
+
+    &:hover { transform: translateY(-2px); box-shadow: $shadow !important; }
+
+    .stat-icon-wrap {
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon { color: $blanc; font-size: 1.35rem; width: auto; height: auto; }
+
+      &.blue  { background: $bleu; }
+      &.green { background: $vert; }
+      &.gold  { background: $or; }
+      &.red   { background: $rouge; }
+    }
+
+    .stat-content {
+      .stat-label {
+        font-family: $font-sous-titre;
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: $texte-gris;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .stat-value {
+        font-family: $font-titre;
+        font-weight: 800;
+        font-size: 1.8rem;
+        line-height: 1.1;
+        margin-top: 2px;
+      }
+    }
+
+    &.c-bleu  { background: rgba($bleu, 0.04) !important;  .stat-value { color: $bleu; } }
+    &.c-vert  { background: rgba($vert, 0.04) !important;  .stat-value { color: $vert; } }
+    &.c-or    { background: rgba($or, 0.06) !important;    .stat-value { color: color.adjust($or, $lightness: -12%); } }
+    &.c-rouge { background: rgba($rouge, 0.04) !important; .stat-value { color: $rouge; } }
+  }
+}
+
+// ── Filtres ───────────────────────────────────
+.filters-section {
+  margin-bottom: 20px;
+  animation: fadeUp 0.4s 0.1s $ease both;
+
+  .search-field {
+    width: 100%;
+    max-width: 480px;
+  }
+}
+
+// ── Table wrapper ─────────────────────────────
+.table-wrapper {
+  background: $blanc;
+  border-radius: $radius-lg;
+  border: 1px solid $gris-border;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  animation: fadeUp 0.4s 0.12s $ease both;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+  }
+}
+
+.parrainage-table {
+  width: 100%;
+
+  th.mat-mdc-header-cell {
+    font-family: $font-sous-titre;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $texte-gris;
+    background: $fond-clair;
+    border-bottom: 1px solid $gris-border;
+    padding: 12px 16px;
+  }
+
+  td.mat-mdc-cell {
+    font-family: $font-corps;
+    font-size: 0.88rem;
+    color: $texte-fonce;
+    border-bottom: 1px solid rgba($gris-border, 0.6);
+    padding: 12px 16px;
+  }
+
+  tr.mat-mdc-row {
+    transition: background 0.15s $ease;
+    cursor: default;
+
+    &:hover { background: rgba($bleu, 0.025); }
+    &.selected-row { background: rgba($bleu, 0.06); }
+  }
+}
+
+// ── Cellules ──────────────────────────────────
+.client-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .client-name { font-weight: 600; color: $texte-fonce; }
+  .client-phone { font-size: 0.78rem; color: $texte-gris; }
+}
+
+.code-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .referral-badge {
+    font-family: $font-titre;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: $rouge;
+    background: rgba($rouge, 0.07);
+    border: 1px solid rgba($rouge, 0.18);
+    border-radius: 6px;
+    padding: 3px 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .copy-btn {
+    width: 28px; height: 28px;
+    font-size: 14px;
+    color: $texte-gris;
+    &:hover { color: $rouge; }
+  }
+}
+
+.parrain-badge {
+  font-family: $font-titre;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: $bleu;
+  background: rgba($bleu, 0.08);
+  border: 1px solid rgba($bleu, 0.2);
+  border-radius: 6px;
+  padding: 3px 10px;
+}
+
+.no-code {
+  color: $texte-gris;
+  font-style: italic;
+}
+
+.filleuls-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .filleul-count {
+    font-family: $font-titre;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: $texte-gris;
+
+    &.has-filleuls { color: $vert; }
+
+    .filleul-valides {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: $texte-gris;
+    }
+  }
+
+  .mini-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .mini-bar {
+      flex: 1;
+      height: 5px;
+      background: rgba(0,0,0,0.07);
+      border-radius: 99px;
+      overflow: hidden;
+      min-width: 60px;
+
+      .mini-fill {
+        height: 100%;
+        background: linear-gradient(90deg, $rouge, $bleu);
+        border-radius: 99px;
+        transition: width 0.5s $ease;
+      }
+    }
+
+    .mini-label {
+      font-size: 0.72rem;
+      color: $texte-gris;
+      white-space: nowrap;
+    }
+  }
+}
+
+.commissions-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .comm-attente, .comm-versee {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+
+    mat-icon { font-size: 13px; width: 13px; height: 13px; }
+  }
+
+  .comm-attente { color: #f59e0b; }
+  .comm-versee  { color: $vert; }
+}
+
+// ── Palier chips ──────────────────────────────
+.palier-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 99px;
+  font-family: $font-sous-titre;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
+
+  &.palier-0 { background: rgba($texte-gris, 0.10); color: $texte-gris; }
+  &.palier-1 { background: rgba($or, 0.12); color: color.adjust($or, $lightness: -15%); border: 1px solid rgba($or, 0.30); }
+  &.palier-2 { background: linear-gradient(135deg, rgba($or, 0.15), rgba($rouge, 0.08)); color: $rouge; border: 1px solid rgba($rouge, 0.25); }
+}
+
+.detail-btn {
+  border-radius: $radius-sm;
+  font-family: $font-sous-titre;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border-color: rgba($bleu, 0.3);
+  color: $bleu;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover { background: rgba($bleu, 0.06); }
+}
+
+// ── Panneau filleuls ──────────────────────────
+.filleuls-panel {
+  border-top: 2px solid rgba($bleu, 0.15);
+  background: rgba($bleu, 0.02);
+  padding: 20px 24px;
+  animation: fadeUp 0.3s $ease both;
+
+  .filleuls-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon { color: $bleu; }
+
+      h4 {
+        font-family: $font-sous-titre;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: $texte-fonce;
+        margin: 0;
+      }
+
+      .panel-code {
+        font-family: $font-titre;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: $rouge;
+        background: rgba($rouge, 0.08);
+        border: 1px solid rgba($rouge, 0.18);
+        border-radius: 6px;
+        padding: 2px 8px;
+      }
+    }
+
+    button { color: $texte-gris; }
+  }
+}
+
+// ── Commissions résumé panel ──────────────────
+.parrain-commissions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+
+  .comm-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: $radius-sm;
+    font-size: 0.82rem;
+
+    mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+    &.attente {
+      background: rgba(#f59e0b, 0.1);
+      color: color.adjust(#f59e0b, $lightness: -15%);
+      border: 1px solid rgba(#f59e0b, 0.25);
+    }
+
+    &.versee {
+      background: rgba($vert, 0.08);
+      color: $vert;
+      border: 1px solid rgba($vert, 0.2);
+    }
+  }
+}
+
+// ── Jalons ────────────────────────────────────
+.jalons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  .jalon {
+    .jalon-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: $font-sous-titre;
+      font-size: 0.8rem;
+      color: $texte-moyen;
+      font-weight: 500;
+      margin-bottom: 6px;
+
+      .jalon-pct { color: $rouge; font-weight: 600; }
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(0,0,0,0.07);
+      border-radius: 99px;
+      overflow: hidden;
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, $rouge, $bleu);
+        border-radius: 99px;
+        transition: width 0.6s $ease;
+
+        &.gold { background: linear-gradient(90deg, $or, color.adjust($or, $lightness: -15%)); }
+      }
+    }
+  }
+}
+
+// ── Liste filleuls panel ──────────────────────
+.filleuls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+
+  .filleul-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: $blanc;
+    border: 1px solid $gris-border;
+    border-radius: $radius-sm;
+    transition: background 0.15s;
+
+    &:hover { background: rgba($bleu, 0.03); }
+
+    .filleul-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba($bleu, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      mat-icon { color: $bleu; font-size: 1.1rem; width: auto; height: auto; }
+
+      &.validated {
+        background: rgba($vert, 0.1);
+        mat-icon { color: $vert; }
+      }
+    }
+
+    .filleul-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+
+      .filleul-name {
+        font-family: $font-sous-titre;
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: $texte-fonce;
+      }
+
+      .filleul-phone { font-size: 0.78rem; color: $texte-gris; }
+    }
+
+    .filleul-depots {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: rgba($texte-gris, 0.08);
+      color: $texte-gris;
+
+      mat-icon { font-size: 13px; width: 13px; height: 13px; }
+
+      &.has-depots {
+        background: rgba($vert, 0.1);
+        color: $vert;
+      }
+    }
+  }
+}
+
+// ── État vide ─────────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: $blanc;
+  border-radius: $radius-lg;
+  border: 2px dashed rgba($rouge, 0.18);
+  box-shadow: $shadow-sm;
+
+  mat-icon {
+    font-size: 3.5rem;
+    width: auto; height: auto;
+    color: rgba($rouge, 0.25);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  h4 {
+    font-family: $font-titre;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: $texte-moyen;
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-size: 0.88rem;
+    color: $texte-gris;
+    margin: 0;
+  }
+}
+
+// ── Pagination ────────────────────────────────
+mat-paginator {
+  border-top: 1px solid $gris-border;
+  font-family: $font-corps;
+}
+
+// ── Responsive ───────────────────────────────
+@media (max-width: 768px) {
+  .stat-cards { grid-template-columns: repeat(2, 1fr); }
+
+  .parrainage-table {
+    th.mat-mdc-header-cell,
+    td.mat-mdc-cell { padding: 10px 12px; }
+  }
+
+  .filleuls-panel { padding: 16px; }
+}
+
+@media (max-width: 480px) {
+  .stat-cards { grid-template-columns: 1fr; }
+}

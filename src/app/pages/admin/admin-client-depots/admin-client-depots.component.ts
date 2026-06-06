@@ -14,9 +14,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
+import { environment } from '../../../../environments/environment';
 
 type TransactionState = 'PENDING' | 'VALIDATED' | 'REJECTED';
-type Platform = 'IXBET'|'BETWINNER'|'MELBET'|'IWIN'|'STARZ'|'—';
+type Platform = 'IXBET'|'BETWINNER'|'MELBET'|'STARZ'|'—';
 
 type Depot = {
   idDepot: number;
@@ -54,8 +55,8 @@ export class AdminClientDepotsComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   private location = inject(Location);
+  private readonly API = environment.apiBaseUrl;
 
-  private readonly API = 'http://192.168.11.124:8080';
 
   clientId!: string;
   depots: Depot[] = [];
@@ -99,7 +100,6 @@ export class AdminClientDepotsComponent implements OnInit {
           this.loading = false;
         },
         error: (err) => {
-          console.error(err);
           this.error = true;
           this.loading = false;
         }
@@ -112,7 +112,6 @@ export class AdminClientDepotsComponent implements OnInit {
     if (up === '1XBET' || up === 'IXBET') return 'IXBET';
     if (up === 'BETWINNER') return 'BETWINNER';
     if (up === 'MELBET') return 'MELBET';
-    if (up === '1WIN' || up === 'IWIN') return 'IWIN';
     if (up === '888STARZ' || up === 'STARZ') return 'STARZ';
     return '—';
   }
@@ -213,3 +212,4 @@ export class AdminClientDepotsComponent implements OnInit {
 
   trackByDepot = (_: number, d: Depot) => d.idDepot;
 }
+

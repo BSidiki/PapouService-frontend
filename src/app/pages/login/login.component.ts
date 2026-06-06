@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
+import { ErrorService } from '../../services/error.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,7 +38,7 @@ export class LoginComponent {
   hidePassword = true;
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router, private errorService: ErrorService) {}
 
   // Validation assouplie du numéro de téléphone
   isValidPhoneNumber(): boolean {
@@ -47,9 +48,8 @@ export class LoginComponent {
     return phoneRegex.test(cleaned);
   }
 
-  // Validation du formulaire - plus permissive pour le numéro
   isFormValid(): boolean {
-    return this.credentials.numeroUtilisateur.length >= 8 &&
+    return this.isValidPhoneNumber() &&
            this.credentials.password.length >= 6;
   }
 
@@ -76,22 +76,18 @@ export class LoginComponent {
       },
       error: (error) => {
         this.loading = false;
-        this.errorMessage = error.message || 'Numéro ou mot de passe incorrect';
-
-        // Réinitialiser le mot de passe en cas d'erreur
+        if (error.status === 0) {
+          this.errorMessage = 'Impossible de joindre le serveur. Vérifiez votre connexion.';
+        } else {
+          this.errorMessage = 'Numéro de téléphone ou mot de passe incorrect.';
+        }
         this.credentials.password = '';
       }
     });
   }
 
-  // Gestion du mot de passe oublié
   onForgotPassword(event: Event) {
     event.preventDefault();
-    // Implémentation future pour la réinitialisation du mot de passe
-    alert('Fonctionnalité de réinitialisation de mot de passe à venir.');
-  }
-
-  isLoggedIn(): boolean {
-    return this.authService.isLoggedIn();
+    this.errorService.info('Contactez le support au 04116262 pour réinitialiser votre mot de passe.');
   }
 }

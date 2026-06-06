@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -15,6 +16,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { environment } from '../../../../environments/environment';
 
 type Annonce = {
   idAnnonce: number;
@@ -45,11 +47,14 @@ type Annonce = {
   styleUrls: ['./admin-annonces.component.scss']
 })
 export class AdminAnnoncesComponent implements OnInit {
-  private readonly API = 'http://192.168.11.124:8080';
+  private readonly API = environment.apiBaseUrl;
 
   displayedColumns: string[] = ['media', 'titre', 'texte', 'actions'];
   dataSource = new MatTableDataSource<Annonce>([]);
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginatorRef(p: MatPaginator) {
+    if (p) { this.dataSource.paginator = p; }
+  }
 
   search = '';
   form!: FormGroup;
@@ -303,3 +308,4 @@ export class AdminAnnoncesComponent implements OnInit {
     }
   }
 }
+

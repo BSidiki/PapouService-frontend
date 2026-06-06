@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,6 +8,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { UtilisateurService } from '../../services/utilisateur.service';
 
 @Component({
   selector: 'app-mot-de-passe',
@@ -44,7 +44,7 @@ export class MotDePasseComponent {
 
   userId: number = 0;
 
-  constructor(private http: HttpClient, private auth: AuthService) {
+  constructor(private auth: AuthService, private utilisateurService: UtilisateurService) {
     const user = this.auth.getUser();
     this.userId = user?.idUtilisateur || 0;
   }
@@ -64,36 +64,62 @@ export class MotDePasseComponent {
     }
 
     const payload = {
-      ancienMotDePasse: this.form.ancienMotDePasse,
-      nouveauMotDePasse: this.form.nouveauMotDePasse
+      ancienPassword: this.form.ancienMotDePasse,
+      nouveauPassword: this.form.nouveauMotDePasse,
+      confirmPassword: this.form.confirmation
     };
 
     this.isSubmitting = true;
 
-    this.http
-      .put(
-        `http://192.168.11.118:8080/utilisateur/${this.userId}/mot-de-passe`,
-        payload
-      )
-      .subscribe({
-        next: () => {
-          this.isSubmitting = false;
-          this.message = 'Mot de passe changé avec succès.';
-          this.form = { ancienMotDePasse: '', nouveauMotDePasse: '', confirmation: '' };
-          form.resetForm();
-        },
-        error: (err) => {
-          this.isSubmitting = false;
-          this.error =
-            err?.status === 400 || err?.status === 401
-              ? 'Ancien mot de passe incorrect.'
-              : 'Une erreur est survenue. Veuillez réessayer.';
-        }
-      });
+    this.utilisateurService.changePassword(this.userId, payload).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.message = 'Mot de passe changé avec succès.';
+        this.form = { ancienMotDePasse: '', nouveauMotDePasse: '', confirmation: '' };
+        form.resetForm();
+      },
+      error: (err: any) => {
+        this.isSubmitting = false;
+        this.error =
+          err?.status === 400 || err?.status === 401
+            ? 'Ancien mot de passe incorrect.'
+            : 'Une erreur est survenue. Veuillez réessayer.';
+      }
+    });
   }
 
-  // Helpers pour les tooltips / accessibilité si besoin plus tard
   get hasFeedback(): boolean {
     return !!this.message || !!this.error;
   }
+
+  get passwordsMatch(): boolean {
+    return !this.form.confirmation || this.form.nouveauMotDePasse === this.form.confirmation;
+  }
+
+  getPasswordStrength(): number {
+    const p = this.form.nouveauMotDePasse;
+    if (!p) return 0;
+    let s = 0;
+    if (p.length >= 6) s++;
+    if (p.length >= 8) s++;
+    if (/[A-Z]/.test(p)) s++;
+    if (/[0-9]/.test(p)) s++;
+    if (/[^A-Za-z0-9]/.test(p)) s++;
+    return s;
+  }
+
+  getPasswordStrengthClass(): string {
+    const s = this.getPasswordStrength();
+    if (s <= 2) return 'weak';
+    if (s <= 3) return 'medium';
+    return 'strong';
+  }
+
+  getPasswordStrengthText(): string {
+    const s = this.getPasswordStrength();
+    if (s <= 2) return 'Faible';
+    if (s <= 3) return 'Moyen';
+    return 'Fort';
+  }
 }
+

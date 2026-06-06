@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   OnInit,
   ViewChild,
@@ -7,13 +7,18 @@ import {
   HostListener,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { environment } from '../../../environments/environment';
+
+type PubType = 'IMAGE' | 'VIDEO_FICHIER' | 'VIDEO_LIEN';
 
 type Pub = {
   id?: number;
   titre?: string | null;
   lien?: string | null;
+  typePub?: PubType;
   // le backend peut renvoyer string (base64) ou byte[]
   fichier?: string | number[] | null | undefined;
 };
@@ -48,20 +53,20 @@ export class CarouselPubsComponent implements OnInit, OnDestroy {
   carouselRef!: ElementRef<HTMLDivElement>;
   @ViewChild('zoomImage', { static: false })
   zoomImageRef?: ElementRef<HTMLImageElement>;
+  private readonly API = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
-    this.http.get<Pub[]>('http://192.168.11.124:8080/pubs').subscribe({
+    this.http.get<Pub[]>(`${this.API}/pubs`).subscribe({
       next: (data) => {
         this.pubs = data ?? [];
-        // Sécurise l’index si liste vide
+        // Sécurise l'index si liste vide
         this.currentIndex = this.pubs.length ? 0 : -1;
         if (this.pubs.length > 1) this.startAutoScroll();
-        // S’assure que la première slide est bien en place
+        // S'assure que la première slide est bien en place
         setTimeout(() => this.scrollToCurrent(), 0);
       },
-      error: () => console.error('Erreur chargement des publicités'),
     });
   }
 
@@ -73,15 +78,16 @@ export class CarouselPubsComponent implements OnInit, OnDestroy {
 
   /* ================== Helpers ================== */
 
-  /** Convertit string | number[] | null en data URL d’image */
+  /** Convertit string | number[] | null en data URL d'image */
   toBase64(data: string | number[] | null | undefined): string {
     if (!data) return 'assets/images/placeholder-pub.jpg';
 
     if (typeof data === 'string') {
       const trimmed = data.trim();
-      return trimmed
-        ? 'data:image/jpeg;base64,' + trimmed
-        : 'assets/images/placeholder-pub.jpg';
+      if (!trimmed) return 'assets/images/placeholder-pub.jpg';
+      // Déjà un data URL ou une URL http(s)
+      if (trimmed.startsWith('data:') || trimmed.startsWith('http')) return trimmed;
+      return 'data:image/jpeg;base64,' + trimmed;
     }
 
     // number[] -> Uint8Array -> base64
@@ -94,6 +100,55 @@ export class CarouselPubsComponent implements OnInit, OnDestroy {
     for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
     const b64 = btoa(bin);
     return 'data:image/jpeg;base64,' + b64;
+  }
+
+  /** Retourne true si la pub est une vidéo */
+  isVideo(pub: Pub): boolean {
+    return pub.typePub === 'VIDEO_FICHIER' || pub.typePub === 'VIDEO_LIEN';
+  }
+
+  /** Retourne true si la pub est une vidéo en base64/fichier */
+  isVideoFile(pub: Pub): boolean {
+    return pub.typePub === 'VIDEO_FICHIER';
+  }
+
+  /** Retourne true si la pub est une vidéo via lien externe */
+  isVideoLink(pub: Pub): boolean {
+    return pub.typePub === 'VIDEO_LIEN';
+  }
+
+  /** Convertit un lien YouTube ou direct en URL embed sécurisée */
+  getVideoEmbedUrl(pub: Pub): SafeResourceUrl {
+    const url = pub.lien ?? '';
+
+    // YouTube watch URL → embed
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) {
+      return this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=0`
+      );
+    }
+
+    // YouTube embed déjà formé ou lien direct
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  /** Retourne true si l'URL de lien est YouTube */
+  isYouTubeLink(pub: Pub): boolean {
+    const url = pub.lien ?? '';
+    return url.includes('youtube.com') || url.includes('youtu.be');
+  }
+
+  /** Retourne la src base64 pour vidéo fichier */
+  toVideoBase64(data: string | number[] | null | undefined): string {
+    if (!data) return '';
+    if (typeof data === 'string') return 'data:video/mp4;base64,' + data.trim();
+    const arr = Array.isArray(data) ? data : [];
+    if (!arr.length) return '';
+    const bytes = new Uint8Array(arr);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return 'data:video/mp4;base64,' + btoa(bin);
   }
 
   /* ================== Auto défilement ================== */
@@ -288,3 +343,4 @@ export class CarouselPubsComponent implements OnInit, OnDestroy {
     (event.target as HTMLImageElement).src = 'assets/images/placeholder-pub.jpg';
   }
 }
+

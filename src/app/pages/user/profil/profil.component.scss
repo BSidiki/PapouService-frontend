@@ -1,461 +1,959 @@
-// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500;600&family=Roboto:wght@400;500&display=swap');
+@use "sass:color";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
 
+// ═══════════════════════════════════════════
+// TOKENS OFFICIELS CLIENT
+// ═══════════════════════════════════════════
+$rouge:       #991f23;
+$rouge-dark:  color.adjust($rouge, $lightness: -8%);
+$rouge-pale:  color.adjust($rouge, $lightness: 58%);
+$bleu:        #00adef;
+$bleu-dark:   color.adjust($bleu, $lightness: -8%);
+$blanc:       #ffffff;
+$bg:          #f6f9fc;
+$texte-fonce: #1f2937;
+$texte-moyen: #4b5563;
+$texte-gris:  #6b7280;
+$fond-clair:  #f6f7fb;
+$bordure:     rgba(0, 0, 0, 0.07);
+$bordure-rouge: rgba($rouge, 0.12);
+$gris-border: #e6edf5;
+$or:          #fbbf24;
+
+$font-titre:      'Montserrat', sans-serif;
+$font-sous-titre: 'Poppins', sans-serif;
+$font-corps:      'Roboto', sans-serif;
+
+$radius-sm:   10px;
+$radius-md:   16px;
+$radius-lg:   22px;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
+$shadow-sm:   0 4px 14px rgba(17, 24, 39, 0.06);
+$shadow:      0 8px 24px rgba(17, 24, 39, 0.08);
+
+// ═══════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+@keyframes progress-fill {
+  from { width: 0; }
+}
+
+@keyframes pulse-star {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.08); }
+}
+
+// ═══════════════════════════════════════════
+// HERO CAROUSEL
+// ═══════════════════════════════════════════
+.hero-carousel {
+  width: 100%;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+  }
+}
+
+// ═══════════════════════════════════════════
+// PAGE WRAPPER
+// ═══════════════════════════════════════════
 .profil-page {
-  padding: 1rem;
-  background: linear-gradient(135deg, #f8fdff 0%, #e3f7fb 100%);
+  padding: 28px 24px 64px;
+  background: $bg;
+  background-image:
+    radial-gradient(700px 200px at 10% 0%, rgba($rouge, 0.04), transparent 60%),
+    radial-gradient(700px 200px at 90% 0%, rgba($bleu, 0.04), transparent 60%);
   min-height: 100vh;
+  font-family: $font-corps;
+
+  @media (max-width: 768px) { padding: 20px 16px 48px; }
+  @media (max-width: 480px) { padding: 14px 12px 40px; }
 }
 
 .profil-container {
-  max-width: 1000px;
+  max-width: 960px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 20px;
 }
 
-// En-tête du profil
+// ═══════════════════════════════════════════
+// EN-TÊTE PROFIL
+// ═══════════════════════════════════════════
 .profil-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  gap: 16px;
+  padding: 24px 28px;
+  background: $blanc;
+  border-radius: $radius-lg;
+  border: 1px solid $bordure-rouge;
+  box-shadow: $shadow-sm;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.5s $ease both;
+
+  // Liseré rouge→bleu en haut
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+  }
 
   .header-content {
     .main-title {
-      color: #991f23;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: bold;
-      font-size: clamp(1.8rem, 4vw, 2.2rem);
-      margin: 0 0 0.5rem 0;
+      font-family: $font-titre;      // Montserrat Bold
+      font-weight: 700;
+      font-size: clamp(1.6rem, 3.5vw, 2rem);
+      color: $rouge;
+      margin: 0 0 6px;
+      line-height: 1.15;
     }
 
     .subtitle {
-      color: #666;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.1rem;
+      font-family: $font-sous-titre; // Poppins
+      font-size: 0.92rem;
+      font-weight: 400;
+      color: $texte-moyen;
       margin: 0;
     }
   }
 
   .toggle-btn {
-    border-radius: 10px;
-    font-family: 'Poppins', sans-serif;
+    border-radius: $radius-sm;
+    font-family: $font-sous-titre;
     font-weight: 500;
-    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    padding: 10px 20px;
+    color: $rouge;
+    border-color: rgba($rouge, 0.32);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.22s $ease;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+    &:hover {
+      background: rgba($rouge, 0.05);
+      border-color: $rouge;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba($rouge, 0.15);
+    }
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+
+    .toggle-btn { width: 100%; justify-content: center; }
+  }
+}
+
+// ═══════════════════════════════════════════
+// CARTES (base commune)
+// ═══════════════════════════════════════════
+mat-card {
+  border-radius: $radius-lg !important;
+  box-shadow: $shadow-sm !important;
+  border: 1px solid $gris-border !important;
+  background: $blanc !important;
+  overflow: hidden;
+  animation: fadeUp 0.5s $ease both;
+  position: relative;
+
+  // Liseré rouge→bleu en haut
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    z-index: 1;
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid $gris-border;
+
+  .card-icon {
+    font-size: 1.4rem;
+    width: 1.4rem; height: 1.4rem;
+    color: $rouge;
+    flex-shrink: 0;
+  }
+
+  h3 {
+    font-family: $font-titre;        // Montserrat Bold
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: $texte-fonce;
+    margin: 0;
+  }
+}
+
+.card-content {
+  padding: 24px;
+
+  @media (max-width: 480px) { padding: 16px; }
+}
+
+// ═══════════════════════════════════════════
+// CARTE FIDÉLITÉ
+// ═══════════════════════════════════════════
+.fidelity-card {
+  animation-delay: 0.1s;
+
+  .loading-fidelity {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 32px;
+    font-family: $font-sous-titre;
+    font-size: 0.9rem;
+    color: $texte-gris;
+
+    ::ng-deep circle { stroke: $rouge !important; }
+  }
+}
+
+// ─── Étoiles ─────────────────────────────
+.stars-display {
+  text-align: center;
+  margin-bottom: 28px;
+
+  .stars-container {
+    margin-bottom: 8px;
+    line-height: 1;
+
+    .stars {
+      color: $or;
+      font-size: 2.4rem;
+      letter-spacing: 0.15rem;
+      animation: pulse-star 2s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    .stars-empty {
+      color: #e5e7eb;
+      font-size: 2.4rem;
+      letter-spacing: 0.15rem;
+    }
+  }
+
+  .fidelity-level {
+    font-family: $font-sous-titre;   // Poppins
+    font-weight: 600;
+    font-size: 1rem;
+    color: $rouge;
+    display: inline-block;
+    background: rgba($rouge, 0.07);
+    border: 1px solid rgba($rouge, 0.18);
+    padding: 4px 14px;
+    border-radius: 999px;
+  }
+}
+
+// ─── Stats fidélité ───────────────────────
+.fidelity-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: $fond-clair;
+    border-radius: $radius-sm;
+    border: 1px solid $gris-border;
+    transition: all 0.22s $ease;
+
+    &:hover {
+      background: rgba($rouge, 0.04);
+      border-color: $bordure-rouge;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba($rouge, 0.08);
+    }
 
     mat-icon {
-      margin-right: 0.5rem;
+      color: $bleu;
+      font-size: 1.6rem;
+      width: 1.6rem; height: 1.6rem;
+      flex-shrink: 0;
+      transition: color 0.2s;
+    }
+
+    &:hover mat-icon { color: $rouge; }
+
+    .stat-content {
+      .stat-value {
+        display: block;
+        font-family: $font-titre;    // Montserrat Bold
+        font-weight: 700;
+        font-size: 1.6rem;
+        color: $rouge;
+        line-height: 1;
+        margin-bottom: 3px;
+      }
+
+      .stat-label {
+        display: block;
+        font-family: $font-corps;    // Roboto
+        font-size: 0.80rem;
+        color: $texte-gris;
+        line-height: 1.4;
+      }
     }
   }
 }
 
-// Cartes
-mat-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-  border: 1px solid #e1f5fe;
+// ─── Barre de progression ─────────────────
+.progress-section {
+  margin-bottom: 20px;
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-family: $font-sous-titre;
+    font-size: 0.82rem;
+    color: $texte-moyen;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    height: 7px;
+    background: rgba(0, 0, 0, 0.07);
+    border-radius: 999px;
+    overflow: hidden;
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, $rouge, $bleu);
+      border-radius: 999px;
+      transition: width 0.6s $ease;
+      animation: progress-fill 0.8s $ease both;
+    }
+  }
+}
+
+// ─── Badge fidèle ─────────────────────────
+.fidelity-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #fbbf24;
+  border-radius: $radius-sm;
+  color: #92400e;
+  font-family: $font-sous-titre;     // Poppins
+  font-weight: 600;
+  font-size: 0.92rem;
+
+  mat-icon {
+    color: #d97706;
+    font-size: 1.3rem;
+    width: 1.3rem; height: 1.3rem;
+  }
+}
+
+// ═══════════════════════════════════════════
+// CARTE FORMULAIRE
+// ═══════════════════════════════════════════
+.profil-form-card {
+  animation-delay: 0.15s;
+
+  .profil-form {
+    padding: 0 24px 24px;
+
+    @media (max-width: 480px) { padding: 0 16px 16px; }
+  }
+}
+
+// ─── Sections formulaire ──────────────────
+.form-section {
+  padding: 20px 0;
+  border-bottom: 1px solid $gris-border;
+
+  &:last-of-type { border-bottom: none; }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: $font-sous-titre;   // Poppins
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: $texte-fonce;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba($rouge, 0.10);
+
+    mat-icon {
+      font-size: 18px; width: 18px; height: 18px;
+      color: $rouge;
+      flex-shrink: 0;
+    }
+
+    .optional-badge {
+      margin-left: auto;
+      background: rgba($bleu, 0.09);
+      color: $bleu;
+      border: 1px solid rgba($bleu, 0.22);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.70rem;
+      font-weight: 500;
+      font-family: $font-corps;
+    }
+  }
+
+  .section-description {
+    font-family: $font-corps;
+    font-size: 0.84rem;
+    color: $texte-gris;
+    margin: -8px 0 14px;
+    line-height: 1.55;
+  }
+}
+
+// ─── Grilles ──────────────────────────────
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.full-width { width: 100%; }
+
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+
+  .platform-field { width: 100%; }
+
+  .platform-logo {
+    height: 18px; width: auto;
+    border-radius: 3px;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  .platform-text {
+    font-family: $font-titre;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: $texte-fonce;
+    letter-spacing: 0.03em;
+  }
+}
+
+// ─── Surcharge Angular Material ───────────
+.profil-form ::ng-deep {
+  .mat-mdc-text-field-wrapper {
+    border-radius: $radius-sm !important;
+  }
+
+  .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: rgba(0, 0, 0, 0.13);
+    }
+  }
+
+  .mdc-text-field--focused .mdc-notched-outline__leading,
+  .mdc-text-field--focused .mdc-notched-outline__notch,
+  .mdc-text-field--focused .mdc-notched-outline__trailing {
+    border-color: $rouge !important;
+    border-width: 2px !important;
+  }
+
+  .mdc-text-field--focused .mdc-floating-label { color: $rouge !important; }
+
+  .mat-mdc-input-element {
+    font-family: $font-corps;
+    font-size: 0.92rem;
+    color: $texte-fonce;
+  }
+
+  .mdc-floating-label {
+    font-family: $font-sous-titre;
+    font-size: 0.88rem;
+  }
+
+  .mat-mdc-form-field-hint {
+    font-family: $font-corps;
+    font-size: 0.74rem;
+    color: $texte-gris;
+  }
+
+  .mat-mdc-form-field-icon-prefix mat-icon {
+    color: rgba($texte-gris, 0.65);
+    font-size: 19px;
+    transition: color 0.2s;
+  }
+
+  .mdc-text-field--focused .mat-mdc-form-field-icon-prefix mat-icon {
+    color: $rouge;
+  }
+
+  .mat-mdc-progress-spinner circle {
+    stroke: $blanc !important;
+  }
+}
+
+// ─── Actions formulaire ───────────────────
+.form-actions {
+  margin-top: 20px;
+
+  .submit-btn {
+    width: 100%;
+    padding: 13px 24px;
+    font-family: $font-sous-titre;   // Poppins
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: $radius-sm;
+    background: linear-gradient(135deg, $rouge, $rouge-dark);
+    color: $blanc;
+    border: none;
+    transition: all 0.25s $ease;
+    box-shadow: 0 4px 16px rgba($rouge, 0.28);
+    position: relative;
+    overflow: hidden;
+
+    // Shimmer
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba($blanc, 0.15), transparent);
+      transition: left 0.5s ease;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 22px rgba($rouge, 0.42);
+      &::before { left: 100%; }
+    }
+
+    &:active:not(:disabled) { transform: translateY(0); }
+
+    &:disabled {
+      background: #d1d5db;
+      color: #9ca3af;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-icon { font-size: 18px; width: 18px; height: 18px; }
+    .btn-text { font-weight: 600; letter-spacing: 0.02em; }
+  }
+}
+
+// ─── Note d'information ───────────────────
+.form-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 16px;
+  background: rgba($bleu, 0.05);
+  border: 1px solid rgba($bleu, 0.18);
+  border-left: 3px solid $bleu;
+  border-radius: $radius-sm;
+  margin-top: 16px;
+
+  mat-icon {
+    color: $bleu;
+    font-size: 17px; width: 17px; height: 17px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    margin: 0;
+    font-family: $font-corps;        // Roboto
+    font-size: 0.83rem;
+    color: $texte-moyen;
+    line-height: 1.55;
+
+    strong { color: $texte-fonce; font-weight: 500; }
+  }
+}
+
+// ═══════════════════════════════════════════
+// PROFIL MASQUÉ
+// ═══════════════════════════════════════════
+.profile-hidden {
+  text-align: center;
+  padding: 48px 24px;
+  background: $blanc;
+  border-radius: $radius-lg;
+  border: 2px dashed rgba($rouge, 0.20);
+  box-shadow: $shadow-sm;
+  animation: fadeUp 0.5s 0.1s $ease both;
+
+  .hidden-icon {
+    font-size: 3.5rem;
+    width: auto; height: auto;
+    color: rgba($rouge, 0.25);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  h3 {
+    font-family: $font-titre;        // Montserrat
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: $texte-moyen;
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-family: $font-corps;        // Roboto
+    font-size: 0.88rem;
+    color: $texte-gris;
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+// ═══════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════
+@media (max-width: 768px) {
+  .fidelity-stats { grid-template-columns: 1fr; }
+  .profil-header .header-content .main-title { font-size: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .profil-container { gap: 14px; }
+  .stars-display .stars,
+  .stars-display .stars-empty { font-size: 2rem; }
+  .stat-value { font-size: 1.3rem !important; }
+}
+
+// ═══════════════════════════════════════════
+// REDUCED MOTION
+// ═══════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+  mat-card,
+  .profil-header,
+  .profile-hidden,
+  .submit-btn,
+  .stat-item,
+  .toggle-btn {
+    animation: none;
+    transition: none;
+  }
+
+  .progress-fill { animation: none; }
+  .stars { animation: none; }
+}
+
+// ═══════════════════════════════════════════
+// FOCUS ACCESSIBLE
+// ═══════════════════════════════════════════
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid $bleu;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+// ═══════════════════════════════════════════
+// PARRAINAGE
+// ═══════════════════════════════════════════
+.parrainage-card {
+  border-radius: $radius-lg !important;
+  box-shadow: $shadow !important;
+  animation: fadeUp 0.45s 0.2s $ease both;
 
   .card-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid #e1f5fe;
+    gap: 12px;
+    padding: 20px 24px 0;
 
     .card-icon {
-      color: #00adef;
-      font-size: 1.5rem;
+      color: $bleu;
+      font-size: 1.6rem;
+      width: auto; height: auto;
     }
 
     h3 {
-      color: #991f23;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: bold;
-      font-size: 1.3rem;
+      font-family: $font-titre;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: $texte-fonce;
       margin: 0;
     }
   }
 
   .card-content {
-    padding: 1.5rem;
+    padding: 20px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
   }
 }
 
-// Carte de fidélité
-.fidelity-card {
-  .loading-fidelity {
+// ─── Code de parrainage ───────────────────
+.referral-code-section {
+  text-align: center;
+
+  .referral-label {
+    font-family: $font-sous-titre;
+    font-size: 0.85rem;
+    color: $texte-gris;
+    margin: 0 0 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .referral-code-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba($rouge, 0.06), rgba($bleu, 0.06));
+    border: 2px dashed rgba($rouge, 0.30);
+    border-radius: $radius-md;
+    padding: 14px 20px;
+
+    .referral-code {
+      font-family: $font-titre;
+      font-weight: 800;
+      font-size: 1.6rem;
+      color: $rouge;
+      letter-spacing: 0.08em;
+    }
+
+    .copy-btn {
+      color: $texte-gris;
+      transition: color 0.2s;
+      &:hover { color: $rouge; }
+    }
+  }
+
+  .referral-hint {
+    font-family: $font-corps;
+    font-size: 0.82rem;
+    color: $texte-gris;
+    margin: 10px 0 0;
+    line-height: 1.5;
+  }
+}
+
+// ─── Stats parrainage ─────────────────────
+.parrainage-stats {
+  display: flex;
+  justify-content: center;
+
+  .stat-item {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 2rem;
-    color: #666;
-    font-family: 'Poppins', sans-serif;
+    gap: 12px;
+    padding: 14px 24px;
+    background: rgba($bleu, 0.05);
+    border: 1px solid rgba($bleu, 0.15);
+    border-radius: $radius-md;
+
+    mat-icon { color: $bleu; font-size: 1.5rem; width: auto; height: auto; }
+
+    .stat-content {
+      display: flex;
+      flex-direction: column;
+
+      .stat-value {
+        font-family: $font-titre;
+        font-weight: 800;
+        font-size: 1.8rem;
+        color: $texte-fonce;
+      }
+      .stat-label {
+        font-family: $font-corps;
+        font-size: 0.8rem;
+        color: $texte-gris;
+      }
+    }
+  }
+}
+
+// ─── Jalons ──────────────────────────────
+.milestone {
+  padding: 16px;
+  background: $fond-clair;
+  border-radius: $radius-md;
+  border: 1px solid $gris-border;
+  transition: border-color 0.2s;
+
+  &.achieved {
+    border-color: rgba($rouge, 0.35);
+    background: rgba($rouge, 0.03);
   }
 
-  .fidelity-content {
-    .stars-display {
-      text-align: center;
-      margin-bottom: 2rem;
+  .milestone-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
 
-      .stars-container {
-        margin-bottom: 0.5rem;
+    mat-icon { color: $rouge; font-size: 1.3rem; width: auto; height: auto; }
 
-        .stars {
-          color: #ffd700;
-          font-size: 2.5rem;
-          letter-spacing: 0.2rem;
-        }
-
-        .stars-empty {
-          color: #e0e0e0;
-          font-size: 2.5rem;
-          letter-spacing: 0.2rem;
-        }
-      }
-
-      .fidelity-level {
-        color: #00adef;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 1.1rem;
-      }
+    .milestone-title {
+      font-family: $font-sous-titre;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: $texte-fonce;
+      flex: 1;
     }
 
-    .fidelity-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
+    .milestone-count {
+      font-family: $font-titre;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: $texte-gris;
+    }
+  }
 
-      .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem;
-        background: rgba(0, 173, 239, 0.05);
-        border-radius: 10px;
+  .progress-bar {
+    height: 8px;
+    background: rgba(0, 0, 0, 0.07);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 8px;
 
-        mat-icon {
-          color: #00adef;
-          font-size: 2rem;
-        }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, $rouge, $bleu);
+      border-radius: 99px;
+      transition: width 0.6s $ease;
 
-        .stat-content {
-          .stat-value {
-            display: block;
-            color: #991f23;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: bold;
-            font-size: 1.5rem;
-            line-height: 1;
-          }
-
-          .stat-label {
-            display: block;
-            color: #666;
-            font-family: 'Roboto', sans-serif;
-            font-size: 0.9rem;
-          }
-        }
+      &.gold {
+        background: linear-gradient(90deg, $or, color.adjust($or, $lightness: -15%));
       }
     }
+  }
 
-    .progress-section {
-      margin-bottom: 1.5rem;
+  .milestone-reward {
+    font-family: $font-corps;
+    font-size: 0.8rem;
+    color: $texte-gris;
+    margin: 0 0 8px;
+  }
 
-      .progress-label {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.9rem;
-        color: #666;
-      }
+  .milestone-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: rgba($rouge, 0.10);
+    border-radius: 99px;
+    font-family: $font-sous-titre;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $rouge;
 
-      .progress-bar {
-        height: 8px;
-        background: #e0e0e0;
-        border-radius: 4px;
-        overflow: hidden;
+    mat-icon { font-size: 0.95rem; width: auto; height: auto; }
 
-        .progress-fill {
-          height: 100%;
-          background: linear-gradient(90deg, #00adef, #991f23);
-          border-radius: 4px;
-          transition: width 0.5s ease;
-        }
-      }
+    &.gold-badge {
+      background: rgba($or, 0.15);
+      color: color.adjust($or, $lightness: -20%);
     }
+  }
+}
 
-    .fidelity-badge {
-      display: flex;
+.gold-milestone .milestone-header mat-icon { color: $or; }
+
+// ─── Boutons partage ─────────────────────
+.share-section {
+  .share-title {
+    font-family: $font-sous-titre;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: $texte-moyen;
+    margin: 0 0 12px;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    .share-btn {
+      flex: 1;
+      min-width: 110px;
+      padding: 8px 12px;
+      font-family: $font-sous-titre;
+      font-weight: 500;
+      font-size: 0.82rem;
+      border-radius: $radius-sm;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: linear-gradient(135deg, #ffd700, #ffed4e);
-      border-radius: 10px;
-      color: #8b6914;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
+      gap: 6px;
+      transition: all 0.2s $ease;
 
-      mat-icon {
-        color: #8b6914;
-      }
-    }
-  }
-}
+      mat-icon { font-size: 17px; width: 17px; height: 17px; }
 
-// Formulaire de profil
-.profil-form-card {
-  .profil-form {
-    .form-section {
-      margin-bottom: 2rem;
-
-      .section-title {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        color: #00adef;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-
-        .optional-badge {
-          background: #ff9800;
-          color: white;
-          padding: 0.2rem 0.6rem;
-          border-radius: 12px;
-          font-size: 0.7rem;
-          font-weight: 500;
-        }
-      }
-
-      .section-description {
-        color: #666;
-        font-family: 'Roboto', sans-serif;
-        font-size: 0.95rem;
-        margin: -0.5rem 0 1rem 0;
+      &.whatsapp-btn  { background: #25D366; color: $blanc; &:hover { background: color.adjust(#25D366, $lightness: -8%); } }
+      &.facebook-btn  { background: #1877F2; color: $blanc; &:hover { background: color.adjust(#1877F2, $lightness: -8%); } }
+      &.messenger-btn { background: #0084FF; color: $blanc; &:hover { background: color.adjust(#0084FF, $lightness: -8%); } }
+      &.instagram-btn {
+        background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        color: $blanc;
+        &:hover { opacity: 0.9; }
       }
     }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-
-      @media (max-width: 768px) {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .full-width {
-      width: 100%;
-    }
-
-    .platforms-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-
-      .platform-field {
-        ::ng-deep .mat-form-field-label {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .platform-logo {
-          height: 20px;
-          width: auto;
-          border-radius: 3px;
-        }
-
-        .platform-text {
-          font-weight: 600;
-          color: #333;
-        }
-      }
-    }
-
-    // Personnalisation Material
-    ::ng-deep {
-      .mat-form-field {
-        .mat-form-field-outline {
-          border-radius: 10px;
-        }
-
-        .mat-form-field-appearance-outline .mat-form-field-outline-thick {
-          color: #00adef;
-        }
-
-        .mat-form-field.mat-focused .mat-form-field-label {
-          color: #991f23;
-        }
-
-        mat-icon {
-          color: #00adef;
-        }
-      }
+    @media (max-width: 480px) {
+      .share-btn { min-width: calc(50% - 5px); }
     }
   }
-
-  .form-actions {
-    margin-top: 2rem;
-
-    .submit-btn {
-      width: 100%;
-      padding: 1rem;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 1.1rem;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #991f23, #c82333);
-      color: white;
-      transition: all 0.3s ease;
-
-      &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(153, 31, 35, 0.3);
-      }
-
-      &:disabled {
-        background: #cccccc;
-        cursor: not-allowed;
-      }
-
-      .button-content {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-      }
-
-      .spinner {
-        margin: 0;
-      }
-    }
-  }
-
-  .form-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 1rem;
-    background: rgba(0, 173, 239, 0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(0, 173, 239, 0.2);
-    margin-top: 1.5rem;
-
-    mat-icon {
-      color: #00adef;
-      margin-top: 0.1rem;
-    }
-
-    p {
-      margin: 0;
-      color: #666;
-      font-family: 'Roboto', sans-serif;
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-  }
-}
-
-// Profil masqué
-.profile-hidden {
-  text-align: center;
-  padding: 3rem 2rem;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-
-  .hidden-icon {
-    font-size: 4rem;
-    color: #ccc;
-    margin-bottom: 1rem;
-  }
-
-  h3 {
-    color: #666;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    color: #999;
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-  }
-}
-
-// Responsive
-@media (max-width: 768px) {
-  .profil-page {
-    padding: 0.5rem;
-  }
-
-  .profil-header {
-    flex-direction: column;
-    text-align: center;
-    padding: 1.25rem;
-
-    .header-content {
-      .main-title {
-        font-size: 1.6rem;
-      }
-
-      .subtitle {
-        font-size: 1rem;
-      }
-    }
-  }
-
-  .fidelity-stats {
-    grid-template-columns: 1fr !important;
-  }
-
-  .platforms-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .profil-container {
-    gap: 1rem;
-  }
-
-  mat-card .card-content {
-    padding: 1rem;
-  }
-
-  .fidelity-content .stars-display .stars,
-  .fidelity-content .stars-display .stars-empty {
-    font-size: 2rem;
-  }
-}
-
-// Animations
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-mat-card {
-  animation: fadeIn 0.5s ease-out;
 }

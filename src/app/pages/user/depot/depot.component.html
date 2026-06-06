@@ -13,6 +13,14 @@
       <p class="subtitle">Remplissez le formulaire ci-dessous pour effectuer votre dépôt</p>
     </div>
 
+    <!-- Bouton retour (mode invité seulement) -->
+    <div *ngIf="isGuestMode" class="back-btn-wrapper">
+      <button mat-stroked-button routerLink="/accueil" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+        Retour à l'accueil
+      </button>
+    </div>
+
     <div class="depot-content">
       <!-- Formulaire de dépôt -->
       <mat-card class="depot-form-card">
@@ -22,23 +30,78 @@
         </div>
 
         <form (ngSubmit)="submitDepot()" class="depot-form">
-          <!-- Message d'alerte si pas d'IDs plateforme -->
-          <div *ngIf="transactionOptionsDisponibles.length === 0" class="alert-message">
+          <!-- Bannière mode invité -->
+          <div *ngIf="isGuestMode" class="guest-banner guest-info">
+            <mat-icon class="guest-icon">person_outline</mat-icon>
+            <div class="guest-content">
+              <h3>Mode Invité</h3>
+              <p>Vous effectuez un dépôt sans compte. <a routerLink="/register">Créez un compte</a> ou <a routerLink="/login">connectez-vous</a> pour un suivi complet de vos transactions.</p>
+            </div>
+          </div>
+
+          <!-- Champs invité -->
+          <div *ngIf="isGuestMode" class="guest-fields">
+            <div class="form-grid">
+              <!-- ID Plateforme obligatoire -->
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>ID Plateforme <span class="required-star">*</span></mat-label>
+                <input matInput [(ngModel)]="guestIdPlateforme" name="guestIdPlateforme"
+                       placeholder="Ex: 12345678" required />
+                <mat-icon matPrefix>badge</mat-icon>
+                <mat-hint>Votre identifiant sur la plateforme de jeu (obligatoire)</mat-hint>
+              </mat-form-field>
+
+              <!-- Toggle Nom / Prénom -->
+              <div class="full-width toggle-name-row">
+                <button type="button" mat-stroked-button class="toggle-name-btn"
+                        (click)="showGuestNameFields = !showGuestNameFields">
+                  <mat-icon>{{ showGuestNameFields ? 'expand_less' : 'expand_more' }}</mat-icon>
+                  {{ showGuestNameFields ? 'Masquer Nom / Prénom' : 'Ajouter Nom / Prénom (optionnel)' }}
+                </button>
+              </div>
+
+              <!-- Nom / Prénom (masqués par défaut) -->
+              <ng-container *ngIf="showGuestNameFields">
+                <mat-form-field appearance="outline">
+                  <mat-label>Prénom (optionnel)</mat-label>
+                  <input matInput [(ngModel)]="guestPrenom" name="guestPrenom" placeholder="Votre prénom" />
+                  <mat-icon matPrefix>person</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Nom (optionnel)</mat-label>
+                  <input matInput [(ngModel)]="guestNom" name="guestNom" placeholder="Votre nom" />
+                  <mat-icon matPrefix>person_outline</mat-icon>
+                </mat-form-field>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- Message d'alerte si pas d'IDs plateforme (utilisateur connecté seulement) -->
+          <div *ngIf="!isGuestMode && transactionOptionsDisponibles.length === 0" class="alert-message">
             <mat-icon>warning</mat-icon>
             <div class="alert-content">
               <h3>Aucun ID de plateforme configuré</h3>
               <p>Veuillez configurer vos identifiants de plateforme dans votre profil avant de faire un dépôt.</p>
-              <button mat-stroked-button routerLink="/profil" class="profile-btn">
+              <button mat-stroked-button routerLink="/user/profil" class="profile-btn">
                 <mat-icon>person</mat-icon>
                 Aller au profil
               </button>
             </div>
           </div>
 
-          <!-- Informations utilisateur -->
+          <!-- Informations utilisateur connecté -->
           <div *ngIf="userInfo" class="user-info">
             <mat-icon>person</mat-icon>
             <span>Connecté en tant que : <strong>{{ userInfo }}</strong></span>
+          </div>
+
+          <!-- Étapes -->
+          <div class="form-steps">
+            <div class="step active"><span class="step-num">1</span><span>Infos</span></div>
+            <div class="step-line"></div>
+            <div class="step" [class.active]="!!form.optionDepot"><span class="step-num">2</span><span>Paiement</span></div>
+            <div class="step-line"></div>
+            <div class="step" [class.active]="!!file"><span class="step-num">3</span><span>Justificatif</span></div>
           </div>
 
           <!-- Grille des champs -->
@@ -75,8 +138,21 @@
               <input matInput type="number" [(ngModel)]="form.montant" name="montant"
                      min="1" required placeholder="Ex: 5000" />
               <mat-icon matPrefix>attach_money</mat-icon>
-              <mat-hint>Montant minimum : 1 FCFA</mat-hint>
+              <mat-hint>Montant minimum : 100 FCFA</mat-hint>
             </mat-form-field>
+
+            <!-- Montants rapides -->
+            <div class="quick-amounts">
+              <span class="quick-label">Montant rapide :</span>
+              <div class="amount-chips">
+                <button type="button" class="amount-chip"
+                        *ngFor="let a of quickAmounts"
+                        [class.active]="form.montant === a"
+                        (click)="form.montant = a">
+                  {{ a | number:'1.0-0' }}
+                </button>
+              </div>
+            </div>
 
             <!-- Plateforme -->
             <mat-form-field appearance="outline" class="full-width">
@@ -92,49 +168,57 @@
               <mat-icon matPrefix>casino</mat-icon>
             </mat-form-field>
 
-            <!-- Option de dépôt -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Moyen de paiement</mat-label>
-              <mat-select [(ngModel)]="form.optionDepot" name="optionDepot" required>
-                <mat-option value="O">
-                  <div class="payment-option">
-                    <img src="assets/images/OrangeMoney.png" alt="OrangeMoney" loading="lazy" style="width: 50px;" />
-                    <!-- <mat-icon>account_balance_wallet</mat-icon> -->
-                    <span>Orange Money </span>
-                  </div>
-                </mat-option>
-                <mat-option value="M">
-                  <div class="payment-option">
-                    <img src="assets/images/MoovMoney.png" alt="MoovMoney" loading="lazy" style="width: 50px;" />
-                    <!-- <mat-icon>account_balance_wallet</mat-icon> -->
-                    <span>Moov Money</span>
-                  </div>
-                </mat-option>
-                <mat-option value="W">
-                  <div class="payment-option">
-                    <img src="assets/images/WaveMoney.png" alt="WaveMoney" loading="lazy" style="width: 50px;" />
-                    <!-- <mat-icon>account_balance_wallet</mat-icon> -->
-                    <span>Wave</span>
-                  </div>
-                </mat-option>
-                <mat-option value="S">
-                  <div class="payment-option">
-                    <img src="assets/images/SankMoney.png" alt="SankMoney" loading="lazy" style="width: 50px;" />
-                    <!-- <mat-icon>account_balance_wallet</mat-icon> -->
-                    <span>Sank Money</span>
-                  </div>
-                </mat-option>
-                <mat-option value="C">
-                  <div class="payment-option">
-                    <img src="assets/images/CarteBancaire.png" alt="CarteBancaire" loading="lazy" style="width: 50px;" />
-                    <!-- <mat-icon>credit_card</mat-icon> -->
-                    <span>Carte Bancaire</span>
-                  </div>
-                </mat-option>
-              </mat-select>
-              <mat-icon matPrefix>payment</mat-icon>
-            </mat-form-field>
+            <!-- Moyen de paiement (cartes visuelles) -->
+            <div class="payment-cards-section">
+              <div class="field-section-label">
+                <mat-icon>payment</mat-icon>
+                <span>Moyen de paiement</span>
+              </div>
+              <div class="payment-cards" role="radiogroup" aria-label="Moyen de paiement">
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionDepot === 'O'"
+                        [attr.aria-checked]="form.optionDepot === 'O'"
+                        (click)="form.optionDepot = 'O'">
+                  <img src="assets/images/OrangeMoney.png" alt="Orange Money" loading="lazy" />
+                  <span>Orange Money</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionDepot === 'M'"
+                        [attr.aria-checked]="form.optionDepot === 'M'"
+                        (click)="form.optionDepot = 'M'">
+                  <img src="assets/images/MoovMoney.png" alt="Moov Money" loading="lazy" />
+                  <span>Moov Money</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+<button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionDepot === 'W'"
+                        [attr.aria-checked]="form.optionDepot === 'W'"
+                        (click)="form.optionDepot = 'W'">
+                  <img src="assets/images/WaveMoney.png" alt="Wave" loading="lazy" />
+                  <span>Wave</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionDepot === 'S'"
+                        [attr.aria-checked]="form.optionDepot === 'S'"
+                        (click)="form.optionDepot = 'S'">
+                  <img src="assets/images/SankMoney.png" alt="Sank Money" loading="lazy" />
+                  <span>Sank Money</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionDepot === 'C'"
+                        [attr.aria-checked]="form.optionDepot === 'C'"
+                        (click)="form.optionDepot = 'C'">
+                  <img src="assets/images/CarteBancaire.png" alt="Carte Bancaire" loading="lazy" />
+                  <span>Carte</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+              </div>
+            </div>
           </div>
+
 
           <!-- Actions USSD/Apps -->
           <div *ngIf="form.optionDepot" class="payment-actions">
@@ -143,6 +227,13 @@
                 <mat-icon>smartphone</mat-icon>
                 <h4>Code USSD pour {{ getOptionDepotText(form.optionDepot) }}</h4>
               </div>
+
+              <!-- Numéro de paiement -->
+              <div *ngIf="getPaymentNumber()" class="payment-number-box">
+                <mat-icon>phone_forwarded</mat-icon>
+                <span>Envoyez au numéro : <strong>{{ getPaymentNumber() }}</strong></span>
+              </div>
+
               <p>Cliquez pour lancer le code USSD sur mobile ou le copier sur desktop</p>
               <button mat-raised-button color="accent" type="button" (click)="ouvrirTelephone()"
                       class="action-btn" [disabled]="!form.montant || !form.optionDeTransaction">
@@ -181,32 +272,105 @@
           <div class="file-upload-section">
             <h4 class="section-title">
               <mat-icon>image</mat-icon>
-              Capture de la transaction
+              Capture de la transaction <span class="optional-label">(optionnel)</span>
             </h4>
 
+            <p class="section-subtext">
+              Ajouter une capture est <strong>facultatif</strong> mais <strong>recommandé</strong> pour accélérer la validation.
+            </p>
+
             <div class="file-upload-zone" [class.has-file]="filePreview">
-              <input id="file" type="file" accept="image/*" (change)="onFileSelected($event)"
-                     class="file-input" required />
-              <label for="file" class="file-label">
-                <mat-icon class="upload-icon">cloud_upload</mat-icon>
-                <span class="upload-text">
-                  {{ filePreview ? 'Changer la capture' : 'Choisir une capture' }}
-                </span>
-                <span class="upload-hint">PNG, JPG - Max 5 Mo</span>
-              </label>
+              <input id="file-camera" type="file" accept="image/*" capture="environment"
+                     (change)="onFileSelected($event)" class="file-input" />
+              <input id="file-gallery" type="file" accept="image/*"
+                     (change)="onFileSelected($event)" class="file-input" />
+
+              <div *ngIf="!filePreview" class="upload-buttons">
+                <label for="file-camera" class="upload-btn">
+                  <mat-icon>camera_alt</mat-icon>
+                  <span>Prendre une photo</span>
+                </label>
+                <label for="file-gallery" class="upload-btn">
+                  <mat-icon>photo_library</mat-icon>
+                  <span>Choisir une image</span>
+                </label>
+              </div>
 
               <div *ngIf="filePreview" class="file-preview">
                 <img [src]="filePreview" alt="Aperçu capture" class="preview-image" />
-                <button type="button" mat-icon-button class="remove-btn" (click)="file = null; filePreview = null;">
+                <button type="button" mat-icon-button class="remove-btn" (click)="removeFile()">
                   <mat-icon>close</mat-icon>
                 </button>
               </div>
             </div>
           </div>
 
+          <!-- Panneau de confirmation -->
+          <div *ngIf="showConfirm" class="confirm-overlay">
+            <div class="confirm-box">
+              <div class="confirm-header">
+                <mat-icon class="confirm-icon">summarize</mat-icon>
+                <h3>Récapitulatif du dépôt</h3>
+              </div>
+
+              <div class="confirm-details">
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>attach_money</mat-icon> Montant</span>
+                  <span class="confirm-value amount">{{ form.montant | number:'1.0-0' }} FCFA</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>casino</mat-icon> Plateforme</span>
+                  <span class="confirm-value">{{ form.optionDeTransaction }}</span>
+                </div>
+                <div class="confirm-row" *ngIf="getSelectedPlatformId()">
+                  <span class="confirm-label"><mat-icon>badge</mat-icon> ID Plateforme</span>
+                  <span class="confirm-value">{{ getSelectedPlatformId() }}</span>
+                </div>
+                <div class="confirm-row" *ngIf="isGuestMode && (guestPrenom || guestNom)">
+                  <span class="confirm-label"><mat-icon>person</mat-icon> Nom / Prénom</span>
+                  <span class="confirm-value">{{ guestPrenom }} {{ guestNom }}</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>payment</mat-icon> Moyen</span>
+                  <span class="confirm-value">{{ getOptionDepotText(form.optionDepot) }}</span>
+                </div>
+                <div class="confirm-row" *ngIf="file">
+                  <span class="confirm-label"><mat-icon>image</mat-icon> Capture</span>
+                  <span class="confirm-value ok"><mat-icon>check_circle</mat-icon> Fournie</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>public</mat-icon> Pays</span>
+                  <span class="confirm-value">{{ form.pays }}</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>phone</mat-icon> Téléphone</span>
+                  <span class="confirm-value">{{ form.indicatif }} {{ form.numero }}</span>
+                </div>
+              </div>
+
+              <div class="confirm-warning">
+                <mat-icon>info_outline</mat-icon>
+                <span>Vérifiez que toutes les informations sont correctes avant de confirmer.</span>
+              </div>
+
+              <div class="confirm-actions">
+                <button mat-stroked-button type="button" class="cancel-btn" (click)="cancelConfirm()">
+                  <mat-icon>close</mat-icon> Annuler
+                </button>
+                <button mat-raised-button color="primary" type="button" class="submit-confirm-btn"
+                        (click)="submitDepot()" [disabled]="submitting">
+                  <mat-progress-spinner *ngIf="submitting" diameter="18" mode="indeterminate" color="accent"></mat-progress-spinner>
+                  <mat-icon *ngIf="!submitting">send</mat-icon>
+                  <span>{{ submitting ? 'En cours...' : 'Confirmer le dépôt' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Bouton de soumission -->
-          <button mat-raised-button color="primary" type="submit"
-                  [disabled]="isSubmitDisabled() || submitting" class="submit-btn">
+          <button mat-raised-button color="primary" type="button"
+                  [disabled]="isSubmitDisabled() || submitting" class="submit-btn"
+                  (click)="requestSubmit()">
             <div class="button-content">
               <mat-progress-spinner *ngIf="submitting" diameter="20"
                                     mode="indeterminate" color="accent" class="spinner">
@@ -218,10 +382,41 @@
             </div>
           </button>
         </form>
+
+        <!-- Compte à rebours après soumission -->
+        <div *ngIf="showCountdown" class="countdown-section">
+          <div class="countdown-success-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <h3 class="countdown-title">Demande envoyée avec succès !</h3>
+
+          <div class="countdown-message">
+            <p>Bonjour,</p>
+            <p>Votre demande est en cours de traitement par notre équipe.</p>
+            <p>Un assistant de Papou Service va traiter votre demande à l'instant même.</p>
+            <p *ngIf="countdownSeconds > 0">
+              Si votre demande n'est pas traitée dans les
+              <strong class="countdown-inline">{{ countdownDisplay }}</strong>,
+              contactez-nous sur WhatsApp :
+            </p>
+            <p *ngIf="countdownSeconds === 0">
+              Le délai est écoulé. Contactez-nous immédiatement sur WhatsApp :
+            </p>
+            <a href="https://wa.me/22604116262" target="_blank" rel="noopener" class="whatsapp-btn">
+              <mat-icon>chat</mat-icon>
+              Nous contacter sur WhatsApp
+            </a>
+            <p class="countdown-thanks">Merci de votre patience</p>
+          </div>
+
+          <div class="countdown-timer" [class.expired]="countdownSeconds === 0">
+            <span class="countdown-display">{{ countdownDisplay }}</span>
+          </div>
+        </div>
       </mat-card>
 
-      <!-- Section matchs -->
-      <div class="matchs-section">
+      <!-- Section matchs (masquée en mode invité) -->
+      <div *ngIf="!isGuestMode" class="matchs-section">
         <app-matchs></app-matchs>
       </div>
     </div>
@@ -229,3 +424,4 @@
 </div>
 
 <app-footer></app-footer>
+

@@ -1,323 +1,550 @@
-// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500&family=Roboto:wght@400;500&display=swap');
+@use "sass:color";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
 
+// ═══════════════════════════════════════════
+// TOKENS OFFICIELS CLIENT
+// ═══════════════════════════════════════════
+$rouge:       #991f23;
+$rouge-dark:  color.adjust($rouge, $lightness: -8%);
+$rouge-pale:  color.adjust($rouge, $lightness: 58%);
+$bleu:        #00adef;
+$bleu-dark:   color.adjust($bleu, $lightness: -8%);
+$blanc:       #ffffff;
+$texte-fonce: #1a1d2e;
+$texte-moyen: #4b5563;
+$texte-gris:  #6b7280;
+$fond-clair:  #f6f7fb;
+$bordure:     rgba(0, 0, 0, 0.08);
+$bordure-rouge: rgba($rouge, 0.14);
+$whatsapp:    #25d366;
+
+$font-titre:      'Montserrat', sans-serif;
+$font-sous-titre: 'Poppins', sans-serif;
+$font-corps:      'Roboto', sans-serif;
+
+$radius-sm:   10px;
+$radius-md:   18px;
+$radius-lg:   26px;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
+
+// ═══════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+// ═══════════════════════════════════════════
+// HOST — fond dégradé cohérent avec les autres pages
+// ═══════════════════════════════════════════
+:host {
+  display: block;
+  background: linear-gradient(
+    160deg,
+    $rouge-pale   0%,
+    color.adjust($rouge, $lightness: 54%) 30%,
+    #f9f4f4       60%,
+    $blanc        100%
+  );
+  min-height: 100vh;
+  padding: 40px 1.5rem 72px;
+
+  @media (max-width: 768px) { padding: 28px 1rem 56px; }
+  @media (max-width: 480px) { padding: 20px 0.75rem 48px; }
+}
+
+// ═══════════════════════════════════════════
+// CARTE PRINCIPALE
+// ═══════════════════════════════════════════
 .a-propos-container {
-  max-width: 1200px;
-  margin: 1rem auto;
-  padding: 1rem;
-  font-family: 'Roboto', 'Open Sans', sans-serif;
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  font-family: $font-corps;
+}
 
-  // Bannière
-  .banner {
-    margin-bottom: 2rem;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+// ═══════════════════════════════════════════
+// BANNIÈRE
+// ═══════════════════════════════════════════
+.banner {
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba($rouge, 0.15);
+  margin-bottom: 48px;
+  position: relative;
+  animation: fadeUp 0.7s $ease both;
+
+  // Liseré rouge→bleu en bas de la bannière
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+  }
+
+  img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s $ease;
+
+    &:hover { transform: scale(1.02); }
+
+    @media (max-width: 768px) { height: 220px; }
+    @media (max-width: 480px) { height: 160px; }
+  }
+}
+
+// ═══════════════════════════════════════════
+// TITRES
+// ═══════════════════════════════════════════
+.main-title {
+  text-align: center;
+  font-family: $font-titre;          // Montserrat Bold
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  color: $rouge;
+  margin: 0 0 36px;
+  line-height: 1.15;
+  animation: fadeUp 0.6s 0.1s $ease both;
+}
+
+.section-title {
+  text-align: center;
+  font-family: $font-titre;          // Montserrat Bold
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  color: $texte-fonce;
+  margin: 0 0 32px;
+  position: relative;
+  padding-bottom: 14px;
+
+  // Soulignement gradient centré
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 48px; height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+  }
+}
+
+// ═══════════════════════════════════════════
+// CONTENU PRINCIPAL
+// ═══════════════════════════════════════════
+.main-content {
+  background: $blanc;
+  border-radius: $radius-lg;
+  padding: 40px;
+  border: 1px solid $bordure-rouge;
+  box-shadow: 0 4px 24px rgba($rouge, 0.07);
+  margin-bottom: 0;
+  animation: fadeUp 0.7s 0.15s $ease both;
+
+  // Liseré rouge en haut
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    border-radius: $radius-lg $radius-lg 0 0;
+  }
+
+  @media (max-width: 768px) { padding: 28px 24px; }
+  @media (max-width: 480px) { padding: 20px 16px; border-radius: $radius-md; }
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: start;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+  }
+}
+
+// ─── Texte ───────────────────────────────
+.text-content {
+  p {
+    font-family: $font-corps;        // Roboto
+    font-size: 0.98rem;
+    line-height: 1.80;
+    color: $texte-moyen;
+    margin-bottom: 1.25rem;
+    text-align: justify;
+
+    &.intro-text {
+      font-size: 1.05rem;
+      color: $texte-fonce;
+      line-height: 1.85;
+    }
+
+    strong {
+      color: $rouge;
+      font-weight: 600;
+    }
+
+    &:last-child { margin-bottom: 0; }
+  }
+}
+
+// ─── Photo équipe ─────────────────────────
+.team-section {
+  .team-photo {
+    text-align: center;
 
     img {
       width: 100%;
-      height: 300px;
-      object-fit: cover;
-      transition: transform 0.3s ease;
+      max-width: 380px;
+      height: auto;
+      border-radius: $radius-md;
+      box-shadow: 0 8px 28px rgba($rouge, 0.14);
+      border: 3px solid rgba($rouge, 0.10);
+      transition: transform 0.3s $ease, box-shadow 0.3s $ease;
+      display: block;
+      margin: 0 auto;
 
       &:hover {
-        transform: scale(1.02);
-      }
-    }
-  }
-
-  // Titres
-  .main-title {
-    text-align: center;
-    color: #991f23;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: bold;
-    font-size: clamp(1.8rem, 4vw, 2.5rem);
-    margin-bottom: 2rem;
-    line-height: 1.2;
-  }
-
-  .section-title {
-    text-align: center;
-    color: #991f23;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: bold;
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    margin-bottom: 2rem;
-  }
-
-  // Contenu principal
-  .main-content {
-    .content-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-
-      @media (min-width: 768px) {
-        grid-template-columns: 2fr 1fr;
-        align-items: start;
+        transform: translateY(-5px);
+        box-shadow: 0 14px 36px rgba($rouge, 0.20);
       }
     }
 
-    .text-content {
-      p {
-        font-size: 1rem;
-        line-height: 1.7;
-        color: #444;
-        margin-bottom: 1.5rem;
-        text-align: justify;
-
-        &.intro-text {
-          font-size: 1.1rem;
-          color: #333;
-        }
-
-        strong {
-          color: #991f23;
-          font-weight: 600;
-        }
-      }
+    .caption {
+      font-family: $font-sous-titre; // Poppins
+      font-style: italic;
+      font-size: 0.85rem;
+      color: $texte-gris;
+      margin-top: 12px;
     }
   }
+}
 
-  // Photo d'équipe
-  .team-section {
-    .team-photo {
-      text-align: center;
-      margin: 0;
+// ═══════════════════════════════════════════
+// SÉPARATEUR
+// ═══════════════════════════════════════════
+.section-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba($rouge, 0.25), $bleu, rgba($bleu, 0.25), transparent);
+  margin: 40px 0;
+}
 
-      img {
-        width: 100%;
-        max-width: 400px;
-        height: auto;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        transition: transform 0.3s ease;
+// ═══════════════════════════════════════════
+// SECTION CONTACT & LOCALISATION
+// ═══════════════════════════════════════════
+.contact-section {
+  animation: fadeUp 0.7s 0.2s $ease both;
+}
 
-        &:hover {
-          transform: translateY(-5px);
-        }
-      }
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
 
-      .caption {
-        font-style: italic;
-        margin-top: 1rem;
-        color: #666;
-        font-family: 'Poppins', sans-serif;
-        font-size: 0.95rem;
-      }
-    }
+.info-card {
+  background: $blanc;
+  padding: 28px 24px;
+  border-radius: $radius-md;
+  border: 1px solid $bordure-rouge;
+  box-shadow: 0 4px 16px rgba($rouge, 0.06);
+  text-align: center;
+  transition: transform 0.25s $ease, box-shadow 0.25s $ease, border-color 0.25s $ease;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s $ease both;
+
+  // Barre gradient animée en haut
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s $ease;
   }
 
-  // Séparateurs
-  .section-divider {
-    border: none;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00adef, transparent);
-    margin: 3rem 0;
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 14px 32px rgba($rouge, 0.12);
+    border-color: rgba($rouge, 0.28);
+
+    &::before { transform: scaleX(1); }
   }
 
-  // Cartes d'information
-  .info-grid, .partners-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
+  .card-icon {
+    font-size: 2.2rem;
+    margin-bottom: 14px;
+    display: block;
   }
 
-  .info-card, .partner-card {
-    background: linear-gradient(135deg, #f8fdff 0%, #e3f7fb 100%);
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 173, 239, 0.1);
-    border: 1px solid #e1f5fe;
-    transition: all 0.3s ease;
-    text-align: center;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0, 173, 239, 0.15);
-    }
-
-    .card-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    h3 {
-      color: #00adef;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 600;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
+  h3 {
+    font-family: $font-sous-titre;   // Poppins
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: $texte-fonce;
+    margin: 0 0 16px;
   }
+}
 
-  // Contacts
-  .contact-info, .partner-contacts {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-  }
+// ─── Infos contact ───────────────────────
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  .contact-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: #00adef;
+.contact-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: $radius-sm;
+  text-decoration: none;
+  font-family: $font-sous-titre;     // Poppins
+  font-weight: 500;
+  font-size: 0.88rem;
+  background: $fond-clair;
+  color: $bleu;
+  border: 1px solid rgba($bleu, 0.18);
+  transition: all 0.2s $ease;
+
+  .icon { font-size: 1rem; flex-shrink: 0; }
+
+  &:hover {
+    background: rgba($bleu, 0.07);
+    border-color: rgba($bleu, 0.35);
+    color: $bleu-dark;
+    transform: translateX(3px);
     text-decoration: none;
-    font-weight: 500;
-    padding: 0.5rem;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    background: rgba(0, 173, 239, 0.05);
+  }
+
+  &.whatsapp {
+    color: $whatsapp;
+    border-color: rgba($whatsapp, 0.22);
+    background: rgba($whatsapp, 0.05);
 
     &:hover {
-      background: rgba(0, 173, 239, 0.1);
-      text-decoration: none;
-      color: #008bc1;
+      background: rgba($whatsapp, 0.10);
+      border-color: rgba($whatsapp, 0.40);
+      color: color.adjust($whatsapp, $lightness: -8%);
     }
+  }
+}
 
-    &.whatsapp {
-      background: rgba(37, 211, 102, 0.1);
-      color: #25d366;
+// ─── Code promo ──────────────────────────
+.promo-code {
+  margin-top: 10px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, $rouge, $rouge-dark);
+  color: $blanc;
+  border-radius: $radius-sm;
+  font-family: $font-sous-titre;
+  font-weight: 500;
+  font-size: 0.88rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
 
-      &:hover {
-        background: rgba(37, 211, 102, 0.2);
-      }
-    }
+  // Shimmer décoratif
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba($blanc, 0.12), transparent);
+    animation: shimmer 3s infinite;
+  }
 
-    .icon {
-      font-size: 1.1rem;
+  strong {
+    font-family: $font-titre;        // Montserrat
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+  }
+}
+
+// ─── Localisations ───────────────────────
+.location-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: $fond-clair;
+  border-radius: $radius-sm;
+  border: 1px solid $bordure;
+  font-family: $font-corps;          // Roboto
+  font-size: 0.9rem;
+  color: $texte-moyen;
+  transition: all 0.2s $ease;
+
+  .location-icon { font-size: 1rem; flex-shrink: 0; }
+
+  &:hover {
+    background: rgba($rouge, 0.04);
+    border-color: rgba($rouge, 0.18);
+    color: $texte-fonce;
+    transform: translateX(3px);
+  }
+}
+
+// ═══════════════════════════════════════════
+// SECTION PARTENAIRES
+// ═══════════════════════════════════════════
+.partners-section {
+  animation: fadeUp 0.7s 0.25s $ease both;
+}
+
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+
+  @media (min-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
+}
+
+.partner-card {
+  background: $blanc;
+  padding: 28px 24px;
+  border-radius: $radius-md;
+  border: 1px solid $bordure;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.25s $ease, box-shadow 0.25s $ease, border-color 0.25s $ease;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.6s $ease both;
+
+  // Barre gradient en haut
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s $ease;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.10);
+    border-color: rgba($rouge, 0.22);
+
+    &::before { transform: scaleX(1); }
+
+    .partner-logo img { transform: scale(1.06); }
+  }
+
+  .partner-logo {
+    img {
+      width: 120px;
+      height: 60px;
+      object-fit: contain;
+      transition: transform 0.25s $ease;
     }
   }
 
-  // Code promo
-  .promo-code {
-    margin-top: 1rem;
-    padding: 0.8rem;
-    background: linear-gradient(135deg, #991f23, #c82333);
-    color: white;
-    border-radius: 8px;
-    font-weight: 500;
-
-    strong {
-      font-size: 1.1rem;
-      margin-left: 0.5rem;
-    }
-  }
-
-  // Liste des localisations
-  .location-list {
+  .partner-contacts {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
-  }
-
-  .location-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 6px;
-  }
-
-  // Partenaires
-  .partners-section {
-    .partner-card {
-      .partner-logo {
-        margin-bottom: 1rem;
-
-        img {
-          width: 120px;
-          height: 60px;
-          object-fit: contain;
-          transition: transform 0.3s ease;
-
-          &:hover {
-            transform: scale(1.05);
-          }
-        }
-      }
-    }
-  }
-
-  // Responsive
-  @media (max-width: 768px) {
-    margin: 0.5rem;
-    padding: 1rem;
-    border-radius: 12px;
-
-    .banner img {
-      height: 200px;
-    }
-
-    .info-grid, .partners-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .content-grid {
-      gap: 1.5rem;
-    }
-
-    .team-photo img {
-      max-width: 100%;
-    }
-
-    .contact-link {
-      font-size: 0.9rem;
-      padding: 0.8rem;
-    }
-
-    .info-card, .partner-card {
-      padding: 1.2rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.8rem;
-
-    .main-title {
-      font-size: 1.6rem;
-    }
-
-    .section-title {
-      font-size: 1.4rem;
-    }
-
-    .text-content p {
-      font-size: 0.95rem;
-      text-align: left;
-    }
-
-    .banner img {
-      height: 150px;
-    }
+    gap: 8px;
+    width: 100%;
 
     .contact-link {
       font-size: 0.85rem;
+      padding: 8px 12px;
     }
+  }
+}
+
+// ═══════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════
+@media (max-width: 768px) {
+  .info-grid,
+  .partners-grid { grid-template-columns: 1fr; gap: 14px; }
+
+  .content-grid { gap: 2rem; }
+  .team-photo img { max-width: 100%; }
+  .info-card, .partner-card { padding: 22px 18px; }
+  .section-divider { margin: 28px 0; }
+}
+
+@media (max-width: 480px) {
+  .main-title  { font-size: 1.7rem; }
+  .section-title { font-size: 1.3rem; }
+
+  .text-content p {
+    font-size: 0.92rem;
+    text-align: left;
   }
 
-  // Animations
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .info-card, .partner-card { padding: 18px 14px; }
+}
+
+// ═══════════════════════════════════════════
+// REDUCED MOTION
+// ═══════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+  .info-card, .partner-card,
+  .team-photo img, .banner img,
+  .contact-link, .location-item {
+    transition: none;
+    animation: none;
   }
 
-  .info-card, .partner-card, .team-photo {
-    animation: fadeInUp 0.6s ease-out;
-  }
+  .promo-code::before { animation: none; }
+}
+
+// ═══════════════════════════════════════════
+// FOCUS ACCESSIBLE
+// ═══════════════════════════════════════════
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid $bleu;
+  outline-offset: 2px;
+  border-radius: 6px;
 }

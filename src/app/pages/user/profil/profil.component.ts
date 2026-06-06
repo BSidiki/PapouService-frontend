@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,10 +7,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AnnoncesPublicComponent } from "../../annonces/annonces-public.component";
+import { ErrorService } from '../../../services/error.service';
 import { AuthService } from '../../../services/auth.service';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { DepotService } from '../../../services/depot.service';
+import { UtilisateurService } from '../../../services/utilisateur.service';
+import { catchError, of, map, finalize } from 'rxjs';
+import { FooterComponent } from "../../../layout/footer/footer.component";
 
 @Component({
   selector: 'app-profil',
@@ -25,34 +27,34 @@ import { catchError, forkJoin, map, of } from 'rxjs';
     MatIconModule,
     MatProgressSpinnerModule,
     MatCardModule,
-    AnnoncesPublicComponent
-  ],
+    AnnoncesPublicComponent,
+    FooterComponent
+],
   templateUrl: './profil.component.html',
   styleUrls: ['./profil.component.scss']
 })
 export class ProfilComponent implements OnInit {
-  private readonly API_HOSTS = [
-    'http://192.168.11.124:8080',
-  ];
-  private api = this.API_HOSTS[0];
-
   user: any = {};
   afficherProfil = false;
 
-  depotCount = 0;
   fidelityStars = '';
   isFidele = false;
   fidelityLevel = 0;
-  private readonly fidelityStep = 5;
+  private totalDepotAmount = 0;
+  private readonly fidelityThresholds = [100_000, 1_000_000, 5_000_000, 10_000_000, 20_000_000];
 
   saving = false;
   loadingFidelity = false;
 
+  // Changement de mot de passe
+  showPasswordForm = false;
+  passwordData = { ancienPassword: '', nouveauPassword: '', confirmPassword: '' };
+  savingPassword = false;
+
   constructor(
     private auth: AuthService,
-    private http: HttpClient,
-    private snackBar: MatSnackBar
-  ) {}
+    private depotService: DepotService,
+    private utilisateurService: UtilisateurService, private errorService: ErrorService) {}
 
   ngOnInit(): void {
     const u = this.auth.getUser();
@@ -64,50 +66,42 @@ export class ProfilComponent implements OnInit {
     this.chargerFidelite();
   }
 
-  /** Calcule la fidélité en se basant sur les dépôts VALIDATED de ce user */
-  private chargerFidelite() {
+  private chargerFidelite(): void {
     this.loadingFidelity = true;
 
-    const calls = this.API_HOSTS.map(h => this.http.get<any[]>(`${h}/depots`).pipe(
-      catchError(() => of(null))
-    ));
-
-    forkJoin(calls).pipe(
-      map(results => {
-        const ok = results.find(r => Array.isArray(r));
-        if (!ok) throw new Error('Aucun hôte ne répond');
-
-        const idx = results.indexOf(ok);
-        this.api = this.API_HOSTS[idx];
-
-        const validDepots = ok.filter(d =>
+    this.depotService.getAll().pipe(
+      map((depots) => {
+        const validDepots = (depots ?? []).filter(d =>
           d?.transactionState === 'VALIDATED' &&
           d?.utilisateur?.numeroUtilisateur === this.user?.numeroUtilisateur
         );
-        this.depotCount = validDepots.length;
 
-        const stars = Math.min(5, Math.floor(this.depotCount / this.fidelityStep));
+        this.totalDepotAmount = validDepots.reduce((sum, d) => sum + (d.montant ?? 0), 0);
+
+        const stars = this.fidelityThresholds.filter(t => this.totalDepotAmount >= t).length;
         this.fidelityStars = '★'.repeat(stars);
         this.fidelityLevel = stars;
         this.isFidele = stars === 5;
       }),
-      catchError(() => {
-        this.depotCount = 0;
+      catchError((err) => {
+        this.totalDepotAmount = 0;
         this.fidelityStars = '';
         this.fidelityLevel = 0;
         this.isFidele = false;
+        this.showError('Impossible de charger la fidélité.');
         return of(void 0);
+      }),
+      finalize(() => {
+        this.loadingFidelity = false;
       })
-    ).subscribe(() => {
-      this.loadingFidelity = false;
-    });
+    ).subscribe();
   }
 
-  toggleAffichage() {
+  toggleAffichage(): void {
     this.afficherProfil = !this.afficherProfil;
   }
 
-  modifierProfil() {
+  modifierProfil(): void {
     if (!this.user?.idUtilisateur) {
       this.showError('Utilisateur introuvable.');
       return;
@@ -115,7 +109,6 @@ export class ProfilComponent implements OnInit {
 
     this.saving = true;
 
-    // Utiliser POST avec body JSON au lieu de params URL
     const userData = {
       nomUtilisateur: this.user.nomUtilisateur ?? '',
       prenomUtilisateur: this.user.prenomUtilisateur ?? '',
@@ -123,13 +116,11 @@ export class ProfilComponent implements OnInit {
       id_1XBET: this.user.id_1XBET ?? '',
       id_BETWINNER: this.user.id_BETWINNER ?? '',
       id_MELBET: this.user.id_MELBET ?? '',
-      id_1WIN: this.user.id_1WIN ?? '',
       id_888STARZ: this.user.id_888STARZ ?? ''
     };
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-
-    this.http.put<any>(`${this.api}/utilisateurs/update/${this.user.idUtilisateur}`, userData, { headers })
+    this.utilisateurService.update(this.user.idUtilisateur, userData)
+      .pipe(finalize(() => (this.saving = false)))
       .subscribe({
         next: (res) => {
           this.showSuccess('Profil mis à jour avec succès !');
@@ -138,31 +129,50 @@ export class ProfilComponent implements OnInit {
           this.chargerFidelite();
         },
         error: (err) => {
-          console.error(err);
           this.showError('Erreur lors de la mise à jour du profil.');
         }
-      }).add(() => this.saving = false);
+      });
   }
 
   getFidelityProgress(): number {
-    return ((this.depotCount % this.fidelityStep) / this.fidelityStep) * 100;
+    if (this.fidelityLevel >= 5) return 100;
+    const lower = this.fidelityLevel === 0 ? 0 : this.fidelityThresholds[this.fidelityLevel - 1];
+    const upper = this.fidelityThresholds[this.fidelityLevel];
+    return Math.min(100, ((this.totalDepotAmount - lower) / (upper - lower)) * 100);
   }
 
-  getNextLevelDepots(): number {
-    return this.fidelityStep - (this.depotCount % this.fidelityStep);
+  changerMotDePasse(): void {
+    if (!this.passwordData.ancienPassword || !this.passwordData.nouveauPassword || !this.passwordData.confirmPassword) {
+      this.showError('Veuillez remplir tous les champs.');
+      return;
+    }
+    if (this.passwordData.nouveauPassword !== this.passwordData.confirmPassword) {
+      this.showError('Le nouveau mot de passe et la confirmation ne correspondent pas.');
+      return;
+    }
+    if (!this.user?.idUtilisateur) {
+      this.showError('Utilisateur introuvable.');
+      return;
+    }
+
+    this.savingPassword = true;
+    this.utilisateurService.changePassword(this.user.idUtilisateur, this.passwordData)
+      .pipe(finalize(() => (this.savingPassword = false)))
+      .subscribe({
+        next: () => {
+          this.showSuccess('Mot de passe modifié avec succès !');
+          this.showPasswordForm = false;
+          this.passwordData = { ancienPassword: '', nouveauPassword: '', confirmPassword: '' };
+        },
+        error: () => this.showError('Erreur lors du changement de mot de passe. Vérifiez l\'ancien mot de passe.')
+      });
   }
 
-  private showSuccess(message: string) {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 3000,
-      panelClass: ['success-snackbar']
-    });
+  private showSuccess(message: string): void {
+    this.errorService.success(message);
   }
 
-  private showError(message: string) {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 5000,
-      panelClass: ['error-snackbar']
-    });
+  private showError(message: string): void {
+    this.errorService.toast(message, "danger", 5000);
   }
 }

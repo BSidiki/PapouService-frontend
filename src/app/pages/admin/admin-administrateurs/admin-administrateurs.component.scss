@@ -1,450 +1,813 @@
+@use "sass:color";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
+
+// ═══════════════════════════════════════════
+// TOKENS OFFICIELS CLIENT
+// ═══════════════════════════════════════════
+$rouge:       #991f23;
+$rouge-dark:  color.adjust($rouge, $lightness: -8%);
+$rouge-pale:  color.adjust($rouge, $lightness: 58%);
+$bleu:        #00adef;
+$bleu-dark:   color.adjust($bleu, $lightness: -8%);
+$blanc:       #ffffff;
+$bg:          #f6f9fc;
+$texte-fonce: #1f2937;
+$texte-moyen: #4b5563;
+$texte-gris:  #6b7280;
+$fond-clair:  #f6f7fb;
+$gris-border: #e6edf5;
+
+$danger:      #dc2626;
+$danger-pale: rgba(#dc2626, 0.08);
+$vert:        #16a34a;
+
+$font-titre:      'Montserrat', sans-serif;
+$font-sous-titre: 'Poppins', sans-serif;
+$font-corps:      'Roboto', sans-serif;
+
+$radius-sm:    10px;
+$radius-md:    16px;
+$radius-lg:    22px;
+$ease:         cubic-bezier(0.4, 0, 0.2, 1);
+$shadow-sm:    0 4px 14px rgba(17, 24, 39, 0.06);
+$shadow:       0 8px 24px rgba(17, 24, 39, 0.09);
+$shadow-rouge: 0 6px 20px rgba($rouge, 0.22);
+
+// ═══════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+
+// ═══════════════════════════════════════════
+// WRAPPER
+// ═══════════════════════════════════════════
 .admin-administrateurs {
-  padding: 1rem;
-  background: #f8f9fa;
+  padding: 24px 24px 64px;
+  background: $bg;
+  background-image:
+    radial-gradient(700px 200px at 10% 0%, rgba($rouge, 0.04), transparent 60%),
+    radial-gradient(700px 200px at 90% 0%, rgba($bleu, 0.04), transparent 60%);
   min-height: 100vh;
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-family: $font-corps;
+  color: $texte-fonce;
 
-  // Header Section
-  .header-section {
-    background: white;
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  @media (max-width: 768px) { padding: 16px 16px 48px; }
+  @media (max-width: 480px) { padding: 12px 12px 40px; }
 
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
+  // Focus accessible global
+  a:focus-visible,
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid $bleu;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
 
-      h2 {
-        color: #00adef;
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin: 0;
-      }
+// ═══════════════════════════════════════════
+// HEADER
+// ═══════════════════════════════════════════
+.header-section {
+  background: $blanc;
+  border-radius: $radius-lg;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  border: 1px solid $gris-border;
+  box-shadow: $shadow-sm;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.4s $ease both;
 
-      .refresh-btn {
-        border-radius: 12px;
-        padding: 0.5rem 1rem;
+  // Liseré rouge→bleu en haut
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+  }
 
-        mat-icon {
-          margin-right: 0.5rem;
-        }
-      }
-    }
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 12px;
 
-    .subtitle {
-      color: #64748b;
+    h2 {
+      font-family: $font-titre;      // Montserrat Bold
+      font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+      font-weight: 700;
+      color: $texte-fonce;
       margin: 0;
-      font-size: 0.875rem;
-    }
-  }
-
-  // Stats Cards
-  .stats-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-
-    .stat-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
       display: flex;
       align-items: center;
-      gap: 1rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      border-left: 4px solid transparent;
-
-      &.primary {
-        border-left-color: #00adef;
-      }
-
-      &.accent {
-        border-left-color: #e91e63;
-      }
-
-      .stat-icon {
-        font-size: 2rem;
-        opacity: 0.8;
-      }
-
-      .stat-content {
-        .stat-value {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #1e293b;
-          line-height: 1;
-        }
-
-        .stat-label {
-          font-size: 0.875rem;
-          color: #64748b;
-          margin-top: 0.25rem;
-        }
-      }
+      gap: 10px;
     }
   }
 
-  // Form Section
-  .form-section {
-    margin-bottom: 2rem;
-
-    .form-card {
-      background: white;
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e2e8f0;
-
-      .card-header {
-        margin-bottom: 1.5rem;
-
-        h3 {
-          color: #1e293b;
-          font-size: 1.25rem;
-          font-weight: 600;
-          margin: 0 0 0.25rem;
-        }
-
-        .form-subtitle {
-          color: #64748b;
-          font-size: 0.875rem;
-        }
-      }
-
-      .admin-form {
-        .form-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-
-          .form-field {
-            width: 100%;
-          }
-        }
-
-        .form-actions {
-          display: flex;
-          gap: 1rem;
-          justify-content: flex-end;
-          flex-wrap: wrap;
-
-          .reset-btn {
-            border-radius: 8px;
-          }
-
-          .submit-btn {
-            border-radius: 8px;
-            min-width: 200px;
-
-            .button-content {
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-            }
-          }
-        }
-      }
-    }
+  .subtitle {
+    font-family: $font-corps;        // Roboto
+    font-size: 0.85rem;
+    color: $texte-gris;
+    margin: 0;
   }
 
-  // List Section
-  .list-section {
-    .list-card {
-      background: white;
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  .refresh-btn {
+    border-radius: $radius-sm;
+    font-family: $font-sous-titre;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: $bleu;
+    border-color: rgba($bleu, 0.30);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    transition: all 0.2s $ease;
 
-      .list-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-        gap: 1rem;
+    mat-icon { font-size: 17px; width: 17px; height: 17px; }
 
-        .list-title {
-          h3 {
-            color: #1e293b;
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin: 0 0 0.25rem;
-          }
-
-          .list-subtitle {
-            color: #64748b;
-            font-size: 0.875rem;
-          }
-        }
-
-        .list-actions {
-          .search-field {
-            min-width: 300px;
-
-            @media (max-width: 768px) {
-              min-width: 100%;
-            }
-          }
-        }
-      }
-
-      // Loading State
-      .loading-state {
-        text-align: center;
-        padding: 3rem;
-
-        .loading-content {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1rem;
-
-          span {
-            color: #64748b;
-            font-weight: 500;
-          }
-        }
-      }
-
-      // Table Section
-      .table-section {
-        .desktop-view {
-          display: block;
-
-          @media (max-width: 1024px) {
-            display: none;
-          }
-
-          .table-container {
-            background: #f8fafc;
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-          }
-
-          .admins-table {
-            width: 100%;
-
-            th.mat-header-cell {
-              background: #00adef;
-              color: white;
-              font-weight: 600;
-              padding: 1rem;
-              font-size: 0.875rem;
-            }
-
-            td.mat-cell {
-              padding: 1rem;
-              border-bottom: 1px solid #e2e8f0;
-            }
-
-            .admin-info {
-              .admin-name {
-                font-weight: 500;
-                color: #1e293b;
-              }
-            }
-
-            .phone-cell {
-              display: flex;
-              align-items: center;
-              gap: 0.5rem;
-
-              .phone-icon {
-                font-size: 1rem;
-                width: 16px;
-                height: 16px;
-                color: #64748b;
-              }
-            }
-
-            .action-buttons {
-              .delete-btn {
-                border-radius: 8px;
-                padding: 0.375rem 0.75rem;
-                font-size: 0.75rem;
-
-                mat-icon {
-                  font-size: 1rem;
-                  width: 16px;
-                  height: 16px;
-                  margin-right: 0.25rem;
-                }
-              }
-            }
-          }
-        }
-
-        // Mobile View
-        .mobile-view {
-          display: none;
-
-          @media (max-width: 1024px) {
-            display: grid;
-            gap: 1rem;
-          }
-
-          .admin-card {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 1.25rem;
-            border: 1px solid #e2e8f0;
-
-            .card-header {
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-start;
-              margin-bottom: 1rem;
-
-              .admin-info-mobile {
-                flex: 1;
-
-                h4 {
-                  margin: 0 0 0.5rem;
-                  color: #1e293b;
-                  font-weight: 600;
-                }
-
-                .admin-meta {
-                  .phone {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.25rem;
-                    font-size: 0.875rem;
-                    color: #64748b;
-
-                    mat-icon {
-                      font-size: 1rem;
-                      width: 16px;
-                      height: 16px;
-                    }
-                  }
-                }
-              }
-
-              .admin-badge {
-                .role-badge {
-                  background: #00adef;
-                  color: white;
-                  padding: 0.25rem 0.5rem;
-                  border-radius: 6px;
-                  font-size: 0.75rem;
-                  font-weight: 600;
-                }
-              }
-            }
-
-            .card-actions {
-              .delete-btn-mobile {
-                width: 100%;
-                border-radius: 8px;
-                padding: 0.5rem;
-
-                mat-icon {
-                  margin-right: 0.5rem;
-                }
-              }
-            }
-          }
-        }
-
-        // Pagination
-        .custom-paginator {
-          background: #f8fafc;
-          border-radius: 12px;
-          margin-top: 1rem;
-        }
-      }
-
-      // Empty State
-      .empty-state {
-        text-align: center;
-        padding: 3rem 1rem;
-
-        .empty-icon {
-          font-size: 4rem;
-          margin-bottom: 1rem;
-          opacity: 0.5;
-        }
-
-        h4 {
-          color: #64748b;
-          margin: 0 0 0.5rem;
-          font-weight: 600;
-        }
-
-        p {
-          color: #94a3b8;
-          margin: 0 0 1.5rem;
-        }
-
-        .retry-btn {
-          border-radius: 12px;
-
-          mat-icon {
-            margin-right: 0.5rem;
-          }
-        }
-      }
+    &:hover:not(:disabled) {
+      background: rgba($bleu, 0.06);
+      border-color: $bleu;
+      transform: translateY(-1px);
     }
+
+    &:disabled { color: $texte-gris; border-color: $gris-border; }
+  }
+}
+
+// ═══════════════════════════════════════════
+// STATS CARDS
+// ═══════════════════════════════════════════
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: $blanc;
+  border-radius: $radius-md;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid $gris-border;
+  box-shadow: $shadow-sm;
+  border-left: 4px solid transparent;
+  transition: all 0.22s $ease;
+  animation: fadeUp 0.4s $ease both;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow;
   }
 
-  // Material Overrides
-  ::ng-deep {
-    .mat-form-field-appearance-outline {
-      .mat-form-field-outline {
-        color: #e2e8f0;
-      }
+  &.primary { border-left-color: $rouge; }
+  &.accent  { border-left-color: $bleu; }
 
-      &.mat-focused {
-        .mat-form-field-outline-thick {
-          color: #00adef;
-        }
-      }
-    }
-
-    .mat-raised-button[disabled] {
-      background-color: #94a3b8 !important;
-    }
+  .stat-icon {
+    font-size: 2rem;
+    line-height: 1;
+    flex-shrink: 0;
   }
 
-  // Dark Mode Support
-  @media (prefers-color-scheme: dark) {
-    background: #0f172a;
-    color: #e2e8f0;
-
-    .header-section,
-    .stats-cards .stat-card,
-    .form-section .form-card,
-    .list-section .list-card,
-    .table-section .desktop-view .table-container,
-    .table-section .mobile-view .admin-card,
-    .custom-paginator {
-      background: #1e293b;
-      color: #e2e8f0;
-      border-color: #334155;
+  .stat-content {
+    .stat-value {
+      font-family: $font-titre;      // Montserrat Bold
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: $texte-fonce;
+      line-height: 1;
+      letter-spacing: -0.02em;
     }
 
-    .stats-cards .stat-card .stat-content .stat-value,
-    .form-card .card-header h3,
-    .list-header .list-title h3 {
-      color: #e2e8f0;
-    }
-
-    .admins-table {
-      td.mat-cell {
-        border-bottom-color: #334155;
-      }
-    }
-
-    .mobile-view .admin-card {
-      background: #334155;
+    .stat-label {
+      font-family: $font-sous-titre; // Poppins
+      font-size: 0.80rem;
+      font-weight: 500;
+      color: $texte-gris;
+      margin-top: 4px;
     }
   }
 }
+
+// ═══════════════════════════════════════════
+// SECTION FORMULAIRE
+// ═══════════════════════════════════════════
+.form-section {
+  margin-bottom: 20px;
+}
+
+.form-card {
+  background: $blanc !important;
+  border-radius: $radius-lg !important;
+  box-shadow: $shadow-sm !important;
+  border: 1px solid $gris-border !important;
+  padding: 0 !important;
+  overflow: hidden;
+  animation: fadeUp 0.4s 0.05s $ease both;
+  position: relative;
+
+  // Liseré rouge→bleu
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    z-index: 1;
+  }
+
+  .card-header {
+    padding: 18px 24px 0;
+    margin-bottom: 18px;
+
+    h3 {
+      font-family: $font-titre;      // Montserrat Bold
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: $texte-fonce;
+      margin: 0 0 4px;
+    }
+
+    .form-subtitle {
+      font-family: $font-corps;      // Roboto
+      font-size: 0.82rem;
+      color: $texte-gris;
+    }
+  }
+}
+
+.admin-form {
+  padding: 0 24px 24px;
+
+  @media (max-width: 480px) { padding: 0 16px 20px; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 4px 16px;
+    margin-bottom: 16px;
+
+    .form-field { width: 100%; }
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+
+    @media (max-width: 480px) { flex-direction: column; }
+  }
+}
+
+// ─── Bouton réinitialiser ─────────────────
+.reset-btn {
+  border-radius: $radius-sm;
+  font-family: $font-sous-titre;
+  font-weight: 500;
+  font-size: 0.88rem;
+  color: $texte-moyen;
+  border-color: $gris-border;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  transition: all 0.2s $ease;
+
+  mat-icon { font-size: 17px; width: 17px; height: 17px; }
+
+  &:hover {
+    background: rgba($rouge, 0.04);
+    border-color: rgba($rouge, 0.25);
+    color: $rouge;
+  }
+}
+
+// ─── Bouton soumettre ─────────────────────
+.submit-btn {
+  border-radius: $radius-sm;
+  font-family: $font-sous-titre;
+  font-weight: 600;
+  font-size: 0.88rem;
+  min-width: 210px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, $rouge, $rouge-dark);
+  color: $blanc;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s $ease;
+  box-shadow: 0 4px 14px rgba($rouge, 0.28);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba($blanc, 0.15), transparent);
+    transition: left 0.5s ease;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 20px rgba($rouge, 0.40);
+    &::before { left: 100%; }
+  }
+
+  &:disabled {
+    background: #d1d5db;
+    color: #9ca3af;
+    box-shadow: none;
+  }
+
+  .button-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  // Spinner blanc
+  ::ng-deep .mat-mdc-progress-spinner circle {
+    stroke: $blanc !important;
+  }
+
+  @media (max-width: 480px) { width: 100%; min-width: unset; }
+}
+
+// ─── Surcharge Material formulaire ────────
+::ng-deep {
+  .admin-form {
+    .mat-mdc-text-field-wrapper {
+      border-radius: $radius-sm !important;
+    }
+
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: rgba(0, 0, 0, 0.13);
+      }
+    }
+
+    .mdc-text-field--focused .mdc-notched-outline__leading,
+    .mdc-text-field--focused .mdc-notched-outline__notch,
+    .mdc-text-field--focused .mdc-notched-outline__trailing {
+      border-color: $rouge !important;
+      border-width: 2px !important;
+    }
+
+    .mdc-text-field--focused .mdc-floating-label { color: $rouge !important; }
+
+    .mat-mdc-input-element {
+      font-family: $font-corps;
+      font-size: 0.9rem;
+      color: $texte-fonce;
+    }
+
+    .mdc-floating-label {
+      font-family: $font-sous-titre;
+      font-size: 0.88rem;
+    }
+
+    .mat-mdc-form-field-hint,
+    .mat-mdc-form-field-error {
+      font-family: $font-corps;
+      font-size: 0.74rem;
+    }
+
+    .mat-mdc-form-field-icon-suffix mat-icon {
+      color: rgba($texte-gris, 0.65);
+      font-size: 19px;
+      transition: color 0.2s;
+    }
+
+    .mdc-text-field--focused .mat-mdc-form-field-icon-suffix mat-icon {
+      color: $rouge;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// SECTION LISTE
+// ═══════════════════════════════════════════
+.list-section { }
+
+.list-card {
+  background: $blanc !important;
+  border-radius: $radius-lg !important;
+  box-shadow: $shadow-sm !important;
+  border: 1px solid $gris-border !important;
+  padding: 0 !important;
+  overflow: hidden;
+  animation: fadeUp 0.4s 0.10s $ease both;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+    z-index: 1;
+  }
+}
+
+// ─── Header liste ─────────────────────────
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 18px 24px 0;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 14px;
+
+  @media (max-width: 480px) { padding: 16px 16px 0; }
+
+  .list-title {
+    h3 {
+      font-family: $font-titre;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: $texte-fonce;
+      margin: 0 0 4px;
+    }
+
+    .list-subtitle {
+      font-family: $font-corps;
+      font-size: 0.82rem;
+      color: $texte-gris;
+    }
+  }
+
+  .list-actions {
+    .search-field {
+      min-width: 280px;
+
+      @media (max-width: 768px) { min-width: 100%; }
+    }
+
+    // Surcharge champ recherche
+    ::ng-deep {
+      .mat-mdc-text-field-wrapper {
+        border-radius: $radius-sm !important;
+      }
+
+      .mdc-text-field--focused .mdc-notched-outline__leading,
+      .mdc-text-field--focused .mdc-notched-outline__notch,
+      .mdc-text-field--focused .mdc-notched-outline__trailing {
+        border-color: $rouge !important;
+        border-width: 2px !important;
+      }
+
+      .mdc-text-field--focused .mdc-floating-label { color: $rouge !important; }
+
+      .mat-mdc-input-element {
+        font-family: $font-corps;
+        font-size: 0.9rem;
+      }
+
+      .mdc-floating-label { font-family: $font-sous-titre; }
+    }
+  }
+}
+
+// ─── État chargement ──────────────────────
+.loading-state {
+  padding: 48px 24px;
+  text-align: center;
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+
+    // Spinner CSS natif rouge
+    &::before {
+      content: '';
+      width: 40px; height: 40px;
+      border: 3px solid $gris-border;
+      border-top-color: $rouge;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    // Masquer le spinner Material
+    mat-spinner { display: none !important; }
+
+    span {
+      font-family: $font-sous-titre;
+      font-size: 0.88rem;
+      color: $texte-gris;
+    }
+  }
+}
+
+// ─── Table section ────────────────────────
+.table-section {
+  padding: 0 24px 24px;
+
+  @media (max-width: 480px) { padding: 0 16px 20px; }
+}
+
+.desktop-view {
+  display: block;
+  @media (max-width: 1024px) { display: none; }
+}
+
+.table-container {
+  background: $fond-clair;
+  border-radius: $radius-md;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border: 1px solid $gris-border;
+}
+
+.admins-table {
+  width: 100%;
+
+  // En-têtes : fond rouge
+  th.mat-header-cell {
+    background: linear-gradient(135deg, $rouge, $rouge-dark);
+    color: $blanc;
+    font-family: $font-sous-titre;  // Poppins
+    font-weight: 600;
+    font-size: 0.80rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 14px 16px;
+    border-bottom: none;
+  }
+
+  td.mat-cell {
+    padding: 13px 16px;
+    border-bottom: 1px solid $gris-border;
+    font-family: $font-corps;       // Roboto
+    font-size: 0.88rem;
+    color: $texte-fonce;
+    vertical-align: middle;
+  }
+
+  // Ligne hover
+  tr.mat-row {
+    transition: background 0.18s $ease;
+    &:hover td { background: rgba($rouge, 0.03); }
+    &:last-child td { border-bottom: none; }
+  }
+
+  .admin-info .admin-name {
+    font-family: $font-sous-titre;  // Poppins
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: $texte-fonce;
+  }
+
+  .phone-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .phone-icon {
+      font-size: 15px;
+      width: 15px; height: 15px;
+      color: $texte-gris;
+    }
+  }
+
+  .action-buttons {
+    .delete-btn {
+      border-radius: $radius-sm;
+      font-family: $font-sous-titre;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border: 1px solid rgba($danger, 0.25) !important;
+      background: $danger-pale !important;
+      color: $danger !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s $ease;
+
+      mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+      &:hover {
+        background: $danger !important;
+        color: $blanc !important;
+        border-color: $danger !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba($danger, 0.30);
+      }
+    }
+  }
+}
+
+// ─── Vue mobile cartes ────────────────────
+.mobile-view {
+  display: none;
+
+  @media (max-width: 1024px) {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+}
+
+.admin-card {
+  background: $fond-clair;
+  border-radius: $radius-md;
+  padding: 16px 18px;
+  border: 1px solid $gris-border;
+  box-shadow: $shadow-sm;
+  animation: fadeUp 0.35s $ease both;
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    padding: 0;
+    background: none;
+
+    .admin-info-mobile {
+      flex: 1;
+
+      h4 {
+        font-family: $font-sous-titre; // Poppins
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: $texte-fonce;
+        margin: 0 0 6px;
+      }
+
+      .admin-meta .phone {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-family: $font-corps;
+        font-size: 0.83rem;
+        color: $texte-moyen;
+
+        mat-icon { font-size: 14px; width: 14px; height: 14px; }
+      }
+    }
+
+    .admin-badge .role-badge {
+      background: rgba($rouge, 0.08);
+      color: $rouge;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-family: $font-sous-titre;
+      font-size: 0.70rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border: 1px solid rgba($rouge, 0.22);
+    }
+  }
+
+  .card-actions {
+    .delete-btn-mobile {
+      width: 100%;
+      border-radius: $radius-sm;
+      font-family: $font-sous-titre;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 9px;
+      border: 1px solid rgba($danger, 0.25);
+      background: $danger-pale;
+      color: $danger;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s $ease;
+
+      mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+      &:hover {
+        background: $danger;
+        color: $blanc;
+        border-color: $danger;
+      }
+    }
+  }
+}
+
+// ─── Pagination ───────────────────────────
+.custom-paginator {
+  background: $fond-clair !important;
+  border-radius: $radius-sm !important;
+  margin-top: 14px;
+  border: 1px solid $gris-border !important;
+
+  ::ng-deep {
+    .mat-mdc-paginator-range-label,
+    .mat-mdc-paginator-page-size-label {
+      font-family: $font-sous-titre;
+      font-size: 0.82rem;
+      color: $texte-moyen;
+    }
+
+    .mat-mdc-icon-button {
+      color: $rouge;
+      &:disabled { color: $texte-gris; }
+    }
+
+    .mat-mdc-select-value-text {
+      font-family: $font-sous-titre;
+      font-size: 0.85rem;
+    }
+  }
+}
+
+// ─── État vide ────────────────────────────
+.empty-state {
+  text-align: center;
+  padding: 52px 24px;
+
+  .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 14px;
+    opacity: 0.50;
+    display: block;
+  }
+
+  h4 {
+    font-family: $font-sous-titre;
+    font-weight: 600;
+    font-size: 1rem;
+    color: $texte-moyen;
+    margin: 0 0 6px;
+  }
+
+  p {
+    font-family: $font-corps;
+    font-size: 0.85rem;
+    color: $texte-gris;
+    margin: 0 0 20px;
+  }
+
+  .retry-btn {
+    border-radius: $radius-sm;
+    font-family: $font-sous-titre;
+    font-weight: 600;
+    font-size: 0.88rem;
+    background: linear-gradient(135deg, $rouge, $rouge-dark);
+    color: $blanc;
+    border: none;
+    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.22s $ease;
+    box-shadow: 0 4px 14px rgba($rouge, 0.25);
+
+    mat-icon { font-size: 17px; width: 17px; height: 17px; }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 20px rgba($rouge, 0.38);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// REDUCED MOTION
+// ═══════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+  .header-section,
+  .stat-card,
+  .form-card,
+  .list-card,
+  .admin-card,
+  .submit-btn { animation: none; transition: none; }
+
+  .loading-content::before { animation: none; }
+}
+

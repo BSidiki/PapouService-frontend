@@ -30,7 +30,48 @@
            [attr.data-index]="i"
            [class.active]="i === currentIndex">
 
-        <a *ngIf="pub.lien"
+        <!-- Pub VIDEO_LIEN : YouTube embed ou video direct -->
+        <div *ngIf="isVideoLink(pub)" class="pub-static pub-video"
+             (touchstart)="$event.stopPropagation()"
+             (touchmove)="$event.stopPropagation()"
+             (touchend)="$event.stopPropagation()"
+             (click)="$event.stopPropagation()">
+          <iframe *ngIf="isYouTubeLink(pub)"
+                  [src]="getVideoEmbedUrl(pub)"
+                  frameborder="0"
+                  allowfullscreen
+                  class="pub-iframe"
+                  title="{{ pub.titre || 'Vidéo publicitaire' }}">
+          </iframe>
+          <video *ngIf="!isYouTubeLink(pub)"
+                 [src]="getVideoEmbedUrl(pub)"
+                 controls
+                 class="pub-video-el"
+                 preload="metadata">
+          </video>
+          <div class="slide-overlay" *ngIf="pub.titre">
+            <h3 class="slide-title">{{ pub.titre }}</h3>
+          </div>
+        </div>
+
+        <!-- Pub VIDEO_FICHIER : vidéo en base64 -->
+        <div *ngIf="isVideoFile(pub)" class="pub-static pub-video"
+             (touchstart)="$event.stopPropagation()"
+             (touchmove)="$event.stopPropagation()"
+             (touchend)="$event.stopPropagation()"
+             (click)="$event.stopPropagation()">
+          <video [src]="toVideoBase64(pub.fichier)"
+                 controls
+                 class="pub-video-el"
+                 preload="metadata">
+          </video>
+          <div class="slide-overlay" *ngIf="pub.titre">
+            <h3 class="slide-title">{{ pub.titre }}</h3>
+          </div>
+        </div>
+
+        <!-- Pub IMAGE avec lien externe -->
+        <a *ngIf="!isVideo(pub) && pub.lien"
            [href]="pub.lien"
            target="_blank"
            rel="noopener noreferrer"
@@ -40,7 +81,7 @@
           <img [src]="toBase64(pub.fichier)"
                [alt]="pub.titre || 'Publicité'"
                (error)="onImageError($event)"
-               loading="lazy" />
+               loading="eager" />
           <div class="slide-overlay" *ngIf="pub.titre">
             <h3 class="slide-title">{{ pub.titre }}</h3>
             <div class="zoom-hint">
@@ -50,7 +91,8 @@
           </div>
         </a>
 
-        <div *ngIf="!pub.lien"
+        <!-- Pub IMAGE sans lien -->
+        <div *ngIf="!isVideo(pub) && !pub.lien"
              class="pub-static"
              (click)="openZoom(pub, $event)"
              tabindex="0"
@@ -59,7 +101,7 @@
           <img [src]="toBase64(pub.fichier)"
                [alt]="pub.titre || 'Publicité'"
                (error)="onImageError($event)"
-               loading="lazy" />
+               loading="eager" />
           <div class="slide-overlay" *ngIf="pub.titre">
             <h3 class="slide-title">{{ pub.titre }}</h3>
             <div class="zoom-hint">
@@ -115,7 +157,24 @@
         <button class="nav-btn prev" (click)="previousPub()" aria-label="Publicité précédente"><mat-icon>chevron_left</mat-icon></button>
 
         <div class="zoom-image-container">
-          <img #zoomImage
+          <!-- Vidéo lien dans modal -->
+          <iframe *ngIf="zoomedPub && isVideoLink(zoomedPub) && isYouTubeLink(zoomedPub)"
+                  [src]="getVideoEmbedUrl(zoomedPub!)"
+                  frameborder="0" allowfullscreen class="zoom-image"
+                  title="Vidéo">
+          </iframe>
+          <video *ngIf="zoomedPub && isVideoLink(zoomedPub) && !isYouTubeLink(zoomedPub)"
+                 [src]="getVideoEmbedUrl(zoomedPub!)"
+                 controls class="zoom-image">
+          </video>
+          <!-- Vidéo fichier dans modal -->
+          <video *ngIf="zoomedPub && isVideoFile(zoomedPub)"
+                 [src]="toVideoBase64(zoomedPub.fichier)"
+                 controls class="zoom-image">
+          </video>
+          <!-- Image dans modal -->
+          <img *ngIf="!zoomedPub || !isVideo(zoomedPub)"
+               #zoomImage
                [src]="toBase64(zoomedPub?.fichier)"
                [alt]="zoomedPub?.titre || 'Publicité'"
                class="zoom-image"

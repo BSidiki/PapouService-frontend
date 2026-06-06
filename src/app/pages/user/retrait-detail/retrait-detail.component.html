@@ -23,16 +23,25 @@
   <!-- Success State -->
   <div *ngIf="retrait && !loading" class="success-container">
     <mat-card class="retrait-detail-card">
+
       <!-- En-tête -->
       <div class="card-header">
         <div class="header-content">
-          <h1 class="main-title">
-            <mat-icon class="title-icon">savings</mat-icon>
-            Détail du Retrait
-          </h1>
-          <div class="status-badge" [class]="getStatusClass()">
-            <span class="status-icon">{{ getStatusIcon() }}</span>
-            <span class="status-text">{{ getStatusText() }}</span>
+          <div class="title-group">
+            <h1 class="main-title">
+              <mat-icon class="title-icon">savings</mat-icon>
+              Détail du Retrait
+            </h1>
+            <span class="tx-ref">#{{ retrait.idRetrait }}</span>
+          </div>
+          <div class="header-right">
+            <span *ngIf="retrait.isInvite" class="guest-tag">
+              <mat-icon>person_outline</mat-icon> Invité
+            </span>
+            <div class="status-badge" [class]="getStatusClass()">
+              <span class="status-icon">{{ getStatusIcon() }}</span>
+              <span class="status-text">{{ getStatusText() }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -47,7 +56,6 @@
             <p>{{ motif || 'Nous avons rejeté votre retrait' }}</p>
           </div>
         </div>
-
         <div class="assistance-section">
           <p>Pour plus d'informations, contactez notre assistance :</p>
           <div class="assistance-actions">
@@ -63,21 +71,19 @@
         </div>
       </div>
 
-      <!-- Montant -->
-      <div class="amount-section">
-        <div class="amount-display">
-          <span class="amount-value">{{ retrait.montant }}</span>
-          <span class="amount-currency">FCFA</span>
-        </div>
-        <div class="amount-label">Montant du retrait</div>
-      </div>
-
       <!-- Informations détaillées -->
       <div class="details-grid">
+
+        <!-- Section Client -->
+        <div class="detail-section-header full-width">
+          <mat-icon>person</mat-icon>
+          <span>Client</span>
+        </div>
+
         <div class="detail-item">
           <mat-icon class="detail-icon">person</mat-icon>
           <div class="detail-content">
-            <span class="detail-label">Utilisateur</span>
+            <span class="detail-label">Nom complet</span>
             <span class="detail-value">{{ getNomUtilisateur(retrait) }}</span>
           </div>
         </div>
@@ -86,7 +92,7 @@
           <mat-icon class="detail-icon">phone</mat-icon>
           <div class="detail-content">
             <span class="detail-label">Numéro</span>
-            <span class="detail-value">{{ retrait.numeroEnvoyant || '—' }}</span>
+            <span class="detail-value">{{ getNumero(retrait) }}</span>
           </div>
         </div>
 
@@ -98,37 +104,58 @@
           </div>
         </div>
 
-        <div class="detail-item">
-          <mat-icon class="detail-icon">payments</mat-icon>
-          <div class="detail-content">
-            <span class="detail-label">Option de retrait</span>
-            <span class="detail-value">{{ getOptionRetraitText(retrait.optionRetrait) }}</span>
-          </div>
+        <!-- Section Plateforme -->
+        <div class="detail-section-header full-width">
+          <mat-icon>casino</mat-icon>
+          <span>Plateforme</span>
         </div>
 
         <div class="detail-item">
           <mat-icon class="detail-icon">casino</mat-icon>
           <div class="detail-content">
-            <span class="detail-label">Plateforme</span>
+            <span class="detail-label">Plateforme de jeu</span>
             <span class="detail-value">{{ retrait.optionDeTransaction || '—' }}</span>
           </div>
         </div>
 
-        <div class="detail-item">
-          <mat-icon class="detail-icon">badge</mat-icon>
+        <div class="detail-item full-width" *ngIf="retrait.caisseChoisie">
+          <mat-icon class="detail-icon">place</mat-icon>
           <div class="detail-content">
-            <span class="detail-label">ID Plateforme</span>
-            <span class="detail-value">{{ getIdPlateforme(retrait) }}</span>
+            <span class="detail-label">Caisse choisie</span>
+            <span class="detail-value">{{ retrait.caisseChoisie }}</span>
           </div>
         </div>
 
-        <div class="detail-item full-width">
+        <div class="detail-item full-width" *ngIf="retrait.codeRetrait">
+          <mat-icon class="detail-icon">vpn_key</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Code de retrait</span>
+            <span class="detail-value code-value">{{ retrait.codeRetrait }}</span>
+          </div>
+        </div>
+
+        <!-- Section Paiement -->
+        <div class="detail-section-header full-width">
+          <mat-icon>payments</mat-icon>
+          <span>Paiement</span>
+        </div>
+
+        <div class="detail-item">
+          <mat-icon class="detail-icon">payments</mat-icon>
+          <div class="detail-content">
+            <span class="detail-label">Moyen de retrait</span>
+            <span class="detail-value">{{ getOptionRetraitText(retrait.optionRetrait) }}</span>
+          </div>
+        </div>
+
+        <div class="detail-item">
           <mat-icon class="detail-icon">schedule</mat-icon>
           <div class="detail-content">
             <span class="detail-label">Date et heure</span>
             <span class="detail-value">{{ formatDate(retrait.dateRetrait) }}</span>
           </div>
         </div>
+
       </div>
 
       <!-- Image de justificatif -->
@@ -162,52 +189,13 @@
       <!-- Actions -->
       <div class="actions-section">
         <div class="actions-grid">
-          <button
-            mat-stroked-button
-            (click)="goBack()"
-            class="back-btn"
-          >
+          <button mat-stroked-button (click)="goBack()" class="back-btn">
             <mat-icon>arrow_back</mat-icon>
             Retour
           </button>
-
-          <!-- <div class="status-actions" *ngIf="retrait.transactionState === 'PENDING'">
-            <button
-              mat-raised-button
-              color="primary"
-              (click)="changerStatut('VALIDATED')"
-              [disabled]="changingStatus"
-              class="validate-btn"
-            >
-              <mat-progress-spinner
-                *ngIf="changingStatus"
-                diameter="20"
-                color="accent"
-                class="action-spinner"
-              ></mat-progress-spinner>
-              <mat-icon *ngIf="!changingStatus">check_circle</mat-icon>
-              {{ changingStatus ? 'Validation...' : 'Valider' }}
-            </button>
-
-            <button
-              mat-stroked-button
-              color="warn"
-              (click)="changerStatut('REJECTED')"
-              [disabled]="changingStatus"
-              class="reject-btn"
-            >
-              <mat-progress-spinner
-                *ngIf="changingStatus"
-                diameter="20"
-                color="accent"
-                class="action-spinner"
-              ></mat-progress-spinner>
-              <mat-icon *ngIf="!changingStatus">cancel</mat-icon>
-              {{ changingStatus ? 'Rejet...' : 'Rejeter' }}
-            </button>
-          </div> -->
         </div>
       </div>
+
     </mat-card>
   </div>
 </div>

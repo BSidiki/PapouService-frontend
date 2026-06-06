@@ -13,6 +13,14 @@
       <p class="subtitle">Remplissez le formulaire pour effectuer votre retrait</p>
     </div>
 
+    <!-- Bouton retour (mode invité seulement) -->
+    <div *ngIf="isGuestMode" class="back-btn-wrapper">
+      <button mat-stroked-button routerLink="/accueil" class="back-btn">
+        <mat-icon>arrow_back</mat-icon>
+        Retour à l'accueil
+      </button>
+    </div>
+
     <div class="retrait-content">
       <!-- Formulaire de retrait -->
       <mat-card class="retrait-form-card">
@@ -22,23 +30,40 @@
         </div>
 
         <form (ngSubmit)="submitRetrait()" class="retrait-form">
-          <!-- Message d'alerte si pas d'IDs plateforme -->
-          <div *ngIf="transactionOptionsDisponibles.length === 0" class="alert-message">
-            <mat-icon>warning</mat-icon>
-            <div class="alert-content">
-              <h3>Aucun ID de plateforme configuré</h3>
-              <p>
-                Veuillez configurer vos identifiants de plateforme dans votre profil
-                avant de faire un retrait.
-              </p>
-              <button
-                mat-stroked-button
-                routerLink="/user/profil"
-                class="profile-btn"
-              >
-                <mat-icon>person</mat-icon>
-                Aller au profil
-              </button>
+          <!-- Bannière mode invité -->
+          <div *ngIf="isGuestMode" class="guest-banner guest-info">
+            <mat-icon class="guest-icon">person_outline</mat-icon>
+            <div class="guest-content">
+              <h3>Mode Invité</h3>
+              <p>Vous effectuez un retrait sans compte. <a routerLink="/register">Créez un compte</a> ou <a routerLink="/login">connectez-vous</a> pour un suivi complet de vos transactions.</p>
+            </div>
+          </div>
+
+          <!-- Champs invité -->
+          <div *ngIf="isGuestMode" class="guest-fields">
+            <div class="form-grid">
+              <!-- Toggle Nom / Prénom -->
+              <div class="full-width toggle-name-row">
+                <button type="button" mat-stroked-button class="toggle-name-btn"
+                        (click)="showGuestNameFields = !showGuestNameFields">
+                  <mat-icon>{{ showGuestNameFields ? 'expand_less' : 'expand_more' }}</mat-icon>
+                  {{ showGuestNameFields ? 'Masquer Nom / Prénom' : 'Ajouter Nom / Prénom (optionnel)' }}
+                </button>
+              </div>
+
+              <!-- Nom / Prénom (masqués par défaut) -->
+              <ng-container *ngIf="showGuestNameFields">
+                <mat-form-field appearance="outline">
+                  <mat-label>Prénom (optionnel)</mat-label>
+                  <input matInput [(ngModel)]="guestPrenom" name="guestPrenom" placeholder="Votre prénom" />
+                  <mat-icon matPrefix>person</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Nom (optionnel)</mat-label>
+                  <input matInput [(ngModel)]="guestNom" name="guestNom" placeholder="Votre nom" />
+                  <mat-icon matPrefix>person_outline</mat-icon>
+                </mat-form-field>
+              </ng-container>
             </div>
           </div>
 
@@ -46,6 +71,15 @@
           <div *ngIf="userInfo" class="user-info">
             <mat-icon>person</mat-icon>
             <span>Connecté en tant que : <strong>{{ userInfo }}</strong></span>
+          </div>
+
+          <!-- Étapes -->
+          <div class="form-steps">
+            <div class="step active"><span class="step-num">1</span><span>Infos</span></div>
+            <div class="step-line"></div>
+            <div class="step" [class.active]="!!form.optionRetrait"><span class="step-num">2</span><span>Paiement</span></div>
+            <div class="step-line"></div>
+            <div class="step" [class.active]="!!file"><span class="step-num">3</span><span>Justificatif</span></div>
           </div>
 
           <!-- Grille des champs -->
@@ -86,28 +120,13 @@
               </mat-form-field>
             </div>
 
-            <!-- Montant -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Montant (FCFA)</mat-label>
-              <input
-                matInput
-                type="number"
-                [(ngModel)]="form.montant"
-                name="montant"
-                min="1"
-                required
-                placeholder="Ex: 5000"
-              />
-              <mat-icon matPrefix>attach_money</mat-icon>
-              <mat-hint>Montant minimum : 1 FCFA</mat-hint>
-            </mat-form-field>
-
             <!-- Plateforme -->
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Plateforme de jeu</mat-label>
               <mat-select
                 [(ngModel)]="form.optionDeTransaction"
                 name="optionDeTransaction"
+                (selectionChange)="onPlatformChange()"
                 required
               >
                 <mat-option
@@ -127,83 +146,94 @@
               <mat-icon matPrefix>casino</mat-icon>
             </mat-form-field>
 
-            <!-- Option de retrait -->
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Moyen de retrait</mat-label>
-              <mat-select
-                [(ngModel)]="form.optionRetrait"
-                name="optionRetrait"
-                required
-              >
-                <mat-option value="O">
-                  <div class="payment-option">
-                    <img
-                      [src]="getPaymentLogo('O')"
-                      alt="Orange Money"
-                      class="payment-logo"
-                    />
-                    <span>Orange Money</span>
+            <!-- Caisses de la plateforme -->
+            <div *ngIf="form.optionDeTransaction && getCaissesForPlatform().length > 0" class="caisses-section full-width">
+              <div class="field-section-label">
+                <mat-icon>place</mat-icon>
+                <span>Choisissez une caisse <strong>{{ form.optionDeTransaction }}</strong></span>
+              </div>
+              <div class="caisse-cards">
+                <button
+                  type="button"
+                  class="caisse-card"
+                  *ngFor="let ref of getCaissesForPlatform()"
+                  [class.selected]="caisseChoisie === buildCaisseKey(ref)"
+                  (click)="caisseChoisie = buildCaisseKey(ref)"
+                >
+                  <div class="ref-num">N°{{ ref.num }}</div>
+                  <div class="ref-rue">{{ ref.rue }}</div>
+                  <div class="ref-ville">
+                    <mat-icon class="ref-ville-icon">location_on</mat-icon>
+                    {{ ref.ville }}
                   </div>
-                </mat-option>
-                <mat-option value="M">
-                  <div class="payment-option">
-                    <img
-                      [src]="getPaymentLogo('M')"
-                      alt="Moov Money"
-                      class="payment-logo"
-                    />
-                    <span>Moov Money</span>
-                  </div>
-                </mat-option>
-                <mat-option value="W">
-                  <div class="payment-option">
-                    <img
-                      [src]="getPaymentLogo('W')"
-                      alt="Wave"
-                      class="payment-logo"
-                    />
-                    <span>Wave</span>
-                  </div>
-                </mat-option>
-                <mat-option value="S">
-                  <div class="payment-option">
-                    <img
-                      src="assets/images/SankMoney.png"
-                      alt="SankMoney"
-                      loading="lazy"
-                      style="width: 50px;"
-                    />
-                    <span>Sank Money</span>
-                  </div>
-                </mat-option>
-                <mat-option value="C">
-                  <div class="payment-option">
-                    <img
-                      src="assets/images/CarteBancaire.png"
-                      alt="CarteBancaire"
-                      loading="lazy"
-                      style="width: 50px;"
-                    />
-                    <span>Carte Bancaire</span>
-                  </div>
-                </mat-option>
-              </mat-select>
-              <mat-icon matPrefix>account_balance_wallet</mat-icon>
-            </mat-form-field>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+              </div>
+            </div>
 
-            <!-- Code de retrait -->
+            <!-- Moyen de retrait (cartes visuelles) -->
+            <div class="payment-cards-section">
+              <div class="field-section-label">
+                <mat-icon>account_balance_wallet</mat-icon>
+                <span>Moyen de retrait</span>
+              </div>
+              <div class="payment-cards" role="radiogroup" aria-label="Moyen de retrait">
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionRetrait === 'O'"
+                        [attr.aria-checked]="form.optionRetrait === 'O'"
+                        (click)="form.optionRetrait = 'O'">
+                  <img [src]="getPaymentLogo('O')" alt="Orange Money" loading="lazy" />
+                  <span>Orange Money</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionRetrait === 'M'"
+                        [attr.aria-checked]="form.optionRetrait === 'M'"
+                        (click)="form.optionRetrait = 'M'">
+                  <img [src]="getPaymentLogo('M')" alt="Moov Money" loading="lazy" />
+                  <span>Moov Money</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionRetrait === 'W'"
+                        [attr.aria-checked]="form.optionRetrait === 'W'"
+                        (click)="form.optionRetrait = 'W'">
+                  <img [src]="getPaymentLogo('W')" alt="Wave" loading="lazy" />
+                  <span>Wave</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionRetrait === 'S'"
+                        [attr.aria-checked]="form.optionRetrait === 'S'"
+                        (click)="form.optionRetrait = 'S'">
+                  <img [src]="getPaymentLogo('S')" alt="Sank Money" loading="lazy" />
+                  <span>Sank Money</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+                <button type="button" class="payment-card" role="radio"
+                        [class.selected]="form.optionRetrait === 'C'"
+                        [attr.aria-checked]="form.optionRetrait === 'C'"
+                        (click)="form.optionRetrait = 'C'">
+                  <img [src]="getPaymentLogo('C')" alt="Carte Bancaire" loading="lazy" />
+                  <span>Carte</span>
+                  <mat-icon class="check-icon">check_circle</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- Code de retrait (optionnel si capture fournie) -->
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Code de retrait</mat-label>
+              <mat-label>Code de retrait <span class="optional-label">(requis ou capture)</span></mat-label>
               <input
                 matInput
                 [(ngModel)]="form.codeRetrait"
                 name="codeRetrait"
-                required
                 placeholder="Votre code de retrait"
               />
               <mat-icon matPrefix>vpn_key</mat-icon>
-              <mat-hint>Code fourni par la plateforme de jeu</mat-hint>
+              <mat-hint>Code fourni par la plateforme de jeu — ou fournissez une capture ci-dessous</mat-hint>
             </mat-form-field>
+
           </div>
 
           <!-- Upload de fichier -->
@@ -219,33 +249,25 @@
             </p>
 
             <div class="file-upload-zone" [class.has-file]="filePreview">
-              <input
-                id="file"
-                type="file"
-                accept="image/*"
-                (change)="onFileSelected($event)"
-                class="file-input"
-              />
-              <label for="file" class="file-label">
-                <mat-icon class="upload-icon">cloud_upload</mat-icon>
-                <span class="upload-text">
-                  {{ filePreview ? 'Changer le justificatif' : 'Ajouter un justificatif (optionnel)' }}
-                </span>
-                <span class="upload-hint">PNG, JPG - Max 5 Mo</span>
-              </label>
+              <input id="file-camera" type="file" accept="image/*" capture="environment"
+                     (change)="onFileSelected($event)" class="file-input" />
+              <input id="file-gallery" type="file" accept="image/*"
+                     (change)="onFileSelected($event)" class="file-input" />
+
+              <div *ngIf="!filePreview" class="upload-buttons">
+                <label for="file-camera" class="upload-btn">
+                  <mat-icon>camera_alt</mat-icon>
+                  <span>Prendre une photo</span>
+                </label>
+                <label for="file-gallery" class="upload-btn">
+                  <mat-icon>photo_library</mat-icon>
+                  <span>Choisir une image</span>
+                </label>
+              </div>
 
               <div *ngIf="filePreview" class="file-preview">
-                <img
-                  [src]="filePreview"
-                  alt="Aperçu justificatif"
-                  class="preview-image"
-                />
-                <button
-                  type="button"
-                  mat-icon-button
-                  class="remove-btn"
-                  (click)="file = null; filePreview = null;"
-                >
+                <img [src]="filePreview" alt="Aperçu justificatif" class="preview-image" />
+                <button type="button" mat-icon-button class="remove-btn" (click)="removeFile()">
                   <mat-icon>close</mat-icon>
                 </button>
               </div>
@@ -259,7 +281,7 @@
               <h4>Informations importantes</h4>
               <ul>
                 <li>Assurez-vous que le code de retrait est correct</li>
-                <li>Vérifiez que le montant correspond à votre demande</li>
+                <li>Choisissez bien la caisse correspondant à votre dépôt</li>
                 <li>
                   Si vous ajoutez un justificatif, il doit être clair et lisible
                 </li>
@@ -268,13 +290,76 @@
             </div>
           </div>
 
+          <!-- Panneau de confirmation -->
+          <div *ngIf="showConfirm" class="confirm-overlay">
+            <div class="confirm-box">
+              <div class="confirm-header">
+                <mat-icon class="confirm-icon">summarize</mat-icon>
+                <h3>Récapitulatif du retrait</h3>
+              </div>
+
+              <div class="confirm-details">
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>casino</mat-icon> Plateforme</span>
+                  <span class="confirm-value">{{ form.optionDeTransaction }}</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>place</mat-icon> Caisse</span>
+                  <span class="confirm-value">{{ caisseChoisie }}</span>
+                </div>
+                <div class="confirm-row" *ngIf="isGuestMode && (guestPrenom || guestNom)">
+                  <span class="confirm-label"><mat-icon>person</mat-icon> Nom / Prénom</span>
+                  <span class="confirm-value">{{ guestPrenom }} {{ guestNom }}</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>account_balance_wallet</mat-icon> Moyen</span>
+                  <span class="confirm-value">{{ getOptionRetraitText(form.optionRetrait) }}</span>
+                </div>
+                <div class="confirm-row" *ngIf="form.codeRetrait">
+                  <span class="confirm-label"><mat-icon>vpn_key</mat-icon> Code de retrait</span>
+                  <span class="confirm-value code">{{ form.codeRetrait }}</span>
+                </div>
+                <div class="confirm-row" *ngIf="file">
+                  <span class="confirm-label"><mat-icon>image</mat-icon> Justificatif</span>
+                  <span class="confirm-value ok"><mat-icon>check_circle</mat-icon> Fourni</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>public</mat-icon> Pays</span>
+                  <span class="confirm-value">{{ form.pays }}</span>
+                </div>
+                <div class="confirm-row">
+                  <span class="confirm-label"><mat-icon>phone</mat-icon> Téléphone</span>
+                  <span class="confirm-value">{{ form.indicatif }} {{ form.numeroEnvoyant }}</span>
+                </div>
+              </div>
+
+              <div class="confirm-warning">
+                <mat-icon>info_outline</mat-icon>
+                <span>Vérifiez que toutes les informations sont correctes avant de confirmer.</span>
+              </div>
+
+              <div class="confirm-actions">
+                <button mat-stroked-button type="button" class="cancel-btn" (click)="cancelConfirm()">
+                  <mat-icon>close</mat-icon> Annuler
+                </button>
+                <button mat-raised-button color="primary" type="button" class="submit-confirm-btn"
+                        (click)="submitRetrait()" [disabled]="submitting">
+                  <mat-progress-spinner *ngIf="submitting" diameter="18" mode="indeterminate" color="accent"></mat-progress-spinner>
+                  <mat-icon *ngIf="!submitting">send</mat-icon>
+                  <span>{{ submitting ? 'En cours...' : 'Confirmer le retrait' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Bouton de soumission -->
           <button
             mat-raised-button
             color="primary"
-            type="submit"
+            type="button"
             [disabled]="isSubmitDisabled()"
             class="submit-btn"
+            (click)="requestSubmit()"
           >
             <div class="button-content">
               <mat-progress-spinner
@@ -292,10 +377,41 @@
             </div>
           </button>
         </form>
+
+        <!-- Compte à rebours après soumission -->
+        <div *ngIf="showCountdown" class="countdown-section">
+          <div class="countdown-success-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <h3 class="countdown-title">Demande envoyée avec succès !</h3>
+
+          <div class="countdown-message">
+            <p>Bonjour,</p>
+            <p>Votre demande est en cours de traitement par notre équipe.</p>
+            <p>Un assistant de Papou Service va traiter votre demande à l'instant même.</p>
+            <p *ngIf="countdownSeconds > 0">
+              Si votre demande n'est pas traitée dans les
+              <strong class="countdown-inline">{{ countdownDisplay }}</strong>,
+              contactez-nous sur WhatsApp :
+            </p>
+            <p *ngIf="countdownSeconds === 0">
+              Le délai est écoulé. Contactez-nous immédiatement sur WhatsApp :
+            </p>
+            <a href="https://wa.me/22604116262" target="_blank" rel="noopener" class="whatsapp-btn">
+              <mat-icon>chat</mat-icon>
+              Nous contacter sur WhatsApp
+            </a>
+            <p class="countdown-thanks">Merci de votre patience</p>
+          </div>
+
+          <div class="countdown-timer" [class.expired]="countdownSeconds === 0">
+            <span class="countdown-display">{{ countdownDisplay }}</span>
+          </div>
+        </div>
       </mat-card>
 
-      <!-- Section matchs -->
-      <div class="matchs-section">
+      <!-- Section matchs (masquée en mode invité) -->
+      <div *ngIf="!isGuestMode" class="matchs-section">
         <app-matchs></app-matchs>
       </div>
     </div>

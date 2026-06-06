@@ -1,43 +1,70 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Preferences } from '@capacitor/preferences';
+import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface AuthUser {
+  idUtilisateur: number;
+  nomUtilisateur?: string;
+  prenomUtilisateur?: string;
+  numeroUtilisateur?: string;
+  email?: string;
+  codePromo?: string;
+  commissionEnAttente?: number;
+  id_1XBET?: string;
+  id_BETWINNER?: string;
+  id_MELBET?: string;
+  id_888STARZ?: string;
+  roles?: { name: string }[];
+}
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://192.168.11.124:8080'; // Adapté à ton backend
-  user$: any;
+  private readonly API = environment.apiBaseUrl;
+  private readonly KEY = 'current_user';
+  private _user: AuthUser | null = null;
 
   constructor(public http: HttpClient) {}
 
+  /**
+   * Appelé au démarrage via APP_INITIALIZER.
+   * Charge l'utilisateur depuis le stockage sécurisé en mémoire.
+   */
+  async init(): Promise<void> {
+    try {
+      const { value } = await Preferences.get({ key: this.KEY });
+      this._user = value ? (JSON.parse(value) as AuthUser) : null;
+    } catch {
+      this._user = null;
+    }
+  }
+
   login(credentials: { numeroUtilisateur: string; password: string }) {
-    const params = {
-      username: credentials.numeroUtilisateur,
-      password: credentials.password
-    };
-    return this.http.get(`${this.apiUrl}/utilisateurs/login`, { params });
+    return this.http.get<AuthUser>(`${this.API}/utilisateurs/login`, {
+      params: { username: credentials.numeroUtilisateur, password: credentials.password }
+    });
   }
 
-  saveUser(user: any) {
-    localStorage.setItem('current_user', JSON.stringify(user));
+  saveUser(user: AuthUser): void {
+    this._user = user;
+    Preferences.set({ key: this.KEY, value: JSON.stringify(user) });
   }
 
-  getUser(): any {
-    const user = localStorage.getItem('current_user');
-    return user ? JSON.parse(user) : null;
+  getUser(): AuthUser | null {
+    return this._user;
   }
 
-  logout() {
-    localStorage.removeItem('current_user');
+  logout(): void {
+    this._user = null;
+    Preferences.remove({ key: this.KEY });
   }
 
   isLoggedIn(): boolean {
-    return !!this.getUser();
+    return !!this._user;
   }
 
   getUserRole(): string | null {
-    const user = this.getUser();
-    if (!user || !user.roles || user.roles.length === 0) return null;
-    return user.roles[0].name;
+    if (!this._user?.roles?.length) return null;
+    return this._user.roles[0].name;
   }
 }

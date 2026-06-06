@@ -1,131 +1,617 @@
+@use "sass:color";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
+
+// ═══════════════════════════════════════════
+// TOKENS OFFICIELS CLIENT
+// ═══════════════════════════════════════════
+$rouge:       #991f23;
+$rouge-dark:  color.adjust($rouge, $lightness: -8%);
+$bleu:        #00adef;
+$bleu-dark:   color.adjust($bleu, $lightness: -8%);
+$blanc:       #ffffff;
+$bg:          #f6f9fc;
+$texte-fonce: #1f2937;
+$texte-moyen: #4b5563;
+$texte-gris:  #6b7280;
+$fond-clair:  #f6f7fb;
+$gris-border: #e6edf5;
+
+// Statuts sémantiques
+$vert:        #16a34a;
+$vert-pale:   rgba(#16a34a, 0.08);
+$orange:      #d97706;
+$orange-pale: rgba(#d97706, 0.08);
+$rouge-stat:  #dc2626;
+$rouge-stat-pale: rgba(#dc2626, 0.08);
+
+$font-titre:      'Montserrat', sans-serif;
+$font-sous-titre: 'Poppins', sans-serif;
+$font-corps:      'Roboto', sans-serif;
+
+$radius-sm:   10px;
+$radius-md:   16px;
+$radius-lg:   22px;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
+$shadow-sm:   0 4px 14px rgba(17, 24, 39, 0.06);
+$shadow:      0 8px 24px rgba(17, 24, 39, 0.09);
+
+// ═══════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+@keyframes shimmer-card {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+// ═══════════════════════════════════════════
+// HERO CAROUSEL
+// ═══════════════════════════════════════════
+.hero-carousel {
+  width: 100%;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $rouge, $bleu);
+  }
+}
+
+// ═══════════════════════════════════════════
+// PAGE WRAPPER (via :host ou classe parente)
+// ═══════════════════════════════════════════
+:host {
+  display: block;
+  background: $bg;
+  background-image:
+    radial-gradient(700px 200px at 10% 0%, rgba($rouge, 0.04), transparent 60%),
+    radial-gradient(700px 200px at 90% 0%, rgba($bleu, 0.04), transparent 60%);
+  min-height: 100vh;
+  padding-bottom: 64px;
+}
+
+// ═══════════════════════════════════════════
+// BARRE DE FILTRES
+// ═══════════════════════════════════════════
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: flex-start;
-  padding: 0 1rem;
-  margin-top: 1.5rem;
+  gap: 14px;
+  align-items: center;
+  padding: 20px 24px 0;
+  margin-bottom: 4px;
+
+  @media (max-width: 480px) { padding: 16px 14px 0; gap: 10px; }
 }
 
 .filter {
-  min-width: 220px;
+  min-width: 200px;
+  flex: 1 1 200px;
+  max-width: 280px;
+
+  @media (max-width: 480px) { min-width: 100%; max-width: 100%; }
+
+  // Surcharge Material fill → cohérence design system
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      border-radius: $radius-sm !important;
+      background: $blanc !important;
+    }
+
+    .mdc-line-ripple::before {
+      border-bottom-color: $gris-border !important;
+    }
+
+    .mdc-line-ripple::after {
+      border-bottom-color: $rouge !important;
+    }
+
+    .mdc-floating-label {
+      font-family: $font-sous-titre;
+      font-size: 0.88rem;
+      color: $texte-gris !important;
+    }
+
+    .mdc-floating-label--float-above { color: $rouge !important; }
+
+    .mat-mdc-select-value-text {
+      font-family: $font-sous-titre;
+      font-size: 0.9rem;
+      color: $texte-fonce;
+    }
+
+    .mat-mdc-select-arrow { color: $rouge; }
+
+    .mat-mdc-select-panel {
+      border-radius: $radius-sm !important;
+      box-shadow: $shadow !important;
+    }
+
+    .mat-mdc-option {
+      font-family: $font-sous-titre;
+      font-size: 0.88rem;
+
+      &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+        color: $rouge;
+        .mdc-list-item__primary-text { color: $rouge; }
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// ÉTATS (loading / erreur / vide)
+// ═══════════════════════════════════════════
+.loading {
+  text-align: center;
+  padding: 48px 24px;
+  font-family: $font-sous-titre;
+  font-size: 0.92rem;
+  color: $texte-gris;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
+  &::before {
+    content: '';
+    display: block;
+    width: 36px; height: 36px;
+    border: 3px solid $gris-border;
+    border-top-color: $rouge;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  text-align: center;
+  margin: 32px 24px;
+  padding: 16px 20px;
+  background: rgba($rouge, 0.06);
+  border: 1px solid rgba($rouge, 0.25);
+  border-left: 3px solid $rouge;
+  border-radius: $radius-sm;
+  font-family: $font-sous-titre;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: $rouge;
 }
 
 .no-result {
   text-align: center;
-  margin-top: 2rem;
-  font-style: italic;
-  color: #888;
+  padding: 56px 24px;
+  font-family: $font-corps;
+  font-size: 0.92rem;
+  color: $texte-gris;
+
+  &::before {
+    content: '📭';
+    display: block;
+    font-size: 2.8rem;
+    margin-bottom: 12px;
+  }
 }
 
+// ═══════════════════════════════════════════
+// GRILLE TRANSACTIONS
+// ═══════════════════════════════════════════
 .transaction-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 1.2rem;
-  margin-top: 1.5rem;
-  padding: 0 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 20px 24px;
+
+  @media (max-width: 480px) {
+    padding: 14px;
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
 }
 
+// ═══════════════════════════════════════════
+// CARTE TRANSACTION
+// ═══════════════════════════════════════════
 .transaction-card {
-  border-radius: 12px;
-  border-left: 6px solid transparent;
-  background-color: #ffffff;
-  padding: 1.5rem;
+  border-radius: $radius-md !important;
+  background: $blanc !important;
+  border: 1px solid $gris-border !important;
+  box-shadow: $shadow-sm !important;
+  padding: 0 !important;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Roboto', sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 173, 239, 0.06);
+  overflow: hidden;
+  transition: transform 0.22s $ease, box-shadow 0.22s $ease;
+  position: relative;
+  animation: fadeUp 0.4s $ease both;
+
+  // Stagger via nth-child
+  @for $i from 1 through 12 {
+    &:nth-child(#{$i}) { animation-delay: #{($i - 1) * 0.05}s; }
+  }
 
   &:hover {
-    background-color: #f5fcff;
-    box-shadow: 0 6px 18px rgba(0, 173, 239, 0.15);
+    transform: translateY(-4px);
+    box-shadow: $shadow !important;
   }
 
+  &:active { transform: translateY(-1px); }
+
+  // ─── Barre latérale colorée ─────────────
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+  }
+
+  // ─── Liseré haut ────────────────────────
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  // Dépôt : vert
   &.depot-card {
-    border-left-color: #4caf50;
+    &::before { background: $vert; }
+    &::after  { background: linear-gradient(90deg, $vert, transparent); }
+
+    .transaction-header strong { color: $vert; }
+    .type-badge { background: $vert-pale; color: $vert; }
   }
 
+  // Retrait : rouge
   &.retrait-card {
-    border-left-color: #e53935;
+    &::before { background: $rouge; }
+    &::after  { background: linear-gradient(90deg, $rouge, transparent); }
+
+    .transaction-header strong { color: $rouge; }
+    .type-badge { background: rgba($rouge, 0.08); color: $rouge; }
   }
 
-  .contenu {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+  // Retrait Commission : violet/doré
+  &.commission-card {
+    $violet: #7c3aed;
+    $violet-pale: rgba(#7c3aed, 0.08);
 
-    div {
-      font-size: 0.95rem;
-    }
-  }
+    &::before { background: $violet; }
+    &::after  { background: linear-gradient(90deg, $violet, transparent); }
 
-  .transaction-header {
-    display: flex;
-    align-items: center;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #333;
-
-    .icon {
-      font-size: 1.4rem;
-      margin-right: 0.5rem;
-    }
-  }
-
-  .badge {
-    display: inline-block;
-    padding: 0.35rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-family: 'Poppins', sans-serif;
-    letter-spacing: 0.5px;
-
-    &.pending {
-      background-color: #fff3cd;
-      color: #856404;
-    }
-
-    &.validated {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    &.rejected {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-  }
-
-  .link-text {
-    font-style: italic;
-    margin-top: 0.8rem;
-    color: #00adef;
-    font-size: 0.9rem;
-    text-align: right;
-
-    &:hover {
-      text-decoration: underline;
-    }
+    .transaction-header strong { color: $violet; }
   }
 }
 
-@media (max-width: 768px) {
-  .transaction-card {
-    padding: 1rem;
+// ─── Contenu de la carte ──────────────────
+.contenu {
+  padding: 18px 18px 14px 22px; // 22px gauche pour la barre
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+// ─── En-tête type ─────────────────────────
+.transaction-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+
+  .icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
   }
 
-  .transaction-header {
+  strong {
+    font-family: $font-titre;       // Montserrat Bold
     font-size: 1rem;
+    letter-spacing: 0.03em;
   }
 
-  .badge {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
+  .type-badge {
+    margin-left: auto;
+    font-family: $font-sous-titre;  // Poppins
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+// ─── Badge Commission ─────────────────────
+.commission-badge {
+  margin-left: auto;
+  font-family: $font-sous-titre;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(#7c3aed, 0.10);
+  color: #7c3aed;
+  border: 1px solid rgba(#7c3aed, 0.25);
+}
+
+// ─── Lignes info ──────────────────────────
+.contenu > div:not(.transaction-header):not(.link-text) {
+  font-family: $font-corps;         // Roboto
+  font-size: 0.85rem;
+  color: $texte-moyen;
+  line-height: 1.45;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+
+  strong {
+    font-family: $font-sous-titre;  // Poppins
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: $texte-gris;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+}
+
+// ─── Badges statut ────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: $font-sous-titre;    // Poppins
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  // Point coloré
+  &::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
 
-  .loading { text-align:center; margin-top:1rem; color:#666; }
-  .error   { text-align:center; margin-top:1rem; color:#b00020; font-weight:600; }
+  &.pending {
+    background: $orange-pale;
+    color: $orange;
+    border: 1px solid rgba($orange, 0.25);
+    &::before { background: $orange; animation: pulse 1.6s ease-in-out infinite; }
+  }
+
+  &.validated {
+    background: $vert-pale;
+    color: $vert;
+    border: 1px solid rgba($vert, 0.22);
+    &::before { background: $vert; }
+  }
+
+  &.rejected {
+    background: $rouge-stat-pale;
+    color: $rouge-stat;
+    border: 1px solid rgba($rouge-stat, 0.22);
+    &::before { background: $rouge-stat; }
+  }
+}
+
+// ─── Lien "voir les détails" ──────────────
+.link-text {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid $gris-border;
+  font-family: $font-sous-titre;    // Poppins
+  font-size: 0.80rem;
+  font-weight: 500;
+  color: $bleu;
+  transition: color 0.2s $ease;
+
+  &::after {
+    content: '→';
+    font-size: 0.85rem;
+    transition: transform 0.2s $ease;
+  }
+
+  .transaction-card:hover & {
+    color: $bleu-dark;
+    &::after { transform: translateX(3px); }
+  }
+}
+
+// ═══════════════════════════════════════════
+// REDUCED MOTION
+// ═══════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+  .transaction-card {
+    animation: none;
+    transition: none;
+  }
+
+  .badge.pending::before { animation: none; }
+  .loading::before { animation: none; }
+}
+
+// ═══════════════════════════════════════════
+// FOCUS ACCESSIBLE
+// ═══════════════════════════════════════════
+.transaction-card:focus-visible {
+  outline: 2px solid $bleu;
+  outline-offset: 2px;
+}
+
+// ═══════════════════════════════════════════
+// MINI DASHBOARD
+// ═══════════════════════════════════════════
+.stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 20px 24px 0;
+
+  @media (max-width: 480px) { padding: 14px 14px 0; }
+}
+
+.stat-card {
+  flex: 1 1 180px;
+  background: $blanc;
+  border-radius: $radius-md;
+  padding: 16px 20px;
+  border: 1px solid $gris-border;
+  box-shadow: $shadow-sm;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .stat-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .stat-content {
+    .stat-label {
+      font-family: $font-sous-titre;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: $texte-gris;
+      margin-bottom: 3px;
+    }
+    .stat-value {
+      font-family: $font-titre;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: $texte-fonce;
+    }
+  }
+
+  &.retrait .stat-icon { background: $vert-pale; }
+  &.commission .stat-icon { background: rgba(#7c3aed, 0.10); }
+}
+
+// ═══════════════════════════════════════════
+// DATE FILTERS
+// ═══════════════════════════════════════════
+.date-filter {
+  min-width: 160px;
+  flex: 1 1 160px;
+  max-width: 200px;
+
+  @media (max-width: 480px) { min-width: 100%; max-width: 100%; }
+
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      border-radius: $radius-sm !important;
+      background: $blanc !important;
+    }
+    .mdc-floating-label { font-family: $font-sous-titre; font-size: 0.88rem; color: $texte-gris !important; }
+    .mdc-floating-label--float-above { color: $rouge !important; }
+    .mdc-line-ripple::after { border-bottom-color: $rouge !important; }
+  }
+}
+
+.export-btn {
+  align-self: center;
+  height: 40px;
+  white-space: nowrap;
+  font-family: $font-sous-titre;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+// ═══════════════════════════════════════════
+// PAGINATION
+// ═══════════════════════════════════════════
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+
+  .page-info {
+    font-family: $font-sous-titre;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: $texte-moyen;
+    min-width: 60px;
+    text-align: center;
+  }
+}
+
+// ═══════════════════════════════════════════
+// PRINT / PDF EXPORT
+// ═══════════════════════════════════════════
+@media print {
+  app-annonces-public, .filter-bar, .stats-bar, .pagination,
+  .export-btn, button { display: none !important; }
+
+  .transaction-card {
+    break-inside: avoid;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+
+  .transaction-list {
+    display: block;
+  }
+
+  :host {
+    background: white !important;
+  }
+}
+
+// ═══════════════════════════════════════════
+// DARK MODE
+// ═══════════════════════════════════════════
+:host-context(body.dark-theme) {
+  background: #0f172a;
+  background-image: none;
+
+  .transaction-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+
+  .contenu > div:not(.transaction-header):not(.link-text) {
+    color: #94a3b8;
+  }
+
+  .stat-card {
+    background: #1e293b;
+    border-color: #334155;
+    .stat-content .stat-value { color: #f1f5f9; }
+    .stat-content .stat-label { color: #64748b; }
+  }
 }

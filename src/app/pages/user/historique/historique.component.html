@@ -2,76 +2,136 @@
   <app-annonces-public></app-annonces-public>
 </section>
 
-<div class="filter-bar">
-  <mat-form-field appearance="fill" class="filter">
-    <mat-label>Filtrer par type</mat-label>
-    <mat-select [(ngModel)]="filter" (selectionChange)="applyFilter()">
-      <mat-option value="ALL">Tous</mat-option>
-      <mat-option value="DEPOT">Dépôts</mat-option>
-      <mat-option value="RETRAIT">Retraits</mat-option>
-    </mat-select>
-  </mat-form-field>
+<div class="historique-page">
 
-  <mat-form-field appearance="fill" class="filter">
-    <mat-label>Filtrer par statut</mat-label>
-    <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilter()">
-      <mat-option value="ALL">Tous</mat-option>
-      <mat-option value="PENDING">En attente</mat-option>
-      <mat-option value="VALIDATED">Validé</mat-option>
-      <mat-option value="REJECTED">Rejeté</mat-option>
-    </mat-select>
-  </mat-form-field>
-</div>
-
-<!-- états -->
-<div *ngIf="loading" class="loading">Chargement…</div>
-<div *ngIf="!loading && errorMsg" class="error">{{ errorMsg }}</div>
-<div *ngIf="!loading && !errorMsg && filteredHistoriques.length === 0" class="no-result">
-  Aucune transaction trouvée.
-</div>
-
-<div class="transaction-list" *ngIf="!loading && !errorMsg">
-  <mat-card
-    *ngFor="let item of filteredHistoriques"
-    class="transaction-card"
-    (click)="goToDetails(item)"
-    [ngClass]="{ 'depot-card': item.transaction === 'DEPOT', 'retrait-card': item.transaction === 'RETRAIT' }"
-  >
-    <div class="contenu">
-      <div class="transaction-header">
-        <span class="icon">{{ item.transaction === 'DEPOT' ? '💸' : '💼' }}</span>
-        <strong>{{ item.transaction }}</strong>
+  <!-- Mini dashboard stats -->
+  <div class="stats-bar">
+    <div class="stat-card retrait">
+      <div class="stat-icon">💼</div>
+      <div class="stat-content">
+        <div class="stat-label">Total Retraits Validés</div>
+        <div class="stat-value">{{ totalRetrait | number:'1.0-0' }} FCFA</div>
       </div>
-
-      <div><strong>ID-TRANSACTION :</strong> N{{ item.id_transaction }}PS</div>
-      <div><strong>Montant :</strong> {{ item.details?.montant ?? '---' }} FCFA</div>
-      <div><strong>Numéro :</strong> {{ item.details?.numeroEnvoyant ?? '---' }}</div>
-      <div *ngIf="item.date">
-        <strong>Date :</strong> {{ item.date | date: 'dd/MM/yyyy - HH:mm' }}
-      </div>
-      <div>
-        <strong>Statut :</strong>
-        <span
-          [ngClass]="{
-            badge: true,
-            pending: item.statut === 'PENDING',
-            validated: item.statut === 'VALIDATED',
-            rejected: item.statut === 'REJECTED'
-          }"
-        >
-          {{
-            item.statut === 'PENDING'
-              ? 'En attente'
-              : item.statut === 'VALIDATED'
-              ? 'Validé'
-              : item.statut === 'REJECTED'
-              ? 'Rejeté'
-              : 'Inconnu'
-          }}
-        </span>
-      </div>
-
-      <div class="link-text">📂 Voir les détails</div>
     </div>
-  </mat-card>
+    <div class="stat-card commission">
+      <div class="stat-icon">🏆</div>
+      <div class="stat-content">
+        <div class="stat-label">Solde Commission</div>
+        <div class="stat-value">{{ commissionBalance | number:'1.0-0' }} FCFA</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre de filtres -->
+  <div class="filter-bar">
+    <mat-form-field appearance="fill" class="filter">
+      <mat-label>Filtrer par type</mat-label>
+      <mat-select [(ngModel)]="filter" (selectionChange)="applyFilter()">
+        <mat-option value="ALL">Tous</mat-option>
+        <mat-option value="DEPOT">Dépôts</mat-option>
+        <mat-option value="RETRAIT">Retraits</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="filter">
+      <mat-label>Filtrer par statut</mat-label>
+      <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilter()">
+        <mat-option value="ALL">Tous</mat-option>
+        <mat-option value="PENDING">En attente</mat-option>
+        <mat-option value="VALIDATED">Validé</mat-option>
+        <mat-option value="REJECTED">Rejeté</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="filter date-filter">
+      <mat-label>Date de</mat-label>
+      <input matInput type="date" [(ngModel)]="dateFrom" (change)="applyFilter()" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="filter date-filter">
+      <mat-label>Date à</mat-label>
+      <input matInput type="date" [(ngModel)]="dateTo" (change)="applyFilter()" />
+    </mat-form-field>
+
+    <button mat-raised-button color="accent" class="export-btn" (click)="exportPDF()">
+      <mat-icon>picture_as_pdf</mat-icon>
+      Export PDF
+    </button>
+  </div>
+
+  <!-- États -->
+  <div *ngIf="loading" class="loading">Chargement…</div>
+  <div *ngIf="!loading && errorMsg" class="error">{{ errorMsg }}</div>
+  <div *ngIf="!loading && !errorMsg && filteredHistoriques.length === 0" class="no-result">
+    Aucune transaction trouvée.
+  </div>
+
+  <!-- Liste des transactions -->
+  <div class="transaction-list" *ngIf="!loading && !errorMsg">
+    <mat-card
+      *ngFor="let item of paginatedItems"
+      class="transaction-card"
+      (click)="goToDetails(item)"
+      [ngClass]="{
+        'depot-card':      item.transaction === 'DEPOT',
+        'retrait-card':    item.transaction === 'RETRAIT' && item.originalTransaction !== 'RETRAIT_COMMISSION',
+        'commission-card': item.originalTransaction === 'RETRAIT_COMMISSION'
+      }"
+    >
+      <div class="contenu">
+        <div class="transaction-header">
+          <span class="icon">{{
+            item.transaction === 'DEPOT' ? '💸' :
+            item.originalTransaction === 'RETRAIT_COMMISSION' ? '🏆' : '💼'
+          }}</span>
+          <strong>{{
+            item.originalTransaction === 'RETRAIT_COMMISSION' ? 'RETRAIT COMMISSION' : item.transaction
+          }}</strong>
+          <span *ngIf="item.originalTransaction === 'RETRAIT_COMMISSION'" class="commission-badge">Parrainage</span>
+        </div>
+
+        <div><strong>ID-TRANSACTION :</strong> N{{ item.id_transaction }}PS</div>
+        <div><strong>Montant :</strong> {{ item.details?.montant ?? '---' }} FCFA</div>
+        <div><strong>Numéro :</strong> {{ item.details?.numeroEnvoyant ?? '---' }}</div>
+        <div *ngIf="item.date">
+          <strong>Date :</strong> {{ item.date | date: 'dd/MM/yyyy - HH:mm' }}
+        </div>
+        <div>
+          <strong>Statut :</strong>
+          <span
+            [ngClass]="{
+              badge: true,
+              pending: item.statut === 'PENDING',
+              validated: item.statut === 'VALIDATED',
+              rejected: item.statut === 'REJECTED'
+            }"
+          >
+            {{
+              item.statut === 'PENDING'
+                ? 'En attente'
+                : item.statut === 'VALIDATED'
+                ? 'Validé'
+                : item.statut === 'REJECTED'
+                ? 'Rejeté'
+                : 'Inconnu'
+            }}
+          </span>
+        </div>
+
+        <div class="link-text">📂 Voir les détails</div>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button mat-icon-button [disabled]="pageIndex === 0" (click)="prevPage()">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <span class="page-info">{{ pageIndex + 1 }} / {{ totalPages }}</span>
+    <button mat-icon-button [disabled]="pageIndex >= totalPages - 1" (click)="nextPage()">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
 </div>

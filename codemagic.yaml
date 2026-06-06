@@ -1,0 +1,44 @@
+workflows:
+
+  ios-simulator:
+    name: iOS Simulator (Appetize.io)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    environment:
+      node: 20
+
+    scripts:
+      - name: Install Node dependencies
+        script: npm ci
+
+      - name: Build Angular
+        script: npm run build
+
+      - name: Sync Capacitor iOS
+        script: npx cap sync ios
+
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios/App
+          pod install --repo-update
+
+      - name: Build for iOS Simulator
+        script: |
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -arch x86_64 \
+            -derivedDataPath ios/build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package simulator build as zip
+        script: |
+          cd ios/build/Build/Products/Debug-iphonesimulator
+          zip -r "$CM_BUILD_DIR/PapouService-Simulator.zip" App.app
+
+    artifacts:
+      - PapouService-Simulator.zip

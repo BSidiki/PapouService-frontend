@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { forkJoin, map, of } from 'rxjs';
+import { environment } from '../../../../environments/environment';
 
 type TransactionType = 'DEPOT' | 'RETRAIT';
 type Statut = 'PENDING' | 'VALIDATED' | 'REJECTED' | 'INCONNU';
@@ -34,8 +35,7 @@ export class AdminClientHistoriqueComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
   private location = inject(Location);
-
-  private readonly API = 'http://192.168.11.124:8080';
+  private readonly API = environment.apiBaseUrl;
 
   historiques: any[] = [];
   filtered: any[] = [];
@@ -99,7 +99,6 @@ export class AdminClientHistoriqueComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error(err);
         alert('Erreur lors du chargement des historiques');
       }
     });
@@ -144,3 +143,4 @@ export class AdminClientHistoriqueComponent implements OnInit {
     this.location.back();
   }
 }
+

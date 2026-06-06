@@ -148,13 +148,6 @@
               </div>
             </div>
 
-            <div class="platform-item" *ngIf="client.id_1WIN">
-              <img src="assets/images/1win-icon.png" alt="1WIN" class="platform-icon" />
-              <div class="platform-info">
-                <span class="platform-name">1WIN</span>
-                <span class="platform-id">{{ client.id_1WIN }}</span>
-              </div>
-            </div>
 
             <div class="platform-item" *ngIf="client.id_888STARZ">
               <img src="assets/images/888starz-icon.png" alt="888STARZ" class="platform-icon" />
@@ -187,6 +180,11 @@
         <button mat-raised-button color="accent" (click)="voirRetraits()" class="action-btn">
           <mat-icon>savings</mat-icon>
           Retraits
+        </button>
+        <button mat-raised-button color="warn" (click)="supprimerClient()" class="action-btn"
+                matTooltip="Supprimer définitivement ce client">
+          <mat-icon>delete_forever</mat-icon>
+          Supprimer le client
         </button>
       </div>
     </div>

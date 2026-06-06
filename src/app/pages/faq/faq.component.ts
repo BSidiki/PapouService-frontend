@@ -5,11 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HeaderPublicComponent } from "../../layout/header-public/header-public.component";
 import { FooterComponent } from "../../layout/footer/footer.component";
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { ErrorService } from '../../services/error.service';
 
 type Faq = {
   id: string;
@@ -24,6 +25,7 @@ type Faq = {
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatExpansionModule,
     MatFormFieldModule,
     MatInputModule,
@@ -39,6 +41,7 @@ export class FaqComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private sanitizer = inject(DomSanitizer);
+  private errorService = inject(ErrorService);
 
   search = '';
   expandedAll = false;
@@ -113,8 +116,8 @@ export class FaqComponent implements OnInit {
     url.searchParams.set('id', f.id);
     if (this.search) url.searchParams.set('q', this.search);
     navigator.clipboard.writeText(url.toString())
-      .then(() => alert('Lien copié ✅'))
-      .catch(() => alert('Impossible de copier le lien'));
+      .then(() => this.errorService.info('Lien copié dans le presse-papiers.'))
+      .catch(() => this.errorService.info('Impossible de copier le lien.'));
   }
 
   onSearchChange() {

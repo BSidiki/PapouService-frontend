@@ -1,8 +1,11 @@
+import { ErrorService } from '../../../services/error.service';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
@@ -17,12 +20,17 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { environment } from '../../../../environments/environment';
+
+type PubType = 'IMAGE' | 'VIDEO_FICHIER' | 'VIDEO_LIEN';
 
 type Pub = {
   id?: number;
   idPub?: number;
   idPublicite?: number;
   fichier?: string | number[] | null;
+  typePub?: PubType;
+  lien?: string | null;
 };
 
 @Component({
@@ -49,13 +57,16 @@ type Pub = {
   ]
 })
 export class AdminPubsComponent implements OnInit, AfterViewInit {
-  private readonly API = 'http://192.168.11.124:8080';
+  private readonly API = environment.apiBaseUrl;
 
   pubForm!: FormGroup;
   selectedFile: File | null = null;
   previewUrl: string | null = null;
   zoomedImage: string | null = null;
   zoomLevel: number = 1;
+
+  typePub: PubType = 'IMAGE';
+  lienVideo = '';
 
   dataSource = new MatTableDataSource<Pub>([]);
   displayedColumns = ['fichier', 'actions'];
@@ -67,8 +78,11 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
   loading = false;
 
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) set paginatorRef(p: MatPaginator) {
+    if (p) { this.dataSource.paginator = p; }
+  }
 
-  constructor(private http: HttpClient, private fb: FormBuilder) {}
+  constructor(private http: HttpClient, private fb: FormBuilder, private sanitizer: DomSanitizer, private errorService: ErrorService) {}
 
   ngOnInit(): void {
     this.pubForm = this.fb.group({});
@@ -97,6 +111,17 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
     });
   }
 
+  toVideoBase64(data: string | number[] | null | undefined): string {
+    if (!data) return '';
+    if (typeof data === 'string') return 'data:video/mp4;base64,' + data.trim();
+    const arr = Array.isArray(data) ? data : [];
+    if (!arr.length) return '';
+    const bytes = new Uint8Array(arr);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return 'data:video/mp4;base64,' + btoa(bin);
+  }
+
   toBase64(fichier: string | number[] | null | undefined): string {
     if (!fichier) return '';
     if (typeof fichier === 'string') {
@@ -110,26 +135,33 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
     return 'data:image/jpeg;base64,' + btoa(bin);
   }
 
+  onTypeChange(): void {
+    this.selectedFile = null;
+    this.previewUrl = null;
+    this.lienVideo = '';
+    const fileInput = document.getElementById('pubUpload') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
     if (!file) return;
 
+    if (this.typePub === 'VIDEO_FICHIER') {
+      const isVideo = /^video\/(mp4|webm|ogg)$/i.test(file.type);
+      if (!isVideo) { this.notify('Format vidéo non supporté. Utilisez MP4, WebM ou OGG.', 'error'); return; }
+      if (file.size > 50 * 1024 * 1024) { this.notify('Fichier trop volumineux (maximum 50 Mo).', 'error'); return; }
+      this.selectedFile = file;
+      this.previewUrl = URL.createObjectURL(file);
+      return;
+    }
+
     const isImage = /^image\/(png|jpe?g|webp|gif)$/i.test(file.type);
-    const isSmallEnough = file.size <= 5 * 1024 * 1024;
-
-    if (!isImage) {
-      this.notify('Format non supporté. Utilisez PNG, JPG, WebP ou GIF.', 'error');
-      return;
-    }
-
-    if (!isSmallEnough) {
-      this.notify('Fichier trop volumineux (maximum 5 Mo).', 'error');
-      return;
-    }
+    if (!isImage) { this.notify('Format non supporté. Utilisez PNG, JPG, WebP ou GIF.', 'error'); return; }
+    if (file.size > 5 * 1024 * 1024) { this.notify('Fichier trop volumineux (maximum 5 Mo).', 'error'); return; }
 
     this.selectedFile = file;
-
     const reader = new FileReader();
     reader.onload = () => this.previewUrl = reader.result as string;
     reader.readAsDataURL(file);
@@ -137,7 +169,10 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
 
   private buildFormData(): FormData {
     const fd = new FormData();
-    if (this.selectedFile) {
+    fd.append('typePub', this.typePub);
+    if (this.typePub === 'VIDEO_LIEN') {
+      fd.append('lien', this.lienVideo.trim());
+    } else if (this.selectedFile) {
       fd.append('fichier', this.selectedFile);
       fd.append('file', this.selectedFile);
     }
@@ -145,8 +180,12 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
   }
 
   onSubmit() {
-    if (!this.selectedFile && !this.isEditing) {
-      this.notify('Veuillez sélectionner une image.', 'error');
+    if (this.typePub === 'VIDEO_LIEN' && !this.lienVideo.trim()) {
+      this.notify('Veuillez saisir l\'URL de la vidéo.', 'error');
+      return;
+    }
+    if (this.typePub !== 'VIDEO_LIEN' && !this.selectedFile && !this.isEditing) {
+      this.notify('Veuillez sélectionner un fichier.', 'error');
       return;
     }
 
@@ -183,8 +222,10 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
     this.editingPub = pub;
     this.previewUrl = null;
     this.selectedFile = null;
+    this.typePub = pub.typePub ?? 'IMAGE';
+    this.lienVideo = pub.lien ?? '';
 
-    this.notify('Sélectionnez une nouvelle image pour modifier la publicité', 'info');
+    this.notify('Modifiez les champs puis sauvegardez', 'info');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -256,6 +297,14 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
     }
   }
 
+  getYoutubeEmbedUrl(url: string): SafeResourceUrl {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const embedUrl = match
+      ? `https://www.youtube.com/embed/${match[1]}`
+      : url;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl);
+  }
+
   // UI Helper methods
   applyFilter() {
     this.dataSource.filter = this.search.trim().toLowerCase();
@@ -297,19 +346,17 @@ export class AdminPubsComponent implements OnInit, AfterViewInit {
     this.editId = null;
     this.editingPub = null;
     this.loading = false;
+    this.typePub = 'IMAGE';
+    this.lienVideo = '';
 
     const fileInput = document.getElementById('pubUpload') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
   }
 
   private notify(message: string, type: 'success' | 'error' | 'info' = 'info') {
-    // Utiliser alert pour l'instant, peut être remplacé par un service de notification
-    const icons = {
-      success: '✅',
-      error: '❌',
-      info: 'ℹ️'
-    };
-
-    alert(`${icons[type]} ${message}`);
+    const duration = type === 'error' ? 5000 : 3000;
+    const panelClass = type === 'success' ? ['snack-success'] : type === 'error' ? ['snack-error'] : [];
+    this.errorService.info(message);
   }
 }
+

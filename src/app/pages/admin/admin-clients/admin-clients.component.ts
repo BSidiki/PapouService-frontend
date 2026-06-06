@@ -1,3 +1,4 @@
+import { ErrorService } from '../../../services/error.service';
 import { Component, OnInit, ViewChild, AfterViewInit, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
@@ -17,8 +18,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ChartConfiguration, ChartType } from 'chart.js';
+import { environment } from '../../../../environments/environment';
 
 interface Role { name: string; }
 
@@ -82,15 +83,13 @@ interface ClientView extends Utilisateur {
     MatIconModule,
     MatTooltipModule,
     MatSelectModule,
-    NgChartsModule,
-    MatSnackBarModule
+    NgChartsModule
   ],
 })
 export class AdminClientsComponent implements OnInit, AfterViewInit {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private snackBar = inject(MatSnackBar);
-
+  private errorService = inject(ErrorService);
   // Filtres
   search = '';
   selectedStarFilter = '';
@@ -101,7 +100,9 @@ export class AdminClientsComponent implements OnInit, AfterViewInit {
   private masterData: ClientView[] = [];
 
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatPaginator) set paginatorRef(p: MatPaginator) {
+    if (p) { this.dataSource.paginator = p; }
+  }
 
   // Graph
   chartLabels: string[] = ['0⭐', '1⭐', '2⭐', '3⭐', '4⭐', '5⭐'];
@@ -118,14 +119,12 @@ export class AdminClientsComponent implements OnInit, AfterViewInit {
   loading = false;
   totalClients = 0;
   fideleClients = 0;
-
-  private API = 'http://192.168.11.124:8080';
+  private readonly API = environment.apiBaseUrl;
 
   ngOnInit(): void { this.loadClientsData(); }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
     this.configureFilterPredicate();
   }
 
@@ -192,8 +191,9 @@ export class AdminClientsComponent implements OnInit, AfterViewInit {
           const totalDepot = dValidated.reduce((s, d) => s + (d.montant || 0), 0);
           const totalRetrait = rValidated.reduce((s, r) => s + (r.montant || 0), 0);
 
-          // ★ règle: 1 étoile / 5 dépôts validés
-          const stars = Math.min(5, Math.floor(depotCount / 5));
+          // ★ règle: seuils de montant cumulé des dépôts validés
+          const fidelityThresholds = [100_000, 1_000_000, 5_000_000, 10_000_000, 20_000_000];
+          const stars = fidelityThresholds.filter(t => totalDepot >= t).length;
           const fidelityStars = '★'.repeat(stars) + '☆'.repeat(5 - stars);
           const isFidele = stars === 5;
 
@@ -224,9 +224,8 @@ export class AdminClientsComponent implements OnInit, AfterViewInit {
 
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Erreur chargement clients:', err);
-        this.snackBar.open('Erreur lors du chargement des clients', 'Fermer', { duration: 3000 });
+      error: () => {
+        this.errorService.info('Erreur lors du chargement des clients');
         this.loading = false;
       }
     });
@@ -281,6 +280,14 @@ export class AdminClientsComponent implements OnInit, AfterViewInit {
     };
   }
 
+  get pagedMobileData(): ClientView[] {
+    const data = this.dataSource.filteredData ?? [];
+    const pag = this.dataSource.paginator;
+    if (!pag) return data;
+    const start = pag.pageIndex * pag.pageSize;
+    return data.slice(start, start + pag.pageSize);
+  }
+
   applyFilter() {
     // reset à la source
     this.dataSource.data = this.masterData.slice();
@@ -321,6 +328,29 @@ export class AdminClientsComponent implements OnInit, AfterViewInit {
     return `${Math.floor(diffDays / 30)}mois`;
   }
 
+  readonly fidelityThresholds = [100_000, 1_000_000, 5_000_000, 10_000_000, 20_000_000];
+
+  getProgressToNextStar(client: ClientView): string {
+    if (client.stars >= 5) return '';
+    const nextThreshold = this.fidelityThresholds[client.stars];
+    const remaining = nextThreshold - client.totalDepot;
+    if (remaining <= 0) return '';
+    return `+${this.formatMontant(remaining)} → ★`;
+  }
+
+  getProgressPercent(client: ClientView): number {
+    if (client.stars >= 5) return 100;
+    const lower = client.stars === 0 ? 0 : this.fidelityThresholds[client.stars - 1];
+    const upper = this.fidelityThresholds[client.stars];
+    return Math.min(100, Math.round(((client.totalDepot - lower) / (upper - lower)) * 100));
+  }
+
+  private formatMontant(amount: number): string {
+    if (amount >= 1_000_000) return (amount / 1_000_000).toFixed(1).replace('.0', '') + 'M';
+    if (amount >= 1_000) return Math.round(amount / 1_000) + 'k';
+    return amount + '';
+  }
+
   getActivityColor(lastActivity?: string): string {
     if (!lastActivity) return '#6b7280';
     const activityDate = new Date(lastActivity);
@@ -335,3 +365,4 @@ export class AdminClientsComponent implements OnInit, AfterViewInit {
     return '#ef4444';
   }
 }
+

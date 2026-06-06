@@ -39,28 +39,11 @@
             <span class="fidelity-level">Niveau {{ fidelityLevel }}/5</span>
           </div>
 
-          <div class="fidelity-stats">
-            <div class="stat-item">
-              <mat-icon>payments</mat-icon>
-              <div class="stat-content">
-                <span class="stat-value">{{ depotCount }}</span>
-                <span class="stat-label">Dépôts validés</span>
-              </div>
-            </div>
-
-            <div class="stat-item">
-              <mat-icon>trending_up</mat-icon>
-              <div class="stat-content">
-                <span class="stat-value">{{ getNextLevelDepots() }}</span>
-                <span class="stat-label">Dépôts jusqu'au niveau {{ fidelityLevel + 1 }}</span>
-              </div>
-            </div>
-          </div>
-
           <!-- Barre de progression -->
           <div class="progress-section">
             <div class="progress-label">
-              <span>Progression vers le niveau {{ fidelityLevel + 1 }}</span>
+              <span *ngIf="fidelityLevel < 5">Progression vers le niveau {{ fidelityLevel + 1 }}</span>
+              <span *ngIf="fidelityLevel >= 5">Niveau maximum atteint</span>
               <span>{{ getFidelityProgress().toFixed(0) }}%</span>
             </div>
             <div class="progress-bar">
@@ -168,13 +151,6 @@
               <mat-icon matPrefix>sports_esports</mat-icon>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="platform-field">
-              <mat-label>
-                <span class="platform-text">1WIN</span>
-              </mat-label>
-              <input matInput [(ngModel)]="user.id_1WIN" name="id_1WIN" />
-              <mat-icon matPrefix>sports_esports</mat-icon>
-            </mat-form-field>
 
             <mat-form-field appearance="outline" class="platform-field">
               <mat-label>
@@ -215,8 +191,7 @@
         <div class="form-info">
           <mat-icon>info</mat-icon>
           <p>
-            <strong>Note :</strong> Si vous modifiez votre numéro, votre fidélité sera recalculée
-            à partir des dépôts validés associés à votre nouveau numéro.
+            <strong>Note :</strong> Si vous modifiez votre numéro, votre fidélité sera automatiquement recalculée.
           </p>
         </div>
       </form>
@@ -228,5 +203,52 @@
       <h3>Profil masqué</h3>
       <p>Cliquez sur "Voir le profil" pour afficher et modifier vos informations</p>
     </div>
+
+    <!-- Changement de mot de passe -->
+    <mat-card class="password-card">
+      <div class="card-header">
+        <mat-icon class="card-icon">lock</mat-icon>
+        <h3>Sécurité</h3>
+        <button mat-stroked-button (click)="showPasswordForm = !showPasswordForm" class="toggle-password-btn">
+          <mat-icon>{{ showPasswordForm ? 'expand_less' : 'edit' }}</mat-icon>
+          {{ showPasswordForm ? 'Annuler' : 'Modifier le mot de passe' }}
+        </button>
+      </div>
+
+      <div *ngIf="showPasswordForm" class="password-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Ancien mot de passe</mat-label>
+          <input matInput type="password" [(ngModel)]="passwordData.ancienPassword" name="ancienPassword"
+                 placeholder="Votre mot de passe actuel" />
+          <mat-icon matPrefix>lock_open</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nouveau mot de passe</mat-label>
+          <input matInput type="password" [(ngModel)]="passwordData.nouveauPassword" name="nouveauPassword"
+                 placeholder="Nouveau mot de passe" />
+          <mat-icon matPrefix>lock</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirmer le nouveau mot de passe</mat-label>
+          <input matInput type="password" [(ngModel)]="passwordData.confirmPassword" name="confirmPassword"
+                 placeholder="Répétez le nouveau mot de passe" />
+          <mat-icon matPrefix>lock</mat-icon>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-raised-button color="primary" (click)="changerMotDePasse()" [disabled]="savingPassword">
+            <div class="button-content">
+              <mat-progress-spinner *ngIf="savingPassword" diameter="20" mode="indeterminate" color="accent" class="spinner"></mat-progress-spinner>
+              <mat-icon *ngIf="!savingPassword">save</mat-icon>
+              <span>{{ savingPassword ? 'Enregistrement...' : 'Enregistrer le nouveau mot de passe' }}</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </mat-card>
+
   </div>
 </div>
+<app-footer></app-footer>

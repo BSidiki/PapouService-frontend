@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class FooterComponent {
   currentYear: number = new Date().getFullYear();
-  appVersion = 'v1.0.0';
+  appVersion = 'v1.0.0.0';
 
   scrollToTop(): void {
     window.scrollTo({

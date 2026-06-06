@@ -1,18 +1,59 @@
-<div class="matchs-container">
+<div class="matchs-container welcome-card">
   <h2>📅 Matchs à venir</h2>
 
-  <div *ngFor="let match of matchs" class="match-card">
-    <mat-card>
-      <mat-card-title>
-        {{ match.equipe1 }} vs {{ match.equipe2 }}
-      </mat-card-title>
-      <mat-card-subtitle>{{ match.ligue }} - {{ match.date }}</mat-card-subtitle>
+  <div class="league-selector">
+    <mat-form-field appearance="outline">
+      <mat-label>Championnat</mat-label>
+      <mat-select [(ngModel)]="selectedLeague" (ngModelChange)="loadMatchs()">
+        <mat-option *ngFor="let l of leagues" [value]="l.key">{{ l.label }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
 
-      <div class="cotes">
-        <div class="cote">1 : <strong>{{ match.cotes.c1 }}</strong></div>
-        <div class="cote">N : <strong>{{ match.cotes.n }}</strong></div>
-        <div class="cote">2 : <strong>{{ match.cotes.c2 }}</strong></div>
-      </div>
-    </mat-card>
+  <div *ngIf="loading" class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Chargement des matchs...</p>
+  </div>
+
+  <div *ngIf="error && !loading" class="error-state">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button (click)="loadMatchs()">Réessayer</button>
+  </div>
+
+  <div *ngIf="!loading && !error && matchs.length === 0" class="empty-state">
+    <mat-icon>sports_soccer</mat-icon>
+    <p>Aucun match à venir pour ce championnat.</p>
+  </div>
+
+  <div class="matches-list">
+    <div *ngFor="let match of matchs" class="match-card">
+      <mat-card>
+        <mat-card-title>
+          {{ match.equipe1 }} <span class="vs">vs</span> {{ match.equipe2 }}
+        </mat-card-title>
+        <mat-card-subtitle>{{ match.ligue }} — {{ match.date }}</mat-card-subtitle>
+
+        <div class="cotes">
+          <div class="cote">
+            <span class="cote-label">1</span>
+            <strong>{{ match.cotes.c1 ?? '—' }}</strong>
+          </div>
+          <div class="cote">
+            <span class="cote-label">N</span>
+            <strong>{{ match.cotes.n ?? '—' }}</strong>
+          </div>
+          <div class="cote">
+            <span class="cote-label">2</span>
+            <strong>{{ match.cotes.c2 ?? '—' }}</strong>
+          </div>
+        </div>
+
+        <div class="bookmaker-label" *ngIf="match.bookmaker">
+          <mat-icon>storefront</mat-icon> {{ match.bookmaker }}
+        </div>
+      </mat-card>
+    </div>
   </div>
 </div>
+

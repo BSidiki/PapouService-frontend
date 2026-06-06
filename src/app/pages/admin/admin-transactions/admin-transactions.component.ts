@@ -1,9 +1,7 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,39 +11,15 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
-import { MatIconModule } from "@angular/material/icon";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
-
-type TransactionState = 'PENDING' | 'VALIDATED' | 'REJECTED';
-
-type Utilisateur = {
-  nomUtilisateur?: string;
-  prenomUtilisateur?: string;
-  numeroUtilisateur?: string;
-  id_1XBET?: string; id_BETWINNER?: string; id_MELBET?: string; id_1WIN?: string; id_888STARZ?: string;
-};
-
-type Depot = {
-  idDepot: number;
-  utilisateur?: Utilisateur;
-  numeroEnvoyant?: string;
-  montant?: number;
-  optionDeTransaction?: string;
-  dateDepot?: string;
-  transactionState?: TransactionState;
-};
-
-type Retrait = {
-  idRetrait: number;
-  utilisateur?: Utilisateur;
-  numeroEnvoyant?: string;
-  montant?: number;
-  optionDeTransaction?: string;
-  dateRetrait?: string;
-  transactionState?: TransactionState;
-};
+import { Depot, Retrait, Utilisateur, TransactionState } from '../../../models';
+import { DepotService } from '../../../services/depot.service';
+import { RetraitService } from '../../../services/retrait.service';
+import { ExportService, ExportRow } from '../../../services/export.service';
+import { PlatformUtilsService } from '../../../services/platform-utils.service';
 
 type Row = {
   type: 'DEPOT' | 'RETRAIT';
@@ -56,6 +30,8 @@ type Row = {
   plateforme: string;
   statut: TransactionState;
   date?: string | null;
+  isInvite: boolean;
+  caisseChoisie?: string;
   raw: Depot | Retrait;
 };
 
@@ -80,68 +56,55 @@ type Row = {
   ]
 })
 export class AdminTransactionsComponent implements OnInit, AfterViewInit {
-  private readonly API = 'http://192.168.11.124:8080';
-
   type: 'ALL' | 'DEPOT' | 'RETRAIT' = 'ALL';
   statut = '';
   search = '';
   plateforme = '';
   loading = false;
 
+  selectedRow: Row | null = null;
+
   displayedColumns = ['type', 'nom', 'numero', 'montant', 'plateforme', 'statut', 'date', 'actions'];
   dataSource = new MatTableDataSource<Row>([]);
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  private _paginator: MatPaginator | null = null;
+  @ViewChild(MatPaginator) set paginatorRef(p: MatPaginator) {
+    this._paginator = p ?? null;
+    if (p) { this.dataSource.paginator = p; }
+  }
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private depotService: DepotService,
+    private retraitService: RetraitService,
+    private exportService: ExportService,
+    private platformUtils: PlatformUtilsService
+  ) {}
 
   ngOnInit(): void {
     this.loadTransactions();
   }
 
-  // ngAfterViewInit(): void {
-  //   this.dataSource.paginator = this.paginator;
-  //   this.dataSource.sort = this.sort;
-  //   this.dataSource.sortingDataAccessor = (row: Row, column: string) => {
-  //     switch (column) {
-  //       case 'date': return this.parseTs(row.date ?? null);
-  //       case 'montant': return row.montant;
-  //       case 'nom': return this.nomComplet(row.utilisateur).toLowerCase();
-  //       case 'plateforme': return row.plateforme?.toLowerCase() ?? '';
-  //       default: return (row as any)[column];
-  //     }
-  //   };
-  // }
-
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
     this.dataSource.sortingDataAccessor = (row: Row, column: string) => {
       switch (column) {
         case 'date': return this.parseTs(row.date ?? null);
         case 'montant': return row.montant;
-        case 'nom': return this.nomComplet(row.utilisateur).toLowerCase();
+        case 'nom': return this.nomComplet(row.utilisateur, row).toLowerCase();
         case 'plateforme': return row.plateforme?.toLowerCase() ?? '';
         default: return (row as any)[column];
       }
     };
   }
 
-  private attachPagerSafely() {
-    // petit délai pour laisser Angular insérer le paginator si *ngIf a bougé
-    setTimeout(() => {
-      this.dataSource.paginator = this.paginator;
-      // revenir page 1 si besoin
-      this.paginator?.firstPage();
-    });
-  }
+  dateOf(r: Row): string | null { return r.date ?? null; }
 
-  dateOf(r: Row): string | null {
-    return r.date ?? null;
-  }
-
-  nomComplet(u?: Utilisateur): string {
+  nomComplet(u?: Utilisateur, row?: Row): string {
+    if (row?.isInvite) {
+      const nom = `${(row.raw as any).prenomInvite ?? ''} ${(row.raw as any).nomInvite ?? ''}`.trim();
+      return nom || '(Invité)';
+    }
     return `${u?.prenomUtilisateur ?? ''} ${u?.nomUtilisateur ?? ''}`.trim();
   }
 
@@ -153,97 +116,82 @@ export class AdminTransactionsComponent implements OnInit, AfterViewInit {
 
   loadTransactions() {
     this.loading = true;
-
     forkJoin({
-      depots: this.http.get<Depot[]>(`${this.API}/depots`),
-      retraits: this.http.get<Retrait[]>(`${this.API}/retraits`)
+      depots: this.depotService.getAll(),
+      retraits: this.retraitService.getAll()
     }).subscribe({
       next: ({ depots, retraits }) => {
         const rowsDepots: Row[] = (depots ?? []).map(d => ({
-          type: 'DEPOT',
+          type: 'DEPOT' as const,
           id: d.idDepot,
           utilisateur: d.utilisateur,
-          numero: d.numeroEnvoyant ?? d.utilisateur?.numeroUtilisateur ?? '—',
+          numero: d.isInvite ? (d.numeroInvite ?? '—') : (d.numeroEnvoyant ?? d.utilisateur?.numeroUtilisateur ?? '—'),
           montant: d.montant ?? 0,
           plateforme: (d.optionDeTransaction ?? '—').toString().toUpperCase(),
           statut: d.transactionState ?? 'PENDING',
           date: d.dateDepot ?? null,
+          isInvite: !!d.isInvite,
           raw: d
         }));
 
-        const rowsRetraits: Row[] = (retraits ?? []).map(r => ({
-          type: 'RETRAIT',
-          id: r.idRetrait,
-          utilisateur: r.utilisateur,
-          numero: r.numeroEnvoyant ?? r.utilisateur?.numeroUtilisateur ?? '—',
-          montant: r.montant ?? 0,
-          plateforme: (r.optionDeTransaction ?? '—').toString().toUpperCase(),
-          statut: r.transactionState ?? 'PENDING',
-          date: r.dateRetrait ?? null,
-          raw: r
-        }));
+        const rowsRetraits: Row[] = (retraits ?? []).map(r => {
+          const parsed = this.retraitService.parseCode(r.codeRetrait);
+          return {
+            type: 'RETRAIT' as const,
+            id: r.idRetrait,
+            utilisateur: r.utilisateur,
+            numero: r.isInvite ? (r.numeroInvite ?? '—') : (r.numeroEnvoyant ?? r.utilisateur?.numeroUtilisateur ?? '—'),
+            montant: 0,
+            plateforme: (r.optionDeTransaction ?? '—').toString().toUpperCase(),
+            statut: r.transactionState ?? 'PENDING',
+            date: r.dateRetrait ?? null,
+            isInvite: !!r.isInvite,
+            caisseChoisie: parsed.ref || undefined,
+            raw: r
+          };
+        });
 
-        const all = [...rowsDepots, ...rowsRetraits]
+        this.dataSource.data = [...rowsDepots, ...rowsRetraits]
+          .filter(r => r.statut === 'VALIDATED' || r.statut === 'REJECTED')
           .sort((a, b) => this.parseTs(b.date) - this.parseTs(a.date));
-          // .sort((a, b) => (new Date(b.date ?? 0).getTime()) - (new Date(a.date ?? 0).getTime()));
-
-          this.dataSource.data = all;
-          this.setupFilterPredicate();
-          this.applyFilter();   // déclenche le filtrage
-          this.attachPagerSafely();   // ✅ ré-attache le paginator
-          this.loading = false;
+        this.setupFilterPredicate();
+        this.applyFilter();
+        this.loading = false;
       },
-      error: (error) => {
-        console.error('Error loading transactions:', error);
+      error: () => {
         this.dataSource.data = [];
         this.loading = false;
       }
     });
   }
 
+  voirDetail(row: Row): void { this.selectedRow = row; }
+  fermerDetail(): void { this.selectedRow = null; }
+
   private setupFilterPredicate() {
-    this.dataSource.filterPredicate = (row: Row, filter: string) => {
+    this.dataSource.filterPredicate = (row: Row, _filter: string) => {
       const matchesType = this.type === 'ALL' || row.type === this.type;
       const matchesStatut = !this.statut || row.statut === this.statut;
       const matchesPlateforme = !this.plateforme || row.plateforme === this.plateforme;
-
-      const searchText = this.search.toLowerCase().trim();
-      const matchesSearch = !searchText ||
-        this.nomComplet(row.utilisateur).toLowerCase().includes(searchText) ||
-        (row.numero?.toLowerCase() ?? '').includes(searchText) ||
-        String(row.montant).includes(searchText) ||
-        row.plateforme.toLowerCase().includes(searchText) ||
-        row.type.toLowerCase().includes(searchText);
-
+      const s = this.search.toLowerCase().trim();
+      const matchesSearch = !s ||
+        this.nomComplet(row.utilisateur, row).toLowerCase().includes(s) ||
+        (row.numero?.toLowerCase() ?? '').includes(s) ||
+        String(row.montant).includes(s) ||
+        row.plateforme.toLowerCase().includes(s) ||
+        row.type.toLowerCase().includes(s);
       return matchesType && matchesStatut && matchesPlateforme && matchesSearch;
     };
   }
 
   applyFilter() {
     this.dataSource.filter = Math.random().toString();
-    this.dataSource.filter = Math.random().toString();
-    this.attachPagerSafely();
+    if (this.dataSource.paginator) this.dataSource.paginator.firstPage();
   }
 
-  voirDetails(r: Row) {
-    if (r.type === 'DEPOT') {
-      this.router.navigate(['/user/depot', r.id]);
-    } else {
-      this.router.navigate(['/user/retrait', r.id]);
-    }
-  }
-
-  getTotalTransactions(): number {
-    return this.dataSource.data.length;
-  }
-
-  getDepotCount(): number {
-    return this.dataSource.data.filter(t => t.type === 'DEPOT').length;
-  }
-
-  getRetraitCount(): number {
-    return this.dataSource.data.filter(t => t.type === 'RETRAIT').length;
-  }
+  getTotalTransactions(): number { return this.dataSource.data.length; }
+  getDepotCount(): number { return this.dataSource.data.filter(t => t.type === 'DEPOT').length; }
+  getRetraitCount(): number { return this.dataSource.data.filter(t => t.type === 'RETRAIT').length; }
 
   getStatusClass(statut: TransactionState): string {
     switch (statut) {
@@ -256,9 +204,8 @@ export class AdminTransactionsComponent implements OnInit, AfterViewInit {
 
   get pagedFilteredData(): Row[] {
     const data = this.dataSource.filteredData ?? [];
-    const start = (this.paginator?.pageIndex ?? 0) * (this.paginator?.pageSize ?? data.length);
-    const end = start + (this.paginator?.pageSize ?? data.length);
-    return data.slice(start, end);
+    const start = (this._paginator?.pageIndex ?? 0) * (this._paginator?.pageSize ?? data.length);
+    return data.slice(start, start + (this._paginator?.pageSize ?? data.length));
   }
 
   trackById(_i: number, r: Row) { return r.type + '-' + r.id; }
@@ -269,5 +216,61 @@ export class AdminTransactionsComponent implements OnInit, AfterViewInit {
     this.search = '';
     this.plateforme = '';
     this.applyFilter();
+  }
+
+  getPlatformId(row: Row): string {
+    if (row.isInvite) return (row.raw as Depot).idPlateforme ?? '—';
+    return this.platformUtils.getUserPlatformId(
+      this.platformUtils.normalize(row.plateforme),
+      row.utilisateur
+    );
+  }
+
+  getCodeRetrait(row: Row): string {
+    if (row.type !== 'RETRAIT') return '';
+    return this.retraitService.parseCode((row.raw as Retrait).codeRetrait).code;
+  }
+
+  getMoyenPaiement(row: Row): string {
+    const code = row.type === 'DEPOT'
+      ? (row.raw as Depot).optionDepot
+      : (row.raw as Retrait).optionRetrait;
+    return code ? this.platformUtils.getPaymentLabel(code) : '—';
+  }
+
+  async exportPdf(): Promise<void> {
+    const rows = this.dataSource.filteredData;
+    if (!rows.length) return;
+    const exportRows: ExportRow[] = rows.map(r => ({
+      type: r.type,
+      nom: this.nomComplet(r.utilisateur, r),
+      numero: r.numero,
+      montant: r.montant,
+      plateforme: r.plateforme,
+      caisseOuId: r.type === 'DEPOT' ? this.getPlatformId(r) : (r.caisseChoisie ?? '—'),
+      moyen: this.getMoyenPaiement(r),
+      statut: r.statut,
+      date: r.date,
+      isInvite: r.isInvite
+    }));
+    await this.exportService.exportPdf(exportRows);
+  }
+
+  exportCsv(): void {
+    const rows = this.dataSource.filteredData;
+    if (!rows.length) return;
+    const exportRows: ExportRow[] = rows.map(r => ({
+      type: r.type,
+      nom: this.nomComplet(r.utilisateur, r),
+      numero: r.numero,
+      montant: r.montant,
+      plateforme: r.plateforme,
+      caisseOuId: r.type === 'DEPOT' ? this.getPlatformId(r) : (r.caisseChoisie ?? '—'),
+      moyen: this.getMoyenPaiement(r),
+      statut: r.statut,
+      date: r.date,
+      isInvite: r.isInvite
+    }));
+    this.exportService.exportCsv(exportRows, 'transactions');
   }
 }

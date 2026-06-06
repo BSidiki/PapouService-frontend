@@ -13,6 +13,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { environment } from '../../../environments/environment';
 
 type AnnonceDto = {
   id?: number;
@@ -48,10 +49,7 @@ type Annonce = {
   ]
 })
 export class AnnoncesPublicComponent implements OnInit, OnDestroy {
-  private readonly API_HOSTS = [
-    'http://192.168.11.124:8080',
-    'http://192.168.11.106:8080'
-  ];
+  private readonly API = environment.apiBaseUrl;
 
   annonces: Annonce[] = [];
   currentIndex = 0;
@@ -87,21 +85,12 @@ export class AnnoncesPublicComponent implements OnInit, OnDestroy {
     this.error = false;
     this.cdr.markForCheck();
 
-    // Essai sur le premier host, fallback sur le second si échec
-    this.http.get<AnnonceDto[]>(`${this.API_HOSTS[0]}/annonces`).subscribe({
-      next: (data) => {
-        this.handleAnnoncesSuccess(data);
-      },
+    this.http.get<AnnonceDto[]>(`${this.API}/annonces`).subscribe({
+      next: (data) => this.handleAnnoncesSuccess(data),
       error: () => {
-        // On tente le 2e host
-        this.http.get<AnnonceDto[]>(`${this.API_HOSTS[1]}/annonces`).subscribe({
-          next: (data) => this.handleAnnoncesSuccess(data),
-          error: () => {
-            this.loading = false;
-            this.error = true;
-            this.cdr.markForCheck();
-          }
-        });
+        this.loading = false;
+        this.error = true;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -246,3 +235,4 @@ export class AnnoncesPublicComponent implements OnInit, OnDestroy {
   @HostListener('document:keydown.arrowleft') keyPrev() { this.previous(); }
   @HostListener('document:keydown.arrowright') keyNext() { this.next(); }
 }
+

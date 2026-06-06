@@ -15,30 +15,49 @@
     Aucune transaction en attente.
   </div>
 
-  <mat-card *ngFor="let t of transactions" class="transaction-card" [class.depot]="filter==='DEPOT'" [class.retrait]="filter==='RETRAIT'">
+  <mat-card *ngFor="let t of transactions" class="transaction-card"
+            [class.depot]="filter==='DEPOT'"
+            [class.retrait]="filter==='RETRAIT'"
+            [class.priority-client]="getFidelityLevel(t) > 0">
     <div class="header">
       <div class="who">
         <strong>Client :</strong>
-        {{ t.utilisateur?.prenomUtilisateur || '—' }} {{ t.utilisateur?.nomUtilisateur || '' }}
+        {{ getNomClient(t) }}
+        <span *ngIf="isInvite(t)" class="invite-badge">Invité</span>
+        <span *ngIf="getFidelityLevel(t) > 0" class="fidelity-priority-badge"
+              [title]="'Client fidèle niveau ' + getFidelityLevel(t) + '/5 — Traitement prioritaire'">
+          {{ getFidelityStars(t) }} Prioritaire
+        </span>
       </div>
       <span class="badge pending">⏳ En attente</span>
     </div>
 
     <div class="grid">
-      <div><strong>Montant :</strong> {{ t.montant | number:'1.0-0' }} FCFA</div>
-      <div><strong>Numéro :</strong> {{ t.numeroEnvoyant }}</div>
+      <div *ngIf="filter === 'DEPOT'"><strong>Montant :</strong> {{ t.montant | number:'1.0-0' }} FCFA</div>
+      <div><strong>Numéro :</strong> {{ getNumero(t) }}</div>
       <div><strong>Plateforme :</strong> {{ t.optionDeTransaction }}</div>
-      <div><strong>ID Plateforme :</strong> {{ getIdPlateforme(t) }}</div>
+      <div *ngIf="filter === 'DEPOT'"><strong>ID Plateforme :</strong> {{ getIdPlateforme(t) }}</div>
+      <div *ngIf="filter === 'RETRAIT'"><strong>Caisse :</strong> {{ getCaisseChoisie(t) }}</div>
+      <div *ngIf="filter === 'RETRAIT' && getCodeRetrait(t)"><strong>Code retrait :</strong> {{ getCodeRetrait(t) }}</div>
       <div><strong>Date :</strong> {{ dateOf(t) | date:'medium' }}</div>
-      <!-- <div><strong>Date :</strong> {{ (t.dateDepot || t.dateRetrait) | date:'medium' }}</div> -->
       <div><strong>Pays :</strong> {{ t.pays || '—' }}</div>
     </div>
 
     <img *ngIf="getImageSrc(t) as img" [src]="img" alt="Capture" class="thumb"/>
 
     <div class="actions">
-      <button mat-raised-button color="primary" (click)="validerTransaction(t)">✅ Valider</button>
-      <button mat-stroked-button color="warn" (click)="rejeterTransaction(t)">❌ Rejeter</button>
+      <button mat-raised-button color="primary"
+              (click)="validerTransaction(t)"
+              [disabled]="isProcessing(t)">
+        <mat-icon>check_circle</mat-icon>
+        {{ isProcessing(t) ? 'En cours...' : '✅ Valider' }}
+      </button>
+      <button mat-stroked-button color="warn"
+              (click)="rejeterTransaction(t)"
+              [disabled]="isProcessing(t)">
+        <mat-icon>cancel</mat-icon>
+        ❌ Rejeter
+      </button>
       <button mat-stroked-button color="accent" (click)="voirDetails(t)">🔎 Détails</button>
     </div>
   </mat-card>

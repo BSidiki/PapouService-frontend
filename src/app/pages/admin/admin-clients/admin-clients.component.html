@@ -171,11 +171,21 @@
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Fidélité</th>
               <td mat-cell *matCellDef="let client">
                 <div class="fidelity-display">
-                  <span class="stars" [class.fidele]="client.isFidele" [matTooltip]="'Niveau ' + client.stars + ' étoiles'">
-                    {{ client.fidelityStars }}
-                  </span>
-                  <span *ngIf="client.isFidele" class="fidele-badge" matTooltip="Client fidèle 🎖">
-                    🎖 Fidèle
+                  <div class="stars-row">
+                    <span class="stars" [class.fidele]="client.isFidele"
+                          [matTooltip]="'Niveau ' + client.stars + '/5 — ' + client.depotCount + ' dépôts validés'">
+                      {{ client.fidelityStars }}
+                    </span>
+                    <span *ngIf="client.isFidele" class="fidele-badge" matTooltip="Client fidèle 🎖">
+                      🎖 Fidèle
+                    </span>
+                  </div>
+                  <div *ngIf="!client.isFidele" class="progress-bar-wrap"
+                       [matTooltip]="(client.totalDepot | number) + ' / ' + (fidelityThresholds[client.stars] | number) + ' FCFA pour la prochaine étoile'">
+                    <div class="progress-bar-inner" [style.width.%]="getProgressPercent(client)"></div>
+                  </div>
+                  <span *ngIf="!client.isFidele" class="progress-hint">
+                    {{ getProgressToNextStar(client) }}
                   </span>
                 </div>
               </td>
@@ -212,7 +222,7 @@
 
       <!-- Mobile View -->
       <div class="mobile-view" *ngIf="dataSource.filteredData.length > 0">
-        <div *ngFor="let client of dataSource.filteredData" class="client-card">
+        <div *ngFor="let client of pagedMobileData" class="client-card">
           <div class="card-header">
             <div class="client-info">
               <h4>{{ client.prenomUtilisateur }} {{ client.nomUtilisateur }}</h4>
@@ -228,10 +238,16 @@
               </div>
             </div>
             <div class="fidelity-mobile">
-              <span class="stars" [class.fidele]="client.isFidele" [matTooltip]="'Niveau ' + client.stars + ' étoiles'">
+              <span class="stars" [class.fidele]="client.isFidele"
+                    [matTooltip]="'Niveau ' + client.stars + '/5 — ' + client.depotCount + ' dépôts validés'">
                 {{ client.fidelityStars }}
               </span>
               <span *ngIf="client.isFidele" class="fidele-badge" matTooltip="Client fidèle">🎖</span>
+              <div *ngIf="!client.isFidele" class="progress-bar-wrap"
+                   [matTooltip]="(client.totalDepot | number) + ' / ' + (fidelityThresholds[client.stars] | number) + ' FCFA'">
+                <div class="progress-bar-inner" [style.width.%]="getProgressPercent(client)"></div>
+              </div>
+              <span *ngIf="!client.isFidele" class="progress-hint">{{ getProgressToNextStar(client) }}</span>
             </div>
           </div>
 

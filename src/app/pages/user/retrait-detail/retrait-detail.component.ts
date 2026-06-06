@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { ErrorService } from '../../../services/error.service';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { CommonModule, formatDate } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
 import { MatIcon } from "@angular/material/icon";
+import { environment } from '../../../../environments/environment';
 
-type Platform = 'IXBET' | 'BETWINNER' | 'MELBET' | 'IWIN' | 'STARZ' | '—';
 type TxState = 'PENDING' | 'VALIDATED' | 'REJECTED';
 
 type Utilisateur = {
@@ -19,7 +19,6 @@ type Utilisateur = {
   id_1XBET?: string;
   id_BETWINNER?: string;
   id_MELBET?: string;
-  id_1WIN?: string;
   id_888STARZ?: string;
   numeroUtilisateur?: string;
   nomUtilisateur?: string;
@@ -28,17 +27,22 @@ type Utilisateur = {
 
 type Retrait = {
   idRetrait: number;
-  montant?: number;
   numeroEnvoyant?: string;
+  numeroInvite?: string;
   pays?: string;
   optionRetrait?: string;
+  codeRetrait?: string;
   optionDeTransaction?: string;
+  caisseChoisie?: string;
   dateRetrait?: string;
   file?: string | number[];
   capture?: string | number[];
   transactionState?: TxState;
   motifRejet?: string;
   motif?: string;
+  isInvite?: boolean;
+  nomInvite?: string;
+  prenomInvite?: string;
   utilisateur?: Utilisateur | null;
 };
 
@@ -57,10 +61,7 @@ type Retrait = {
   styleUrls: ['./retrait-detail.component.scss']
 })
 export class RetraitDetailComponent implements OnInit {
-  private readonly API_HOSTS = [
-    'http://192.168.11.124:8080',
-    'http://192.168.11.119:8080'
-  ];
+  private readonly API = environment.apiBaseUrl;
 
   retrait: Retrait | null = null;
   motif = '';
@@ -74,9 +75,7 @@ export class RetraitDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    private location: Location,
-    private snackBar: MatSnackBar
-  ) {}
+    private location: Location, private errorService: ErrorService) {}
 
   async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
@@ -93,43 +92,32 @@ export class RetraitDetailComponent implements OnInit {
       const img = this.retrait.file ?? this.retrait.capture ?? null;
       if (img != null) this.retrait.file = img;
 
+      // Parse le codeRetrait encodé "CODE||REF||Référence choisie"
+      if (this.retrait.codeRetrait) {
+        const parsed = this.parseCode(this.retrait.codeRetrait);
+        this.retrait.codeRetrait = parsed.code || undefined;
+        this.retrait.caisseChoisie = parsed.ref || undefined;
+      }
+
       // Motif
       this.motif = (this.retrait.motifRejet ?? this.retrait.motif ?? '').trim();
 
       this.loading = false;
     } catch (e) {
-      console.error('Erreur chargement retrait:', e);
       this.error = true;
       this.loading = false;
       this.showError('Erreur lors du chargement du retrait');
     }
   }
 
-  /** GET avec fallback multi-hôtes */
+  /** GET avec fallback */
   private async getWithFallback<T>(path: string): Promise<T> {
-    let lastError: unknown;
-    for (const host of this.API_HOSTS) {
-      try {
-        return await firstValueFrom(this.http.get<T>(`${host}${path}`));
-      } catch (e) {
-        lastError = e;
-        console.warn(`Hôte ${host} inaccessible, tentative suivante...`);
-      }
-    }
-    throw lastError;
+    return firstValueFrom(this.http.get<T>(`${this.API}${path}`));
   }
 
   private async putWithFallback<T = void>(path: string, body: any): Promise<T> {
-    let lastError: unknown;
-    for (const host of this.API_HOSTS) {
-      try {
-        const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-        return await firstValueFrom(this.http.put<T>(`${host}${path}`, body, { headers }));
-      } catch (e) {
-        lastError = e;
-      }
-    }
-    throw lastError;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return firstValueFrom(this.http.put<T>(`${this.API}${path}`, body, { headers }));
   }
 
   /** Base64 safe: string ou tableau d'octets */
@@ -149,7 +137,6 @@ export class RetraitDetailComponent implements OnInit {
 
   onImageError() {
     this.imageLoading = false;
-    console.warn('Erreur de chargement de l\'image');
   }
 
   goBack() {
@@ -160,38 +147,18 @@ export class RetraitDetailComponent implements OnInit {
     this.zoomed = !this.zoomed;
   }
 
-  /** Normalise les valeurs plateforme venant du backend */
-  normalizePlatform(p?: string): Platform {
-    if (!p) return '—';
-    const up = p.toUpperCase();
-    if (up === '1XBET' || up === 'IXBET') return 'IXBET';
-    if (up === 'BETWINNER') return 'BETWINNER';
-    if (up === 'MELBET') return 'MELBET';
-    if (up === '1WIN' || up === 'IWIN') return 'IWIN';
-    if (up === '888STARZ' || up === 'STARZ') return 'STARZ';
-    return '—';
-  }
-
-  /** Récupère l'ID plateforme depuis l'utilisateur */
-  getIdPlateforme(retrait: Retrait): string {
-    const u = retrait.utilisateur ?? undefined;
-    const plat = this.normalizePlatform(retrait.optionDeTransaction);
-    if (!u) return '—';
-    switch (plat) {
-      case 'IXBET': return u.id_1XBET     || '—';
-      case 'BETWINNER': return u.id_BETWINNER || '—';
-      case 'MELBET': return u.id_MELBET   || '—';
-      case 'IWIN': return u.id_1WIN       || '—';
-      case 'STARZ': return u.id_888STARZ  || '—';
-      default: return '—';
-    }
-  }
-
   /** Obtenir le nom complet de l'utilisateur */
   getNomUtilisateur(retrait: Retrait): string {
+    if (retrait.isInvite) {
+      return `${retrait.prenomInvite || ''} ${retrait.nomInvite || ''}`.trim() || '(Invité)';
+    }
     const u = retrait.utilisateur;
     if (!u) return '—';
     return `${u.prenomUtilisateur || ''} ${u.nomUtilisateur || ''}`.trim() || '—';
+  }
+
+  getNumero(retrait: Retrait): string {
+    return (retrait.isInvite ? retrait.numeroInvite : retrait.numeroEnvoyant) || '—';
   }
 
   /** Formater la date */
@@ -215,6 +182,11 @@ export class RetraitDetailComponent implements OnInit {
   async changerStatut(nouveauStatut: TxState) {
     if (!this.retrait) return;
 
+    if (nouveauStatut === 'REJECTED' && !this.motif.trim()) {
+      this.showError('Veuillez saisir un motif de rejet.');
+      return;
+    }
+
     const confirmation = confirm(
       `Êtes-vous sûr de vouloir ${nouveauStatut === 'VALIDATED' ? 'valider' : 'rejeter'} ce retrait ?`
     );
@@ -222,18 +194,20 @@ export class RetraitDetailComponent implements OnInit {
     if (!confirmation) return;
 
     const userId = this.retrait.utilisateur?.idUtilisateur ?? 0;
-    const path = `/retraits/${userId}/${this.retrait.idRetrait}/${nouveauStatut}`;
+    let path = `/retraits/${userId}/${this.retrait.idRetrait}/${nouveauStatut}`;
+    if (nouveauStatut === 'REJECTED') {
+      path += `?motifRejet=${encodeURIComponent(this.motif.trim())}`;
+    }
 
     this.changingStatus = true;
 
     try {
-      await this.putWithFallback(path, nouveauStatut === 'REJECTED' ? { motif: this.motif || 'Rejeté' } : {});
+      await this.putWithFallback(path, {});
       if (this.retrait) {
         this.retrait.transactionState = nouveauStatut;
       }
       this.showSuccess(`Retrait ${nouveauStatut === 'VALIDATED' ? 'validé' : 'rejeté'} avec succès`);
     } catch (error) {
-      console.error('Erreur changement statut:', error);
       this.showError('Erreur lors du changement de statut');
     } finally {
       this.changingStatus = false;
@@ -241,17 +215,11 @@ export class RetraitDetailComponent implements OnInit {
   }
 
   private showSuccess(message: string) {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 3000,
-      panelClass: ['success-snackbar']
-    });
+    this.errorService.success(message);
   }
 
   private showError(message: string) {
-    this.snackBar.open(message, 'Fermer', {
-      duration: 5000,
-      panelClass: ['error-snackbar']
-    });
+    this.errorService.toast(message, "danger", 5000);
   }
 
   // Helper pour les classes CSS
@@ -280,15 +248,23 @@ export class RetraitDetailComponent implements OnInit {
     }
   }
 
+  parseCode(raw?: string): { code: string; ref: string } {
+    if (!raw) return { code: '', ref: '' };
+    const idx = raw.indexOf('||REF||');
+    if (idx === -1) return { code: raw, ref: '' };
+    return { code: raw.substring(0, idx), ref: raw.substring(idx + 7) };
+  }
+
   getOptionRetraitText(option?: string): string {
     if (!option) return '—';
     const options: { [key: string]: string } = {
       'O': 'Orange Money',
       'M': 'Moov Money',
       'W': 'Wave',
-      'S': 'Stripe',
+      'S': 'Sank Money',
       'C': 'Carte Bancaire'
     };
     return options[option] || option;
   }
 }
+

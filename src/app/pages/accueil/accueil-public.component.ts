@@ -10,6 +10,7 @@ import { HeaderPublicComponent } from '../../layout/header-public/header-public.
 import { FooterComponent } from '../../layout/footer/footer.component';
 import { AnnoncesPublicComponent } from '../annonces/annonces-public.component';
 import { CarouselPubsComponent } from '../carousel-pubs/carousel-pubs.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-accueil-public',
@@ -32,41 +33,27 @@ export class AccueilPublicComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
 
   annonces: any[] = [];
-  albums: any[] = [];
 
-  loading = { annonces: false, albums: false };
-  error = { annonces: '', albums: '' };
+  loading = false;
+  error = '';
 
   // Carrousel auto-slide
   currentIndex = 0;
   private slideTimer: any;
 
   ngOnInit(): void {
-    // ⚠️ Remplace par ton environment (ex: environment.apiUrl)
-    const API = 'http://192.168.11.124:8080';
+    const API = environment.apiBaseUrl;
 
-    this.loading.annonces = true;
+    this.loading = true;
     this.http.get<any[]>(`${API}/annonces`).subscribe({
       next: data => {
         this.annonces = data ?? [];
-        this.loading.annonces = false;
+        this.loading = false;
         this.startAutoSlide();
       },
       error: () => {
-        this.loading.annonces = false;
-        this.error.annonces = 'Impossible de charger les annonces pour le moment.';
-      }
-    });
-
-    this.loading.albums = true;
-    this.http.get<any[]>(`${API}/albums`).subscribe({
-      next: data => {
-        this.albums = data ?? [];
-        this.loading.albums = false;
-      },
-      error: () => {
-        this.loading.albums = false;
-        this.error.albums = 'Impossible de charger les albums pour le moment.';
+        this.loading = false;
+        this.error = 'Impossible de charger les annonces pour le moment.';
       }
     });
   }
@@ -107,3 +94,4 @@ export class AccueilPublicComponent implements OnInit, OnDestroy {
     return 'data:image/jpeg;base64,' + btoa(binary);
   }
 }
+

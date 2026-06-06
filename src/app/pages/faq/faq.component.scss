@@ -1,507 +1,767 @@
-// @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Poppins:wght@500;600&family=Roboto:wght@400;500&display=swap');
+@use "sass:color";
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=Roboto:wght@400;500&display=swap');
 
-.faq-page {
-  max-width: 1000px;
-  margin: 1rem auto;
-  padding: 0 1rem;
-  font-family: 'Roboto', 'Open Sans', sans-serif;
+// ═══════════════════════════════════════════
+// TOKENS OFFICIELS CLIENT
+// ═══════════════════════════════════════════
+$rouge:       #991f23;
+$rouge-dark:  color.adjust($rouge, $lightness: -8%);
+$rouge-pale:  color.adjust($rouge, $lightness: 58%);
+$bleu:        #00adef;
+$bleu-dark:   color.adjust($bleu, $lightness: -8%);
+$blanc:       #ffffff;
+$texte-fonce: #1a1d2e;
+$texte-moyen: #4b5563;
+$texte-gris:  #6b7280;
+$fond-clair:  #f6f7fb;
+$bordure:     rgba(0, 0, 0, 0.08);
+$bordure-rouge: rgba($rouge, 0.14);
 
-  // En-tête
-  .faq-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-    padding: 0 1rem;
+$font-titre:      'Montserrat', sans-serif;
+$font-sous-titre: 'Poppins', sans-serif;
+$font-corps:      'Roboto', sans-serif;
 
-    .main-title {
-      color: #991f23;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: bold;
-      font-size: clamp(1.8rem, 4vw, 2.5rem);
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-    }
+$radius-sm:   10px;
+$radius-md:   16px;
+$radius-lg:   24px;
+$ease:        cubic-bezier(0.4, 0, 0.2, 1);
 
-    .subtitle {
-      color: #666;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.1rem;
-      margin: 0;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-  }
-
-  // Barre d'outils
-  .faq-toolbar {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #f8fdff 0%, #e3f7fb 100%);
-    border-radius: 16px;
-    border: 1px solid #e1f5fe;
-
-    .search-container {
-      flex: 1 1 400px;
-      min-width: 280px;
-    }
-
-    .search-field {
-      width: 100%;
-
-      ::ng-deep {
-        .mat-form-field-outline {
-          border-radius: 12px;
-        }
-
-        .mat-form-field-appearance-outline .mat-form-field-outline-thick {
-          color: #00adef;
-        }
-
-        .mat-form-field.mat-focused .mat-form-field-label {
-          color: #991f23;
-        }
-      }
-    }
-
-    .toolbar-actions {
-      flex-shrink: 0;
-    }
-
-    .toggle-all-btn {
-      border-radius: 10px;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 500;
-      padding: 0 1rem;
-      border-color: #00adef;
-      color: #00adef;
-
-      &:hover {
-        background: rgba(0, 173, 239, 0.1);
-      }
-
-      mat-icon {
-        margin-right: 0.5rem;
-      }
-    }
-  }
-
-  // Statistiques de recherche
-  .search-stats {
-    background: rgba(0, 173, 239, 0.05);
-    border: 1px solid rgba(0, 173, 239, 0.2);
-    border-radius: 10px;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-
-    p {
-      margin: 0;
-      color: #00adef;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 500;
-
-      strong {
-        color: #991f23;
-      }
-    }
-  }
-
-  // Contenu FAQ
-  .faq-content {
-    .faq-accordion {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .faq-panel {
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-      border: 1px solid #e1f5fe;
-      transition: all 0.3s ease;
-      overflow: hidden;
-
-      &:hover {
-        box-shadow: 0 6px 20px rgba(0, 173, 239, 0.15);
-        transform: translateY(-2px);
-      }
-
-      &.mat-expanded {
-        box-shadow: 0 8px 25px rgba(0, 173, 239, 0.2);
-        border-color: #00adef;
-      }
-    }
-
-    .faq-header-panel {
-      background: #ffffff;
-      padding: 1.25rem 1.5rem;
-      min-height: 72px;
-
-      &:hover {
-        background: #f8fdff;
-      }
-
-      .faq-question {
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        font-size: 1.05rem;
-        color: #2c3e50;
-        margin: 0;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.75rem;
-
-        .question-number {
-          color: #00adef;
-          font-weight: 700;
-          flex-shrink: 0;
-          margin-top: 0.1rem;
-        }
-      }
-
-      .faq-indicator {
-        flex-shrink: 0;
-        margin-left: auto;
-
-        mat-icon {
-          color: #00adef;
-          transition: transform 0.3s ease;
-        }
-      }
-    }
-
-    .faq-answer {
-      padding: 1.5rem;
-      background: #fafcfd;
-      border-top: 1px solid #e1f5fe;
-
-      p {
-        font-size: 1rem;
-        line-height: 1.7;
-        color: #444;
-        margin: 0 0 1.5rem 0;
-        font-family: 'Roboto', sans-serif;
-      }
-
-      .faq-keywords {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        padding-top: 1rem;
-        border-top: 1px dashed #e1f5fe;
-
-        .keywords-label {
-          font-family: 'Poppins', sans-serif;
-          font-weight: 500;
-          font-size: 0.9rem;
-          color: #666;
-          flex-shrink: 0;
-        }
-
-        .keywords-list {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-        }
-
-        .keyword-tag {
-          background: rgba(0, 173, 239, 0.1);
-          color: #00adef;
-          padding: 0.3rem 0.8rem;
-          border-radius: 20px;
-          font-size: 0.8rem;
-          font-family: 'Roboto', sans-serif;
-          font-weight: 500;
-          border: 1px solid rgba(0, 173, 239, 0.3);
-        }
-      }
-    }
-
-    .faq-actions {
-      padding: 0 1.5rem 1.5rem;
-      background: #fafcfd;
-
-      .share-btn {
-        font-family: 'Poppins', sans-serif;
-        font-weight: 500;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-
-        mat-icon {
-          margin-right: 0.5rem;
-          font-size: 1.1rem;
-        }
-
-        &:hover {
-          background: rgba(0, 173, 239, 0.1);
-        }
-      }
-    }
-  }
-
-  // Aucun résultat
-  .no-results {
-    text-align: center;
-    padding: 3rem 2rem;
-    background: linear-gradient(135deg, #f8fdff 0%, #e3f7fb 100%);
-    border-radius: 16px;
-    border: 2px dashed #00adef;
-
-    .no-results-icon {
-      margin-bottom: 1.5rem;
-
-      mat-icon {
-        font-size: 4rem;
-        width: auto;
-        height: auto;
-        color: #00adef;
-        opacity: 0.7;
-      }
-    }
-
-    h3 {
-      color: #991f23;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: bold;
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    p {
-      color: #666;
-      font-family: 'Roboto', sans-serif;
-      font-size: 1rem;
-      margin-bottom: 2rem;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .no-results-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-
-      button {
-        border-radius: 10px;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 500;
-
-        mat-icon {
-          margin-right: 0.5rem;
-        }
-      }
-    }
-  }
-
-  // Section d'aide
-  .help-section {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 2px solid #e1f5fe;
-
-    .help-card {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      padding: 2rem;
-      background: linear-gradient(135deg, #991f23, #c82333);
-      border-radius: 16px;
-      color: white;
-      flex-wrap: wrap;
-
-      .help-icon {
-        font-size: 3rem;
-        width: auto;
-        height: auto;
-        flex-shrink: 0;
-      }
-
-      .help-content {
-        flex: 1;
-        min-width: 250px;
-
-        h3 {
-          font-family: 'Montserrat', sans-serif;
-          font-weight: bold;
-          font-size: 1.4rem;
-          margin: 0 0 0.5rem 0;
-          color: white;
-        }
-
-        p {
-          font-family: 'Roboto', sans-serif;
-          font-size: 1rem;
-          margin: 0;
-          opacity: 0.9;
-        }
-      }
-
-      .help-button {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        border-radius: 12px;
-        padding: 0.75rem 1.5rem;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        transition: all 0.3s ease;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.3);
-          transform: translateY(-2px);
-        }
-
-        mat-icon {
-          margin-right: 0.5rem;
-        }
-      }
-    }
-  }
+// ═══════════════════════════════════════════
+// ANIMATIONS
+// ═══════════════════════════════════════════
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-// Responsive
-@media (max-width: 768px) {
-  .faq-page {
-    margin: 0.5rem auto;
-    padding: 0 0.75rem;
-
-    .faq-header {
-      margin-bottom: 2rem;
-      padding: 0;
-
-      .main-title {
-        font-size: 1.6rem;
-      }
-
-      .subtitle {
-        font-size: 1rem;
-      }
-    }
-
-    .faq-toolbar {
-      flex-direction: column;
-      gap: 1rem;
-      padding: 1.25rem;
-
-      .search-container {
-        flex: 1 1 100%;
-        min-width: auto;
-      }
-
-      .toolbar-actions {
-        width: 100%;
-      }
-
-      .toggle-all-btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    .faq-content {
-      .faq-header-panel {
-        padding: 1rem 1.25rem;
-        min-height: 64px;
-
-        .faq-question {
-          font-size: 0.95rem;
-          gap: 0.5rem;
-        }
-      }
-
-      .faq-answer {
-        padding: 1.25rem;
-
-        .faq-keywords {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 0.5rem;
-        }
-      }
-
-      .faq-actions {
-        padding: 0 1.25rem 1.25rem;
-      }
-    }
-
-    .no-results {
-      padding: 2rem 1rem;
-
-      .no-results-actions {
-        flex-direction: column;
-        align-items: center;
-
-        button {
-          width: 100%;
-          max-width: 250px;
-        }
-      }
-    }
-
-    .help-section {
-      .help-card {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem;
-        gap: 1rem;
-
-        .help-content {
-          min-width: auto;
-        }
-
-        .help-button {
-          width: 100%;
-          max-width: 250px;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .faq-page {
-    padding: 0 0.5rem;
-
-    .faq-toolbar {
-      padding: 1rem;
-      border-radius: 12px;
-    }
-
-    .faq-content {
-      .faq-header-panel {
-        padding: 0.875rem 1rem;
-      }
-
-      .faq-answer {
-        padding: 1rem;
-      }
-
-      .faq-actions {
-        padding: 0 1rem 1rem;
-      }
-    }
-  }
-}
-
-// Animations
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+// ═══════════════════════════════════════════
+// PAGE WRAPPER — dégradé cohérent avec l'accueil
+// ═══════════════════════════════════════════
+.faq-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 1.5rem 72px;
+  font-family: $font-corps;
+  position: relative;
+
+  @media (max-width: 768px) { padding: 36px 1rem 56px; }
+  @media (max-width: 480px) { padding: 28px 0.75rem 48px; }
+}
+
+// ─── Fond global page (appliqué sur :host ou wrapper parent) ─
+:host {
+  display: block;
+  background: linear-gradient(
+    160deg,
+    $rouge-pale   0%,
+    color.adjust($rouge, $lightness: 54%) 30%,
+    #f9f4f4       60%,
+    $blanc        100%
+  );
+  min-height: 100vh;
+
+  // Cercle déco haut-droite
+  &::before {
+    content: '';
+    position: fixed;
+    top: -100px; right: -100px;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba($rouge, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+}
+
+// ═══════════════════════════════════════════
+// EN-TÊTE FAQ
+// ═══════════════════════════════════════════
+.faq-header {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: fadeUp 0.6s $ease both;
+
+  .main-title {
+    font-family: $font-titre;        // Montserrat Bold
+    font-weight: 700;
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    color: $rouge;
+    margin: 0 0 12px;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-family: $font-sous-titre;   // Poppins
+    font-size: 1rem;
+    font-weight: 400;
+    color: $texte-moyen;
+    margin: 0 auto;
+    max-width: 540px;
+    line-height: 1.65;
+  }
+}
+
+// ═══════════════════════════════════════════
+// BARRE D'OUTILS (recherche + toggle)
+// ═══════════════════════════════════════════
+.faq-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding: 20px 24px;
+  background: $blanc;
+  border-radius: $radius-md;
+  border: 1px solid $bordure-rouge;
+  box-shadow: 0 4px 16px rgba($rouge, 0.07);
+  animation: fadeUp 0.6s 0.1s $ease both;
+
+  .search-container {
+    flex: 1 1 360px;
+    min-width: 240px;
+  }
+
+  .search-field {
+    width: 100%;
+
+    ::ng-deep {
+      // Outline au focus → rouge
+      .mdc-text-field--focused .mdc-notched-outline__leading,
+      .mdc-text-field--focused .mdc-notched-outline__notch,
+      .mdc-text-field--focused .mdc-notched-outline__trailing {
+        border-color: $rouge !important;
+        border-width: 2px !important;
+      }
+
+      .mdc-text-field--focused .mdc-floating-label {
+        color: $rouge !important;
+      }
+
+      .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: $bordure;
+        }
+      }
+
+      .mat-mdc-input-element {
+        font-family: $font-corps;
+        font-size: 0.92rem;
+        color: $texte-fonce;
+      }
+
+      .mdc-floating-label {
+        font-family: $font-sous-titre;
+        font-size: 0.9rem;
+      }
+
+      // Icône search
+      .mat-mdc-form-field-icon-suffix mat-icon {
+        color: $texte-gris;
+        font-size: 20px;
+        transition: color 0.2s;
+      }
+
+      .mdc-text-field--focused .mat-mdc-form-field-icon-suffix mat-icon {
+        color: $rouge;
+      }
+
+      .mat-mdc-text-field-wrapper {
+        border-radius: $radius-sm !important;
+      }
+    }
+  }
+
+  .toolbar-actions { flex-shrink: 0; }
+
+  .toggle-all-btn {
+    height: 56px;
+    padding: 0 20px;
+    border-radius: $radius-sm;
+    font-family: $font-sous-titre;   // Poppins
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: $bleu;
+    border-color: rgba($bleu, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s $ease;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+    &:hover {
+      background: rgba($bleu, 0.07);
+      border-color: $bleu;
+      color: $bleu-dark;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 16px;
+    gap: 10px;
+
+    .search-container { flex: 1 1 100%; min-width: auto; }
+    .toggle-all-btn { width: 100%; justify-content: center; }
+  }
+}
+
+// ═══════════════════════════════════════════
+// STATS DE RECHERCHE
+// ═══════════════════════════════════════════
+.search-stats {
+  background: rgba($bleu, 0.05);
+  border: 1px solid rgba($bleu, 0.20);
+  border-radius: $radius-sm;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  text-align: center;
+  animation: fadeUp 0.4s $ease both;
+
+  p {
+    margin: 0;
+    font-family: $font-sous-titre;   // Poppins
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $texte-moyen;
+
+    strong { color: $rouge; }
+  }
+}
+
+// ═══════════════════════════════════════════
+// ACCORDÉON FAQ
+// ═══════════════════════════════════════════
+.faq-content {
+  animation: fadeUp 0.6s 0.15s $ease both;
+
+  .faq-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 }
 
 .faq-panel {
-  animation: fadeIn 0.4s ease-out;
+  border-radius: $radius-md !important;
+  border: 1px solid $bordure !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
+  transition: transform 0.25s $ease, box-shadow 0.25s $ease, border-color 0.25s $ease;
+  animation: fadeIn 0.4s $ease both;
+  background: $blanc !important;
+
+  // Barre rouge à gauche quand ouvert
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, $rouge, $bleu);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s $ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba($rouge, 0.10) !important;
+    border-color: $bordure-rouge !important;
+  }
+
+  // Panel ouvert
+  &.mat-expanded {
+    border-color: rgba($rouge, 0.25) !important;
+    box-shadow: 0 8px 28px rgba($rouge, 0.12) !important;
+
+    &::before { transform: scaleY(1); }
+  }
 }
+
+// ─── Header du panel ─────────────────────
+.faq-header-panel {
+  background: $blanc !important;
+  padding: 0 20px !important;
+  min-height: 68px !important;
+  transition: background 0.2s $ease;
+
+  &:hover { background: rgba($rouge, 0.02) !important; }
+
+  // Force l'indicateur à ne pas voler l'espace du titre
+  ::ng-deep .mat-expansion-panel-header-description {
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .faq-question {
+    font-family: $font-sous-titre;   // Poppins
+    font-weight: 600;
+    font-size: 1rem;
+    color: $texte-fonce;
+    margin: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+    flex-grow: 1;
+    min-width: 0;
+
+    .question-number {
+      font-family: $font-titre;      // Montserrat
+      font-weight: 700;
+      color: $rouge;
+      flex-shrink: 0;
+      font-size: 0.95rem;
+      min-width: 22px;
+    }
+  }
+
+  .faq-indicator {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-left: 8px;
+
+    mat-icon {
+      color: $bleu;
+      font-size: 20px;
+      width: 20px; height: 20px;
+      transition: transform 0.25s $ease, color 0.2s;
+    }
+  }
+
+  // Indicator rouge quand ouvert
+  .mat-expanded & .faq-indicator mat-icon { color: $rouge; }
+}
+
+// ─── Contenu réponse ─────────────────────
+.faq-answer {
+  padding: 20px 24px;
+  background: $fond-clair;
+  border-top: 1px solid rgba($rouge, 0.08);
+
+  p {
+    font-family: $font-corps;        // Roboto
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: $texte-moyen;
+    margin: 0 0 16px;
+  }
+
+  // Mots-clés
+  .faq-keywords {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba($rouge, 0.15);
+
+    .keywords-label {
+      font-family: $font-sous-titre;
+      font-weight: 500;
+      font-size: 0.80rem;
+      color: $texte-gris;
+      flex-shrink: 0;
+    }
+
+    .keywords-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .keyword-tag {
+      background: rgba($rouge, 0.07);
+      color: $rouge;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-family: $font-corps;
+      font-weight: 500;
+      border: 1px solid rgba($rouge, 0.18);
+      transition: all 0.2s $ease;
+
+      &:hover {
+        background: rgba($rouge, 0.12);
+        border-color: rgba($rouge, 0.3);
+      }
+    }
+  }
+}
+
+// ─── Actions du panel ────────────────────
+.faq-actions {
+  padding: 0 20px 16px;
+  background: $fond-clair;
+
+  .share-btn {
+    font-family: $font-sous-titre;
+    font-weight: 500;
+    font-size: 0.82rem;
+    color: $texte-gris;
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s $ease;
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+    &:hover {
+      color: $bleu;
+      background: rgba($bleu, 0.07);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// AUCUN RÉSULTAT
+// ═══════════════════════════════════════════
+.no-results {
+  text-align: center;
+  padding: 48px 24px;
+  background: $blanc;
+  border-radius: $radius-lg;
+  border: 2px dashed rgba($rouge, 0.25);
+  animation: fadeUp 0.5s $ease both;
+
+  .no-results-icon {
+    margin-bottom: 20px;
+
+    mat-icon {
+      font-size: 3.5rem;
+      width: auto; height: auto;
+      color: rgba($rouge, 0.35);
+    }
+  }
+
+  h3 {
+    font-family: $font-titre;        // Montserrat
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: $rouge;
+    margin: 0 0 10px;
+  }
+
+  p {
+    font-family: $font-corps;        // Roboto
+    font-size: 0.95rem;
+    color: $texte-gris;
+    margin: 0 auto 28px;
+    max-width: 380px;
+    line-height: 1.65;
+
+    strong { color: $texte-fonce; }
+  }
+
+  .no-results-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    button {
+      border-radius: $radius-sm;
+      font-family: $font-sous-titre;
+      font-weight: 500;
+      font-size: 0.875rem;
+
+      mat-icon { font-size: 17px; width: 17px; height: 17px; }
+
+      // Bouton effacer
+      &[mat-stroked-button] {
+        border-color: rgba($rouge, 0.3);
+        color: $rouge;
+
+        &:hover { background: rgba($rouge, 0.05); border-color: $rouge; }
+      }
+
+      // Bouton contacter
+      &[mat-raised-button] {
+        background: linear-gradient(135deg, $rouge, $rouge-dark);
+        color: $blanc;
+        box-shadow: 0 4px 14px rgba($rouge, 0.28);
+
+        &:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba($rouge, 0.38); }
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// SECTION AIDE EN BAS
+// ═══════════════════════════════════════════
+.help-section {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba($rouge, 0.12);
+  animation: fadeUp 0.6s 0.2s $ease both;
+
+  .help-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, $rouge 0%, $rouge-dark 100%);
+    border-radius: $radius-lg;
+    color: $blanc;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+
+    // Motif de points décoratif
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba($blanc, 0.07) 1px, transparent 1px);
+      background-size: 20px 20px;
+      pointer-events: none;
+    }
+
+    // Cercle déco
+    &::after {
+      content: '';
+      position: absolute;
+      right: -60px; top: -60px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba($blanc, 0.06);
+      pointer-events: none;
+    }
+
+    .help-icon {
+      font-size: 2.8rem;
+      width: auto; height: auto;
+      flex-shrink: 0;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    .help-content {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+      z-index: 1;
+
+      h3 {
+        font-family: $font-titre;    // Montserrat
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: $blanc;
+        margin: 0 0 6px;
+      }
+
+      p {
+        font-family: $font-corps;    // Roboto
+        font-size: 0.9rem;
+        color: rgba($blanc, 0.80);
+        margin: 0;
+        line-height: 1.55;
+      }
+    }
+
+    .help-button {
+      background: $blanc;
+      color: $rouge;
+      border: none;
+      border-radius: $radius-sm;
+      padding: 12px 22px;
+      font-family: $font-sous-titre; // Poppins
+      font-weight: 600;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+      transition: all 0.22s $ease;
+      position: relative;
+      z-index: 1;
+
+      mat-icon { font-size: 17px; width: 17px; height: 17px; }
+
+      &:hover {
+        background: rgba($blanc, 0.92);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        color: $rouge-dark;
+      }
+
+      &:active { transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      flex-direction: column;
+      text-align: center;
+      padding: 24px 20px;
+      gap: 16px;
+
+      .help-content { min-width: auto; }
+      .help-button { width: 100%; justify-content: center; }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+// RESPONSIVE
+// ═══════════════════════════════════════════
+@media (max-width: 768px) {
+  .faq-header { margin-bottom: 28px; }
+
+  .faq-header-panel {
+    padding: 0 12px !important;
+    min-height: 58px !important;
+
+    .faq-question {
+      font-size: 0.92rem;
+      gap: 7px;
+      flex-grow: 1;
+      min-width: 0;
+    }
+
+    .faq-indicator {
+      flex-grow: 0;
+      flex-shrink: 0;
+      margin-left: 6px;
+    }
+  }
+
+  .faq-answer {
+    padding: 16px 18px;
+
+    .faq-keywords {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+
+  .faq-actions { padding: 0 16px 14px; }
+  .help-section { margin-top: 36px; padding-top: 24px; }
+}
+
+@media (max-width: 480px) {
+  .faq-header {
+    margin-bottom: 20px;
+    .main-title { font-size: 1.6rem; }
+    .subtitle { font-size: 0.875rem; }
+  }
+
+  .faq-toolbar { border-radius: $radius-sm; padding: 12px; gap: 8px; }
+
+  .faq-header-panel {
+    padding: 0 10px !important;
+    min-height: 54px !important;
+
+    .faq-question {
+      font-size: 0.855rem;
+      gap: 5px;
+      .question-number { font-size: 0.82rem; min-width: 17px; }
+    }
+
+    .faq-indicator mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+
+  .faq-answer {
+    padding: 14px;
+    p { font-size: 0.875rem; line-height: 1.65; }
+  }
+
+  .faq-actions {
+    padding: 0 12px 12px;
+    .share-btn {
+      min-height: 40px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .no-results { padding: 32px 14px; }
+
+  .no-results-actions {
+    flex-direction: column;
+    align-items: stretch;
+    button { width: 100%; }
+  }
+
+  .search-stats { padding: 10px 14px; }
+}
+
+// ─── Très petits téléphones (≤ 360px) ────
+@media (max-width: 360px) {
+  .faq-page { padding: 18px 0.5rem 36px; }
+
+  .faq-header .main-title { font-size: 1.4rem; }
+
+  .faq-toolbar { padding: 10px; }
+
+  .faq-header-panel {
+    padding: 0 10px !important;
+    min-height: 52px !important;
+    .faq-question { font-size: 0.82rem; }
+  }
+
+  .faq-answer { padding: 12px; }
+  .faq-actions { padding: 0 10px 10px; }
+}
+
+// ─── Appareils tactiles : désactiver les hovers ────
+@media (hover: none), (pointer: coarse) {
+  .faq-panel:hover {
+    transform: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    border-color: $bordure !important;
+  }
+
+  .help-button:hover,
+  .share-btn:hover,
+  .toggle-all-btn:hover {
+    transform: none;
+    background: transparent;
+  }
+}
+
+// ═══════════════════════════════════════════
+// REDUCED MOTION
+// ═══════════════════════════════════════════
+@media (prefers-reduced-motion: reduce) {
+  .faq-panel,
+  .faq-header-panel,
+  .toggle-all-btn,
+  .help-button,
+  .share-btn {
+    transition: none;
+    animation: none;
+  }
+}
+
+// ═══════════════════════════════════════════
+// FOCUS ACCESSIBLE
+// ═══════════════════════════════════════════
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid $bleu;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+

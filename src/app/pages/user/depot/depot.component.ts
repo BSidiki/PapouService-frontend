@@ -1,27 +1,23 @@
 import { AuthService } from './../../../services/auth.service';
-import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { PlatformUtilsService } from '../../../services/platform-utils.service';
+import { DepotService } from '../../../services/depot.service';
+import { ErrorService } from '../../../services/error.service';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
 import { AnnoncesPublicComponent } from '../../annonces/annonces-public.component';
 import { MatchsComponent } from '../../matchs/matchs.component';
 import { FooterComponent } from '../../../layout/footer/footer.component';
 import { firstValueFrom } from 'rxjs';
-
-type User = {
-  idUtilisateur: number;
-  id_1XBET?: string; id_BETWINNER?: string; id_MELBET?: string; id_1WIN?: string; id_888STARZ?: string;
-  nomUtilisateur?: string;
-  prenomUtilisateur?: string;
-};
+import { Utilisateur } from '../../../models';
 
 @Component({
   selector: 'app-depot',
@@ -29,11 +25,11 @@ type User = {
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatSnackBarModule,
     MatProgressSpinnerModule,
     MatCardModule,
     MatIconModule,
@@ -44,40 +40,66 @@ type User = {
   templateUrl: './depot.component.html',
   styleUrls: ['./depot.component.scss']
 })
-export class DepotComponent {
-  private readonly API_HOSTS = [
-    'http://192.168.11.124:8080',
-    'http://192.168.11.119:8080'
-  ];
-
+export class DepotComponent implements OnDestroy {
   form = {
     pays: '',
     indicatif: '',
     numero: '',
     montant: null as number | null,
-    optionDepot: '',            // O, M, W, S, C
-    optionDeTransaction: ''     // 1XBET, BETWINNER, MELBET, 1WIN, 888STARZ
+    optionDepot: '',
+    optionDeTransaction: ''
   };
 
   file: File | null = null;
+  showConfirm = false;
   userId = 0;
   userInfo = '';
+  isGuestMode = false;
+  guestIdPlateforme = '';
+  guestNom = '';
+  guestPrenom = '';
   transactionOptionsDisponibles: { label: string; value: string; id: string | null }[] = [];
   filePreview: string | null = null;
   submitting = false;
+  showGuestNameFields = false;
+  showCountdown = false;
+  countdownSeconds = 180;
+  private countdownInterval: any = null;
+
+  get countdownDisplay(): string {
+    const m = Math.floor(this.countdownSeconds / 60);
+    const s = this.countdownSeconds % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  quickAmounts = [1000, 2000, 3000, 5000, 10000, 15000, 20000, 25000, 50000, 1000000];
 
   paysOptions = [
     { nom: 'Burkina Faso', indicatif: '+226' },
     { nom: 'Côte d\'Ivoire', indicatif: '+225' },
     { nom: 'Togo', indicatif: '+228' },
-    { nom: 'Bénin', indicatif: '+229' }
+    { nom: 'Bénin', indicatif: '+229' },
+    { nom: 'Mali', indicatif: '+223' },
+    { nom: 'Niger', indicatif: '+227' }
   ];
 
-  constructor(private http: HttpClient, private auth: AuthService, private snack: MatSnackBar) {
-    const user = (this.auth.getUser?.() ?? null) as User | null;
+  constructor(
+    private auth: AuthService,
+    private depotService: DepotService,
+    private platform: PlatformUtilsService,
+    private errorService: ErrorService
+  ) {
+    const user = (this.auth.getUser?.() ?? null) as Utilisateur | null;
 
     if (!user) {
-      this.snack.open('Vous devez être connecté pour faire un dépôt.', 'Fermer', { duration: 3500 });
+      this.isGuestMode = true;
+      // Guests can choose any platform — they'll enter their ID manually
+      this.transactionOptionsDisponibles = [
+        { label: '1XBET',     value: '1XBET',     id: '1XBET' },
+        { label: 'BETWINNER', value: 'BETWINNER', id: 'BETWINNER' },
+        { label: 'MELBET',    value: 'MELBET',    id: 'MELBET' },
+        { label: '888STARZ',  value: '888STARZ',  id: '888STARZ' }
+      ];
       return;
     }
 
@@ -89,7 +111,6 @@ export class DepotComponent {
       { label: '1XBET',     value: '1XBET',     id: user.id_1XBET     ?? null },
       { label: 'BETWINNER', value: 'BETWINNER', id: user.id_BETWINNER ?? null },
       { label: 'MELBET',    value: 'MELBET',    id: user.id_MELBET    ?? null },
-      { label: '1WIN',      value: '1WIN',      id: user.id_1WIN      ?? null },
       { label: '888STARZ',  value: '888STARZ',  id: user.id_888STARZ  ?? null }
     ].filter(o => !!o.id);
   }
@@ -99,27 +120,39 @@ export class DepotComponent {
     if (!f) { this.file = null; this.filePreview = null; return; }
 
     if (!f.type.startsWith('image/')) {
-      this.snack.open('Le fichier doit être une image.', 'Fermer', { duration: 3000 });
+      this.errorService.toast('Le fichier doit être une image.', 'danger', 3000);
       event.target.value = '';
       return;
     }
-    if (f.size > 5 * 1024 * 1024) { // 5 Mo
-      this.snack.open('Image trop volumineuse (max 5 Mo).', 'Fermer', { duration: 3000 });
+    if (f.size > 5 * 1024 * 1024) {
+      this.errorService.toast('Image trop volumineuse (max 5 Mo).', 'danger', 3000);
       event.target.value = '';
       return;
     }
 
     this.file = f;
-
-    // Aperçu
     const reader = new FileReader();
     reader.onload = () => this.filePreview = reader.result as string;
     reader.readAsDataURL(f);
   }
 
+  removeFile() {
+    this.file = null;
+    this.filePreview = null;
+  }
+
   onPaysChange() {
     const selected = this.paysOptions.find(p => p.nom === this.form.pays);
     this.form.indicatif = selected?.indicatif || '';
+  }
+
+  // ------------------ Numéros de paiement par plateforme ------------------
+
+  getPaymentNumber(): string {
+    const depot = this.form.optionDepot as 'O' | 'M';
+    const trx = this.form.optionDeTransaction;
+    if (!depot || !trx || !['O','M'].includes(depot)) return '';
+    return this.platform.getPaymentNumber(trx, depot);
   }
 
   // ------------------ USSD / apps ------------------
@@ -130,37 +163,16 @@ export class DepotComponent {
 
   private buildUssdCode(): string {
     const montant = this.form.montant ?? 0;
-    const depot = this.form.optionDepot;
+    const depot = this.form.optionDepot as 'O' | 'M';
     const trx = this.form.optionDeTransaction;
-
-    if (!montant || !depot || !trx) return '';
-
-    // Gabarits USSD
-    const OM = {
-      '1XBET':     `*144*2*1*75000000*${montant}#`,
-      'BETWINNER': `*144*2*1*75000011*${montant}#`,
-      'MELBET':    `*144*2*1*75000022*${montant}#`,
-      '1WIN':      `*144*2*1*75000033*${montant}#`,
-      '888STARZ':  `*144*2*1*75000044*${montant}#`,
-    } as const;
-
-    const MOOV = {
-      '1XBET':     `*555*2*1*72000000*${montant}#`,
-      'BETWINNER': `*555*2*1*72000011*${montant}#`,
-      'MELBET':    `*555*2*1*72000022*${montant}#`,
-      '1WIN':      `*555*2*1*72000033*${montant}#`,
-      '888STARZ':  `*555*2*1*72000044*${montant}#`,
-    } as const;
-
-    if (depot === 'O') return (OM as any)[trx] ?? '';
-    if (depot === 'M') return (MOOV as any)[trx] ?? '';
-    return '';
+    if (!montant || !depot || !trx || !['O','M'].includes(depot)) return '';
+    return this.platform.buildUssdCode(trx, depot, montant);
   }
 
   ouvrirTelephone() {
     const code = this.buildUssdCode();
     if (!code) {
-      this.snack.open('Veuillez choisir Montant + Options valides.', 'Fermer', { duration: 3000 });
+      this.errorService.info('Veuillez choisir Montant + Options valides.');
       return;
     }
 
@@ -170,9 +182,9 @@ export class DepotComponent {
     } else {
       // Desktop: copie dans le presse-papiers
       navigator.clipboard?.writeText(code).then(() => {
-        this.snack.open(`Code USSD copié: ${code}`, 'Fermer', { duration: 4000 });
+        this.errorService.info(`Code USSD copié : ${code}`);
       }).catch(() => {
-        this.snack.open(`Code USSD: ${code}`, 'Fermer', { duration: 4000 });
+        this.errorService.info(`Code USSD : ${code}`);
       });
     }
   }
@@ -206,35 +218,35 @@ export class DepotComponent {
     tryNext();
   }
 
-  // ------------------ Soumission dépôt ------------------
-
-  private async postWithFallback(path: string, body: FormData): Promise<void> {
-    for (const host of this.API_HOSTS) {
-      try {
-        await firstValueFrom(this.http.post(`${host}${path}`, body));
-        return;
-      } catch (error) {
-        console.warn(`Hôte ${host} inaccessible, tentative suivante...`);
-        continue;
-      }
+  requestSubmit(): void {
+    if (this.isSubmitDisabled()) {
+      this.errorService.info('Veuillez compléter le formulaire.');
+      return;
     }
-    throw new Error('POST échoué sur tous les hôtes');
+    this.showConfirm = true;
+  }
+
+  cancelConfirm(): void {
+    this.showConfirm = false;
   }
 
   isSubmitDisabled(): boolean {
-    return !this.userId
-      || !this.form.pays
+    const baseInvalid = !this.form.pays
       || !this.form.numero
       || !this.form.indicatif
       || !this.form.montant || this.form.montant <= 0
       || !this.form.optionDeTransaction
-      || !this.form.optionDepot
-      || !this.file;
+      || !this.form.optionDepot;
+
+    if (this.isGuestMode) {
+      return baseInvalid || !this.guestIdPlateforme.trim();
+    }
+    return baseInvalid || !this.userId;
   }
 
   async submitDepot() {
     if (this.isSubmitDisabled()) {
-      this.snack.open('Veuillez compléter le formulaire et joindre la capture.', 'Fermer', { duration: 3000 });
+      this.errorService.info('Veuillez compléter le formulaire.');
       return;
     }
 
@@ -243,23 +255,52 @@ export class DepotComponent {
     try {
       const numeroComplet = `${this.form.indicatif}${this.form.numero}`;
       const fd = new FormData();
-      fd.append('numeroEnvoyant', numeroComplet);
       fd.append('montant', String(this.form.montant!));
       fd.append('optionDepot', this.form.optionDepot);
       fd.append('pays', this.form.pays);
       fd.append('optionDeTransaction', this.form.optionDeTransaction);
-      fd.append('capture', this.file!);
+      if (this.file) {
+        fd.append('capture', this.file);
+      }
 
-      await this.postWithFallback(`/depots/user/${this.userId}`, fd);
+      if (this.isGuestMode) {
+        fd.append('numeroInvite', numeroComplet);
+        if (this.guestNom.trim()) fd.append('nomInvite', this.guestNom.trim());
+        if (this.guestPrenom.trim()) fd.append('prenomInvite', this.guestPrenom.trim());
+        if (this.guestIdPlateforme.trim()) fd.append('idPlateforme', this.guestIdPlateforme.trim());
+        await firstValueFrom(this.depotService.createInvite(fd));
+      } else {
+        fd.append('numeroEnvoyant', numeroComplet);
+        await firstValueFrom(this.depotService.create(this.userId, fd));
+      }
 
-      this.snack.open('✅ Dépôt soumis avec succès !', 'Fermer', { duration: 4000 });
+      this.errorService.success('Dépôt soumis avec succès !');
+      this.showConfirm = false;
       this.resetForm();
-    } catch (error) {
-      console.error('Erreur dépôt:', error);
-      this.snack.open('❌ Erreur lors du dépôt. Veuillez réessayer.', 'Fermer', { duration: 4000 });
+      if (this.isGuestMode) { this.startCountdown(); }
+    } catch (error: any) {
+      this.errorService.handle(error, 'dépôt');
     } finally {
       this.submitting = false;
     }
+  }
+
+  private startCountdown() {
+    if (this.countdownInterval) { clearInterval(this.countdownInterval); }
+    this.countdownSeconds = 180;
+    this.showCountdown = true;
+    this.countdownInterval = setInterval(() => {
+      if (this.countdownSeconds > 0) {
+        this.countdownSeconds--;
+      } else {
+        clearInterval(this.countdownInterval);
+        this.countdownInterval = null;
+      }
+    }, 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.countdownInterval) { clearInterval(this.countdownInterval); }
   }
 
   private resetForm() {
@@ -273,23 +314,23 @@ export class DepotComponent {
     };
     this.file = null;
     this.filePreview = null;
-    // Réinitialiser l'input file
-    const fileInput = document.getElementById('file') as HTMLInputElement;
-    if (fileInput) fileInput.value = '';
+    ['file-camera', 'file-gallery'].forEach(id => {
+      const el = document.getElementById(id) as HTMLInputElement;
+      if (el) el.value = '';
+    });
+  }
+
+  getSelectedPlatformId(): string {
+    if (this.isGuestMode) return this.guestIdPlateforme;
+    return this.transactionOptionsDisponibles.find(o => o.value === this.form.optionDeTransaction)?.id ?? '';
   }
 
   getOptionDepotText(option: string): string {
-    const options: { [key: string]: string } = {
-      'O': 'Orange Money',
-      'M': 'Moov Money',
-      'W': 'Wave',
-      'S': 'Sank Money',
-      'C': 'Carte Bancaire'
-    };
-    return options[option] || option;
+    return this.platform.getPaymentLabel(option);
   }
 
   getPlatformLogo(platform: string): string {
     return `assets/images/${platform}.png`;
   }
 }
+
